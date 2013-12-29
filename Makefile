@@ -1,7 +1,7 @@
 CC=g++
 CFLAGS=-c -std=c++11 -Wall -Wextra
 LDFLAGS=-lGL -lglut
-SOURCES=main.cpp
+SOURCES=main.cpp matrix.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
 EXECUTABLE=demo
 
