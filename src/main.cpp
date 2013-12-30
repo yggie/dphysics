@@ -1,7 +1,7 @@
 #include <GL/freeglut.h>
-#include "vector.h"
-#include "matrix.h"
-#include "debug.h"
+#include "react/vector.h"
+#include "react/matrix.h"
+#include "react/debug.h"
 
 //static void paint() {
 //  glClear(GL_COLOR_BUFFER_BIT);

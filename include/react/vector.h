@@ -1,7 +1,7 @@
 #ifndef RE_VECTOR_H
 #define RE_VECTOR_H
 
-#include "../math.h"
+#include "react/math.h"
 
 namespace re {
   
@@ -358,7 +358,7 @@ namespace re {
   
   inline bool vec4f::equals(const vec4f& a) const {
     for (int i = 0; i < 4; i++) {
-      if (fabs(v[i] - a.v[i]) > D_FP_TOLERANCE) {
+      if (re::abs(v[i] - a.v[i]) > D_FP_TOLERANCE) {
         return false;
       }
     }

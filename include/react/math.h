@@ -6,17 +6,12 @@
 #endif
 
 #include <cmath>
-#include "common.h"
+#include "react/common.h"
 
 namespace re {
-  inline int fabs(double a) {
-    return (a > 0.0) ? 1 : -1;
-  }
+  static auto abs = static_cast<double(*)(double)>(std::abs);
   
-  template <class T>
-  inline T sqrt(T a) {
-    return std::sqrt(a);
-  }
+  static auto sqrt = static_cast<double(*)(double)>(std::sqrt);
   
   template <class T>
   inline T sq(T a) {
@@ -39,7 +34,7 @@ namespace re {
   }
 
   inline void constrainAngle(double& angle) {
-    if (fabs(angle - PI) > PI) {
+    if (re::abs(angle - PI) > PI) {
       double tmp = (angle - PI)/ (2 * PI);
       angle = (tmp - (int)tmp) * 2 * PI + PI;
     }

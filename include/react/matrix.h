@@ -2,7 +2,7 @@
 #define RE_MATRIX_H
 
 #include <string.h>
-#include "vector.h"
+#include "react/vector.h"
 
 namespace re {
   

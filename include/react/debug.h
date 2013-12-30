@@ -2,8 +2,8 @@
 #define RE_DEBUG_H
 
 #include <stdio.h>
-#include "vector.h"
-#include "matrix.h"
+#include "react/vector.h"
+#include "react/matrix.h"
 
 namespace re {
   void print(const vec& v) {
