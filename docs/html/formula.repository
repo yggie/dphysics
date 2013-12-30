@@ -1,8 +1,0 @@
-\form#0:\[ v = a \]
-\form#1:\[ v = v + a \]
-\form#2:\[ \mathbf{v} = \bar{v} + \bar{a} \]
-\form#3:\[ \mathbf{\bar{v}} = \mathbf{\bar{a}} \]
-\form#4:\[ \mathbf{\bar{v}} = \mathbf{\bar{v}} + \mathbf{\bar{a}} \]
-\form#5:\[ \mathbf{v} = \mathbf{a} \]
-\form#6:\[ \mathbf{v} = \mathbf{v} + \mathbf{a} \]
-\form#7:\[ \mathbf{v} = - \mathbf{v} \]

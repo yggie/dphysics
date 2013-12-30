@@ -1,9 +1,9 @@
-#ifndef D_VECTOR_H
-#define D_VECTOR_H
+#ifndef RE_VECTOR_H
+#define RE_VECTOR_H
 
 #include "../math.h"
 
-namespace d {
+namespace re {
   
   /**
    * Represents a single vector in homogenous coordinates
@@ -15,7 +15,7 @@ namespace d {
     /** copy constructor */
     vec4f(const vec4f& a);
     /** initializes the vector with the input coordinates */
-    vec4f(dfloat _x, dfloat _y, dfloat _z, dfloat _w = 0.0);
+    vec4f(reFloat _x, reFloat _y, reFloat _z, reFloat _w = 0.0);
     
     // inline functions
     float& operator[](int i);
@@ -30,30 +30,30 @@ namespace d {
     vec4f& operator-=(const vec4f& a);
     
     // compound assignment with scalar inputs
-    vec4f& operator+=(dfloat s);
-    vec4f& operator-=(dfloat s);
-    vec4f& operator*=(dfloat s);
-    vec4f& operator/=(dfloat s);
+    vec4f& operator+=(reFloat s);
+    vec4f& operator-=(reFloat s);
+    vec4f& operator*=(reFloat s);
+    vec4f& operator/=(reFloat s);
     
     // arithmetic with vectors
     const vec4f operator+(const vec4f& a) const;
     const vec4f operator-(const vec4f& a) const;
     
     // arithmetic with scalars
-    const vec4f operator+(dfloat s) const;
-    const vec4f operator-(dfloat s) const;
-    const vec4f operator*(dfloat s) const;
-    const vec4f operator/(dfloat s) const;
+    const vec4f operator+(reFloat s) const;
+    const vec4f operator-(reFloat s) const;
+    const vec4f operator*(reFloat s) const;
+    const vec4f operator/(reFloat s) const;
     
     // vector operations
-    dfloat dot(const vec4f& a) const;
+    reFloat dot(const vec4f& a) const;
     const vec4f cross(const vec4f& a) const;
-    dfloat length() const;
-    dfloat lengthSq() const;
+    reFloat length() const;
+    reFloat lengthSq() const;
     
     bool equals(const vec4f& a) const;
     void normalize();
-    void set(dfloat _x, dfloat _y, dfloat _z, dfloat _w = 0.0);
+    void set(reFloat _x, reFloat _y, reFloat _z, reFloat _w = 0.0);
     void set(const vec4f& a);
     void setZero();
     
@@ -81,7 +81,7 @@ namespace d {
   // inline constructors
   inline vec4f::vec4f() : v{0.0} { }
   inline vec4f::vec4f(const vec4f& a) : x(a.x), y(a.y), z(a.z), w(0.0) { }
-  inline vec4f::vec4f(dfloat _x, dfloat _y, dfloat _z, dfloat _w) : x(_x), y(_y), z(_z), w(_w) { }
+  inline vec4f::vec4f(reFloat _x, reFloat _y, reFloat _z, reFloat _w) : x(_x), y(_y), z(_z), w(_w) { }
   
   /**
    * Access an element in the vector
@@ -192,7 +192,7 @@ namespace d {
    * @return A reference to the resulting vector
    */
   
-  inline vec4f& vec4f::operator+=(dfloat s) {
+  inline vec4f& vec4f::operator+=(reFloat s) {
     for (int i = 0; i < 4; i++) {
       v[i] += s;
     }
@@ -206,7 +206,7 @@ namespace d {
    * @return A reference to the resulting vector
    */
   
-  inline vec4f& vec4f::operator-=(dfloat s) {
+  inline vec4f& vec4f::operator-=(reFloat s) {
     for (int i = 0; i < 4; i++) {
       v[i] -= s;
     }
@@ -220,7 +220,7 @@ namespace d {
    * @return A reference to the resulting vector
    */
   
-  inline vec4f& vec4f::operator*=(dfloat s) {
+  inline vec4f& vec4f::operator*=(reFloat s) {
     for (int i = 0; i < 4; i++) {
       v[i] *= s;
     }
@@ -234,7 +234,7 @@ namespace d {
    * @return A reference to the resulting vector
    */
   
-  inline vec4f& vec4f::operator/=(dfloat s) {
+  inline vec4f& vec4f::operator/=(reFloat s) {
     for (int i = 0; i < 4; i++) {
       v[i] /= s;
     }
@@ -270,7 +270,7 @@ namespace d {
    * @return The resulting vector
    */
   
-  inline const vec4f vec4f::operator+(dfloat s) const {
+  inline const vec4f vec4f::operator+(reFloat s) const {
     return vec4f(*this) += s;
   }
   
@@ -281,7 +281,7 @@ namespace d {
    * @return The resulting vector
    */
   
-  inline const vec4f vec4f::operator-(dfloat s) const {
+  inline const vec4f vec4f::operator-(reFloat s) const {
     return vec4f(*this) -= s;
   }
   
@@ -292,7 +292,7 @@ namespace d {
    * @return The resulting vector
    */
   
-  inline const vec4f vec4f::operator*(dfloat s) const {
+  inline const vec4f vec4f::operator*(reFloat s) const {
     return vec4f(*this) *= s;
   }
   
@@ -303,7 +303,7 @@ namespace d {
    * @return The resulting vector
    */
   
-  inline const vec4f vec4f::operator/(dfloat s) const {
+  inline const vec4f vec4f::operator/(reFloat s) const {
     return vec4f(*this) /= s;
   }
   
@@ -314,7 +314,7 @@ namespace d {
    * @return The resulting dot product
    */
   
-  inline dfloat vec4f::dot(const vec4f& a) const {
+  inline reFloat vec4f::dot(const vec4f& a) const {
     return x*a.x + y*a.y + z*a.z + w*a.w;
   }
   
@@ -335,7 +335,7 @@ namespace d {
    * @return The length of the vector
    */
   
-  inline dfloat vec4f::length() const {
+  inline reFloat vec4f::length() const {
     return sqrt(lengthSq());
   }
   
@@ -345,7 +345,7 @@ namespace d {
    * @return The vector's length squared
    */
   
-  inline dfloat vec4f::lengthSq() const {
+  inline reFloat vec4f::lengthSq() const {
     return x*x + y*y + z*z + w*w;
   }
   
@@ -382,7 +382,7 @@ namespace d {
    * @param _w The new w-coordinate of the vector
    */
   
-  inline void vec4f::set(dfloat _x, dfloat _y, dfloat _z, dfloat _w) {
+  inline void vec4f::set(reFloat _x, reFloat _y, reFloat _z, reFloat _w) {
     x = _x;
     y = _y;
     z = _z;

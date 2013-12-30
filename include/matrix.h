@@ -1,29 +1,28 @@
-#ifndef D_MATRIX_H
-#define D_MATRIX_H
+#ifndef RE_MATRIX_H
+#define RE_MATRIX_H
 
 #include <string.h>
 #include "vector.h"
 
-namespace d {
+namespace re {
   
   /**
-   * Represents a 4x4 matrix
+   * Represents a 3x3 matrix
    */
   
-  struct mat4f {
+  struct mat3f {
     /** Default constructor creates an identity matrix */
-    mat4f();
+    mat3f();
     /** Copy constructor */
-    mat4f(const mat4f& m);
+    mat3f(const mat3f& m);
     /** Creates a diagonal matrix from the input scalar */
-    mat4f(dfloat s);
+    mat3f(reFloat s);
     /** Creates a diagonal matrix from the input scalars */
-    mat4f(dfloat m11, dfloat m22, dfloat m33, dfloat m44);
+    mat3f(reFloat m11, reFloat m22, reFloat m33);
     /** Creates the matrix defined element by element from scalar inputs */
-    mat4f(dfloat m11, dfloat m12, dfloat m13, dfloat m14,
-          dfloat m21, dfloat m22, dfloat m23, dfloat m24,
-          dfloat m31, dfloat m32, dfloat m33, dfloat m34,
-          dfloat m41, dfloat m42, dfloat m43, dfloat m44);
+    mat3f(reFloat m11, reFloat m12, reFloat m13,
+          reFloat m21, reFloat m22, reFloat m23,
+          reFloat m31, reFloat m32, reFloat m33);
 
     // inline functions
     float* ptr();
@@ -34,56 +33,46 @@ namespace d {
     float& operator()(int i, int j);
     const float& operator()(int i, int j) const;
     
-    mat4f& operator=(const mat4f& m);
+    mat3f& operator=(const mat3f& m);
     
     // not inline functions
-    const mat4f operator*(const mat4f& m) const;
+    const mat3f operator*(const mat3f& m) const;
     
     /** the elements of the matrix stored as an array */
-    float e[16];
+    float e[9];
     
     /** defines the identity matrix */
-    static const mat4f IDENTITY;
+    static const mat3f IDENTITY;
     /** defines a zero matrix */
-    static const mat4f ZERO;
+    static const mat3f ZERO;
   };
   
-  typedef mat4f mat4;
+  typedef mat3f mat4;
   
-  inline mat4f::mat4f() { *this = mat4f::IDENTITY; }
-  inline mat4f::mat4f(const mat4f& m) { *this = m; }
-  inline mat4f::mat4f(dfloat s) : mat4f(s, s, s, s) { }
+  inline mat3f::mat3f() { *this = mat3f::IDENTITY; }
+  inline mat3f::mat3f(const mat3f& m) { *this = m; }
+  inline mat3f::mat3f(reFloat s) : mat3f(s, s, s) { }
   
-  inline mat4f::mat4f(dfloat m11, dfloat m22, dfloat m33, dfloat m44) : e{0.0} {
+  inline mat3f::mat3f(reFloat m11, reFloat m22, reFloat m33) : e{0.0} {
     e[0] = m11;
-    e[5] = m22;
-    e[10] = m33;
-    e[15] = m44;
+    e[4] = m22;
+    e[8] = m33;
   }
   
-  inline mat4f::mat4f(dfloat m11, dfloat m12, dfloat m13, dfloat m14,
-                      dfloat m21, dfloat m22, dfloat m23, dfloat m24,
-                      dfloat m31, dfloat m32, dfloat m33, dfloat m34,
-                      dfloat m41, dfloat m42, dfloat m43, dfloat m44) {
+  inline mat3f::mat3f(reFloat m11, reFloat m12, reFloat m13,
+                      reFloat m21, reFloat m22, reFloat m23,
+                      reFloat m31, reFloat m32, reFloat m33) {
     e[0] = m11;
     e[1] = m12;
     e[2] = m13;
-    e[3] = m14;
     
-    e[4] = m21;
-    e[5] = m22;
-    e[6] = m23;
-    e[7] = m24;
+    e[3] = m21;
+    e[4] = m22;
+    e[5] = m23;
     
-    e[8] = m31;
-    e[9] = m32;
-    e[10] = m33;
-    e[11] = m34;
-    
-    e[12] = m41;
-    e[13] = m42;
-    e[14] = m43;
-    e[15] = m44;
+    e[6] = m31;
+    e[7] = m32;
+    e[8] = m33;
   }
   
   /**
@@ -92,7 +81,7 @@ namespace d {
    * @return A pointer to the raw data
    */
   
-  inline float* mat4f::ptr() {
+  inline float* mat3f::ptr() {
     return &e[0];
   }
   
@@ -102,7 +91,7 @@ namespace d {
    * @return A const pointer to the raw data
    */
   
-  inline const float* mat4f::cptr() const {
+  inline const float* mat3f::cptr() const {
     return &e[0];
   }
   
@@ -113,8 +102,8 @@ namespace d {
    * @return A pointer to the first element in the row
    */
   
-  inline float* mat4f::operator[](int i) {
-    return &e[4*i];
+  inline float* mat3f::operator[](int i) {
+    return &e[3*i];
   }
   
   /**
@@ -126,8 +115,8 @@ namespace d {
    * @return A pointer to the first element in the row
    */
   
-  inline const float* mat4f::operator[](int i) const {
-    return &e[4*i];
+  inline const float* mat3f::operator[](int i) const {
+    return &e[3*i];
   }
   
   /**
@@ -139,8 +128,8 @@ namespace d {
    * @param j The column number
    */
   
-  inline float& mat4f::operator()(int i, int j) {
-    return e[4*(i - 1) + j - 1];
+  inline float& mat3f::operator()(int i, int j) {
+    return e[3*(i - 1) + j - 1];
   }
   
   /**
@@ -152,8 +141,8 @@ namespace d {
    * @param j The column number
    */
   
-  inline const float& mat4f::operator()(int i, int j) const {
-    return e[4*(i - 1) + j - 1];
+  inline const float& mat3f::operator()(int i, int j) const {
+    return e[3*(i - 1) + j - 1];
   }
   
   /**
@@ -163,8 +152,8 @@ namespace d {
    * @return A reference to the matrix
    */
   
-  inline mat4f& mat4f::operator=(const mat4f& m) {
-    memcpy(ptr(), m.cptr(), 16*sizeof(float));
+  inline mat3f& mat3f::operator=(const mat3f& m) {
+    memcpy(ptr(), m.cptr(), 9*sizeof(float));
     return *this;
   }
 }

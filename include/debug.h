@@ -1,11 +1,11 @@
-#ifndef D_DEBUG_H
-#define D_DEBUG_H
+#ifndef RE_DEBUG_H
+#define RE_DEBUG_H
 
 #include <stdio.h>
 #include "vector.h"
 #include "matrix.h"
 
-namespace d {
+namespace re {
   void print(const vec& v) {
     printf(" ( %+f, %+f, %+f )\n", v[0], v[1], v[2]);
   }

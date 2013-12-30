@@ -22,25 +22,25 @@ int main(int, char**) {
 //  
 //  glutMainLoop();
   
-  d::vec v1(1, 2, 3), v2(3, 2, 1);
-  d::vec v3 = v1 + v2;
+  re::vec v1(1, 2, 3), v2(3, 2, 1);
+  re::vec v3 = v1 + v2;
   v3 += 3.0;
   v3 /= 7;
   v3 *= 4.0;
   v3 -= 3.0;
-  v3 = v3 - d::vec(1.0, 0.0, 0.0);
-  d::print(v3);
+  v3 = v3 - re::vec(1.0, 0.0, 0.0);
+  re::print(v3);
   
   v3.set(3.0, 3.0, 3.0);
-  d::vec v4 = v3.cross(d::vec(-1, -1, 1));
-  d::print(v4);
+  re::vec v4 = v3.cross(re::vec(-1, -1, 1));
+  re::print(v4);
   printf("%f\n", v3.dot(v1));
   
   v4.setZero();
-  d::print(v4);
+  re::print(v4);
   
-  d::mat4 m;
-  d::print(m);
+  re::mat4 m;
+  re::print(m);
   
   return 0;
 }

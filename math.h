@@ -1,5 +1,5 @@
-#ifndef D_MATH_H
-#define D_MATH_H
+#ifndef RE_MATH_H
+#define RE_MATH_H
 
 #ifndef PI
 #define PI 3.14159265359
@@ -8,7 +8,7 @@
 #include <cmath>
 #include "common.h"
 
-namespace d {
+namespace re {
   inline int fabs(double a) {
     return (a > 0.0) ? 1 : -1;
   }

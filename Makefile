@@ -28,13 +28,13 @@ build :
 
 # creates the executable to run
 $(EXECUTABLE) : $(OBJECTS)
-	$(CC) $(addprefix $(BIN_PATH)/, $(subst $(BIN_PATH)/, , $^)) $(LIBS) -o $@
+	$(CC) $(addprefix $(BIN_PATH)/, $(OBJECTS)) $(LIBS) -o $@
 
 %.o : $(SRC_PATH)/%.cpp
 	$(CC) $(CFLAGS) -c $< -o $(BIN_PATH)/$@
 
 clean :
-	rm -rf $(EXECUTABLE) bin .depend
+	rm -rf $(EXECUTABLE) bin
 	find . -name "*~" -exec rm {} \;
 	find . -name "*.o" -exec rm {} \;
 
