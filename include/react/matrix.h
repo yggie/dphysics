@@ -37,8 +37,10 @@ namespace re {
     
     // arithmetic operations (inlined)
     mat3f& operator*=(reFloat s);
+    mat3f& operator/=(reFloat s);
     const vec operator*(const vec& v) const;
     const mat3f operator*(reFloat s) const;
+    const mat3f operator/(reFloat s) const;
     
     // arithmetic operations (not inlined)
     const mat3f operator*(const mat3f& m) const;
@@ -151,6 +153,20 @@ namespace re {
   }
   
   /**
+   * Divides the matrix by the input scalar
+   * 
+   * @param s The scalar operand
+   * @return A reference to the matrix
+   */
+  
+  inline mat3f& mat3f::operator/=(reFloat s) {
+    for (int i = 0; i < 9; i++) {
+      e[i] /= s;
+    }
+    return *this;
+  }
+  
+  /**
    * Multiplies the matrix by a vector
    * 
    * @param v The vector operand
@@ -172,6 +188,17 @@ namespace re {
   
   inline const mat3f mat3f::operator*(reFloat s) const {
     return mat3f(*this) *= s;
+  }
+  
+  /**
+   * Divides a matrix with a scalar
+   * 
+   * @param s The scalar operand
+   * @return The resulting matrix
+   */
+  
+  inline const mat3f mat3f::operator/(reFloat s) const {
+    return mat3f(*this) /= s;
   }
 }
 

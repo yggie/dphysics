@@ -1,10 +1,6 @@
 #ifndef RE_MATH_H
 #define RE_MATH_H
 
-#ifndef PI
-#define PI 3.14159265359
-#endif
-
 #include <cmath>
 #include "react/common.h"
 

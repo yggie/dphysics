@@ -20,3 +20,6 @@ demo
 
 # Ignore generated Makefiles
 *.d
+
+# Ignore rough planning files
+*.vym

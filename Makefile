@@ -17,6 +17,11 @@ vpath %.o $(BIN_PATH)/
 # default rule to execute
 all : $(DEPENDENCIES) $(EXECUTABLE)
 
+debug :
+	@echo depn $(DEPENDENCIES)
+	@echo objs $(OBJECTS)
+	@echo src  $(SOURCES)
+
 build :
 	@mkdir -p $(BIN_PATH)
 
@@ -25,7 +30,8 @@ build :
 	@rm -f $(BIN_PATH)/$@
 	$(CC) $(CFLAGS) -MM $< -MF $(BIN_PATH)/$@
 
-# includes the list of dependencies
+# includes the list of dependencies which are already made
+#-include $(shell find $(BIN_PATH)/ -type f -name '*.d')
 -include $(addprefix $(BIN_PATH)/, $(DEPENDENCIES))
 
 # creates the executable to run

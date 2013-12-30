@@ -1,7 +1,7 @@
-#ifndef RE_DEBUG_H
-#define RE_DEBUG_H
+#ifndef RE_UTILS_H
+#define RE_UTILS_H
 
-#include <stdio.h>
+#include <cstdio>
 #include "react/vector.h"
 #include "react/matrix.h"
 
