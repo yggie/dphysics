@@ -36,11 +36,18 @@ int main(int, char**) {
   re::print(v4);
   printf("%f\n", v3.dot(v1));
   
-  v4.setZero();
+  v4.set(4, 5, 6);
   re::print(v4);
   
-  re::mat4 m;
+  re::mat m;
   re::print(m);
+  
+  v3 = m * v4;
+  re::print(v3);
+  
+  m *= 3;
+  v3 = m * v4;
+  re::print(v3);
   
   return 0;
 }

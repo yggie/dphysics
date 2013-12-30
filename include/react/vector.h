@@ -20,8 +20,6 @@ namespace re {
     // inline functions
     float& operator[](int i);
     const float& operator[](int i) const;
-    float& operator()(int i);
-    const float& operator()(int i) const;
     const vec4f operator-() const;
     
     // compound assignment with vector input
@@ -105,32 +103,6 @@ namespace re {
   
   inline const float& vec4f::operator[](int i) const {
     return v[i];
-  }
-  
-  /**
-   * Access an element in the vector
-   * 
-   * Does not use zero-based indexing
-   * 
-   * @param i The position in the vector to access
-   * @return The value of the element in the vector
-   */
-  
-  inline float& vec4f::operator()(int i) {
-    return v[i + 1];
-  }
-  
-  /**
-   * Access an element in the vector
-   * 
-   * Does not use zero-based indexing. ``const`` version
-   * 
-   * @param i The position in the vector to access
-   * @return The value of the element in the vector
-   */
-  
-  inline const float& vec4f::operator()(int i) const {
-    return v[i + 1];
   }
   
   /**

@@ -28,14 +28,19 @@ namespace re {
     float* ptr();
     const float* cptr() const;
     
+    // accessor methods
     float* operator[](int i);
     const float* operator[](int i) const;
-    float& operator()(int i, int j);
-    const float& operator()(int i, int j) const;
     
+    // copy operation
     mat3f& operator=(const mat3f& m);
     
-    // not inline functions
+    // arithmetic operations (inlined)
+    mat3f& operator*=(reFloat s);
+    const vec operator*(const vec& v) const;
+    const mat3f operator*(reFloat s) const;
+    
+    // arithmetic operations (not inlined)
     const mat3f operator*(const mat3f& m) const;
     
     /** the elements of the matrix stored as an array */
@@ -47,7 +52,7 @@ namespace re {
     static const mat3f ZERO;
   };
   
-  typedef mat3f mat4;
+  typedef mat3f mat;
   
   inline mat3f::mat3f() { *this = mat3f::IDENTITY; }
   inline mat3f::mat3f(const mat3f& m) { *this = m; }
@@ -120,32 +125,6 @@ namespace re {
   }
   
   /**
-   * Access elements in the array using row-major ordering.
-   * 
-   * Does not use zero-based indexing
-   * 
-   * @param i The row number
-   * @param j The column number
-   */
-  
-  inline float& mat3f::operator()(int i, int j) {
-    return e[3*(i - 1) + j - 1];
-  }
-  
-  /**
-   * Access elements in the array using row-major ordering.
-   * 
-   * Does not use zero-based indexing. ``const`` version
-   * 
-   * @param i The row number
-   * @param j The column number
-   */
-  
-  inline const float& mat3f::operator()(int i, int j) const {
-    return e[3*(i - 1) + j - 1];
-  }
-  
-  /**
    * Set the matrix to be equal the input
    * 
    * @param m The matrix to copy
@@ -155,6 +134,44 @@ namespace re {
   inline mat3f& mat3f::operator=(const mat3f& m) {
     memcpy(ptr(), m.cptr(), 9*sizeof(float));
     return *this;
+  }
+  
+  /**
+   * Multiplies the matrix by the input scalar
+   * 
+   * @param s The scalar operand
+   * @return A reference to the matrix
+   */
+  
+  inline mat3f& mat3f::operator*=(reFloat s) {
+    for (int i = 0; i < 9; i++) {
+      e[i] *= s;
+    }
+    return *this;
+  }
+  
+  /**
+   * Multiplies the matrix by a vector
+   * 
+   * @param v The vector operand
+   * @result The resulting vector
+   */
+  
+  inline const vec mat3f::operator*(const vec& v) const {
+    return vec(v[0]*e[0] + v[1]*e[1] + v[2]*e[2],
+               v[0]*e[3] + v[1]*e[4] + v[2]*e[5],
+               v[0]*e[6] + v[1]*e[7] + v[2]*e[8]);
+  }
+  
+  /**
+   * Multiplies a matrix with a scalar
+   * 
+   * @param s The scalar operand
+   * @return The resulting matrix
+   */
+  
+  inline const mat3f mat3f::operator*(reFloat s) const {
+    return mat3f(*this) *= s;
   }
 }
 

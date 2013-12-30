@@ -33,10 +33,10 @@ namespace re {
     return (a >= -0.0f) ? 1 : -1;
   }
 
-  inline void constrainAngle(double& angle) {
-    if (re::abs(angle - PI) > PI) {
-      double tmp = (angle - PI)/ (2 * PI);
-      angle = (tmp - (int)tmp) * 2 * PI + PI;
+  inline void constrainAngle(double& radians) {
+    if (re::abs(radians - PI) > PI) {
+      double tmp = (radians - PI)/ (2 * PI);
+      radians = (tmp - (int)tmp) * 2 * PI + PI;
     }
   }
 }

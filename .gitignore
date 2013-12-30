@@ -19,4 +19,4 @@
 demo
 
 # Ignore generated Makefiles
-.depend
+*.d
