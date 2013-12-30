@@ -1,7 +1,7 @@
 var searchData=
 [
   ['operator_28_29',['operator()',['../structd_1_1mat4f.html#abff80968872c05073fc22615522f0a9f',1,'d::mat4f::operator()(int i, int j)'],['../structd_1_1mat4f.html#ad9f3ec751010999ed14d590e7b379ce3',1,'d::mat4f::operator()(int i, int j) const '],['../structd_1_1vec4f.html#ac4fed85b6d7beea5ce585fade6ee5dd3',1,'d::vec4f::operator()(int i)'],['../structd_1_1vec4f.html#acbf9064f6bff5236380436b0730017a8',1,'d::vec4f::operator()(int i) const ']]],
-  ['operator_2a',['operator*',['../structd_1_1vec4f.html#a4742e8e2dfda890738c38cf9f431b4e3',1,'d::vec4f']]],
+  ['operator_2a',['operator*',['../structd_1_1mat4f.html#a7f88b61df301f0052fd653d99d53df97',1,'d::mat4f::operator*()'],['../structd_1_1vec4f.html#a4742e8e2dfda890738c38cf9f431b4e3',1,'d::vec4f::operator*()']]],
   ['operator_2a_3d',['operator*=',['../structd_1_1vec4f.html#ac185b053ef0f00c7a5e82674fac00901',1,'d::vec4f']]],
   ['operator_2b',['operator+',['../structd_1_1vec4f.html#a0f94f1209d248a347f3a30b1dd787704',1,'d::vec4f::operator+(const vec4f &amp;a) const '],['../structd_1_1vec4f.html#afc5e06d108af52b19297609b36627f78',1,'d::vec4f::operator+(dfloat s) const ']]],
   ['operator_2b_3d',['operator+=',['../structd_1_1vec4f.html#a6e0f1fa19e53955cc1205be52eaf60b5',1,'d::vec4f::operator+=(const vec4f &amp;a)'],['../structd_1_1vec4f.html#af9eae044a52573f8a3aa826b8443aa3c',1,'d::vec4f::operator+=(dfloat s)']]],

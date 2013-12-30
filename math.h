@@ -9,6 +9,15 @@
 #include "common.h"
 
 namespace d {
+  inline int fabs(double a) {
+    return (a > 0.0) ? 1 : -1;
+  }
+  
+  template <class T>
+  inline T sqrt(T a) {
+    return std::sqrt(a);
+  }
+  
   template <class T>
   inline T sq(T a) {
     return a*a;

@@ -1,17 +1,40 @@
+.PHONY : clean all
+
+INCLUDE_PATH=-Iinclude
+BIN_PATH=bin
+SRC_PATH=src
 CC=g++
-CFLAGS=-c -std=c++11 -Wall -Wextra
-LDFLAGS=-lGL -lglut
-SOURCES=main.cpp matrix.cpp
-OBJECTS=$(SOURCES:.cpp=.o)
+CFLAGS=-std=c++11 -Wall -Wextra $(INCLUDE_PATH)
+LIBS=-lGL -lglut
+SOURCES=$(shell find $(SRC_PATH)/ -type f -name '*.cpp')
+OBJECTS=$(patsubst $(SRC_PATH)/%.cpp, %.o, $(SOURCES))
 EXECUTABLE=demo
 
-all: $(SOURCES) $(EXECUTABLE)
+vpath %.o $(BIN_PATH)/
 
-$(EXECUTABLE): $(OBJECTS)
-	$(CC) $(OBJECTS) $(LDFLAGS) -o $@
+# default rule to execute
+all : build .depend $(EXECUTABLE)
 
-.cpp.o:
-	$(CC) $(CFLAGS) $< -o $@
+build :
+	@mkdir -p $(BIN_PATH)
 
-clean:
-	rm -rf *o demo
+# creates a list of dependencies in a separate file (.depend) for the source files
+.depend : $(SOURCES)
+	@rm -f .depend
+	$(CC) $(CFLAGS) -MM $^ -MF .depend
+
+# includes the list of dependencies
+-include .depend
+
+# creates the executable to run
+$(EXECUTABLE) : $(OBJECTS)
+	$(CC) $(addprefix $(BIN_PATH)/, $(subst $(BIN_PATH)/, , $^)) $(LIBS) -o $@
+
+%.o : $(SRC_PATH)/%.cpp
+	$(CC) $(CFLAGS) -c $< -o $(BIN_PATH)/$@
+
+clean :
+	rm -rf $(EXECUTABLE) bin .depend
+	find . -name "*~" -exec rm {} \;
+	find . -name "*.o" -exec rm {} \;
+

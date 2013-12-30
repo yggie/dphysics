@@ -15,6 +15,8 @@ namespace d {
     mat4f();
     /** Copy constructor */
     mat4f(const mat4f& m);
+    /** Creates a diagonal matrix from the input scalar */
+    mat4f(dfloat s);
     /** Creates a diagonal matrix from the input scalars */
     mat4f(dfloat m11, dfloat m22, dfloat m33, dfloat m44);
     /** Creates the matrix defined element by element from scalar inputs */
@@ -23,26 +25,34 @@ namespace d {
           dfloat m31, dfloat m32, dfloat m33, dfloat m34,
           dfloat m41, dfloat m42, dfloat m43, dfloat m44);
 
+    // inline functions
     float* ptr();
     const float* cptr() const;
-    
-    mat4f& operator=(const mat4f& m);
     
     float* operator[](int i);
     const float* operator[](int i) const;
     float& operator()(int i, int j);
     const float& operator()(int i, int j) const;
     
+    mat4f& operator=(const mat4f& m);
+    
+    // not inline functions
+    const mat4f operator*(const mat4f& m) const;
+    
     /** the elements of the matrix stored as an array */
     float e[16];
     
+    /** defines the identity matrix */
     static const mat4f IDENTITY;
+    /** defines a zero matrix */
+    static const mat4f ZERO;
   };
   
   typedef mat4f mat4;
   
   inline mat4f::mat4f() { *this = mat4f::IDENTITY; }
   inline mat4f::mat4f(const mat4f& m) { *this = m; }
+  inline mat4f::mat4f(dfloat s) : mat4f(s, s, s, s) { }
   
   inline mat4f::mat4f(dfloat m11, dfloat m22, dfloat m33, dfloat m44) : e{0.0} {
     e[0] = m11;
@@ -97,18 +107,6 @@ namespace d {
   }
   
   /**
-   * Set the matrix to be equal the input
-   * 
-   * @param m The matrix to copy
-   * @return A reference to the matrix
-   */
-  
-  inline mat4f& mat4f::operator=(const mat4f& m) {
-    memcpy(ptr(), m.cptr(), 16*sizeof(float));
-    return *this;
-  }
-  
-  /**
    * Access a row in the matrix
    * 
    * @param i The row number
@@ -156,6 +154,18 @@ namespace d {
   
   inline const float& mat4f::operator()(int i, int j) const {
     return e[4*(i - 1) + j - 1];
+  }
+  
+  /**
+   * Set the matrix to be equal the input
+   * 
+   * @param m The matrix to copy
+   * @return A reference to the matrix
+   */
+  
+  inline mat4f& mat4f::operator=(const mat4f& m) {
+    memcpy(ptr(), m.cptr(), 16*sizeof(float));
+    return *this;
   }
 }
 

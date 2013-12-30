@@ -14,3 +14,9 @@
 
 # Gedit backup files
 *~
+
+# Ignore generated executable
+demo
+
+# Ignore generated Makefiles
+.depend

@@ -1,7 +1,7 @@
 #ifndef D_VECTOR_H
 #define D_VECTOR_H
 
-#include "math.h"
+#include "../math.h"
 
 namespace d {
   

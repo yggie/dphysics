@@ -39,7 +39,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
       <li>
@@ -72,7 +71,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -112,6 +111,10 @@ Public Member Functions</h2></td></tr>
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structd_1_1mat4f.html#aed2b67512ee1fb9e89494678a3a151a1">mat4f</a> (const <a class="el" href="structd_1_1mat4f.html">mat4f</a> &amp;m)</td></tr>
 <tr class="memdesc:aed2b67512ee1fb9e89494678a3a151a1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy constructor. <br/></td></tr>
 <tr class="separator:aed2b67512ee1fb9e89494678a3a151a1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac140613bf7a1d6638993ce2ab2a81ec0"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac140613bf7a1d6638993ce2ab2a81ec0"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structd_1_1mat4f.html#ac140613bf7a1d6638993ce2ab2a81ec0">mat4f</a> (dfloat s)</td></tr>
+<tr class="memdesc:ac140613bf7a1d6638993ce2ab2a81ec0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a diagonal matrix from the input scalar. <br/></td></tr>
+<tr class="separator:ac140613bf7a1d6638993ce2ab2a81ec0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5d30de3c68218eaa22060f975ab8ae2e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5d30de3c68218eaa22060f975ab8ae2e"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structd_1_1mat4f.html#a5d30de3c68218eaa22060f975ab8ae2e">mat4f</a> (dfloat m11, dfloat m22, dfloat m33, dfloat m44)</td></tr>
 <tr class="memdesc:a5d30de3c68218eaa22060f975ab8ae2e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a diagonal matrix from the input scalars. <br/></td></tr>
@@ -126,9 +129,6 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a5bff1ff927c655cdb034dd07fab8f91d"><td class="memItemLeft" align="right" valign="top">const float *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structd_1_1mat4f.html#a5bff1ff927c655cdb034dd07fab8f91d">cptr</a> () const </td></tr>
 <tr class="memdesc:a5bff1ff927c655cdb034dd07fab8f91d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a const pointer to the raw matrix data.  <a href="#a5bff1ff927c655cdb034dd07fab8f91d">More...</a><br/></td></tr>
 <tr class="separator:a5bff1ff927c655cdb034dd07fab8f91d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aefa0f0867ece40206358811a460420d6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structd_1_1mat4f.html">mat4f</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structd_1_1mat4f.html#aefa0f0867ece40206358811a460420d6">operator=</a> (const <a class="el" href="structd_1_1mat4f.html">mat4f</a> &amp;m)</td></tr>
-<tr class="memdesc:aefa0f0867ece40206358811a460420d6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the matrix to be equal the input.  <a href="#aefa0f0867ece40206358811a460420d6">More...</a><br/></td></tr>
-<tr class="separator:aefa0f0867ece40206358811a460420d6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae0e427ce1f98de63f38be6418996a118"><td class="memItemLeft" align="right" valign="top">float *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structd_1_1mat4f.html#ae0e427ce1f98de63f38be6418996a118">operator[]</a> (int i)</td></tr>
 <tr class="memdesc:ae0e427ce1f98de63f38be6418996a118"><td class="mdescLeft">&#160;</td><td class="mdescRight">Access a row in the matrix.  <a href="#ae0e427ce1f98de63f38be6418996a118">More...</a><br/></td></tr>
 <tr class="separator:ae0e427ce1f98de63f38be6418996a118"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -141,6 +141,12 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ad9f3ec751010999ed14d590e7b379ce3"><td class="memItemLeft" align="right" valign="top">const float &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structd_1_1mat4f.html#ad9f3ec751010999ed14d590e7b379ce3">operator()</a> (int i, int j) const </td></tr>
 <tr class="memdesc:ad9f3ec751010999ed14d590e7b379ce3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Access elements in the array using row-major ordering.  <a href="#ad9f3ec751010999ed14d590e7b379ce3">More...</a><br/></td></tr>
 <tr class="separator:ad9f3ec751010999ed14d590e7b379ce3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aefa0f0867ece40206358811a460420d6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structd_1_1mat4f.html">mat4f</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structd_1_1mat4f.html#aefa0f0867ece40206358811a460420d6">operator=</a> (const <a class="el" href="structd_1_1mat4f.html">mat4f</a> &amp;m)</td></tr>
+<tr class="memdesc:aefa0f0867ece40206358811a460420d6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the matrix to be equal the input.  <a href="#aefa0f0867ece40206358811a460420d6">More...</a><br/></td></tr>
+<tr class="separator:aefa0f0867ece40206358811a460420d6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7f88b61df301f0052fd653d99d53df97"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="structd_1_1mat4f.html">mat4f</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structd_1_1mat4f.html#a7f88b61df301f0052fd653d99d53df97">operator*</a> (const <a class="el" href="structd_1_1mat4f.html">mat4f</a> &amp;m) const </td></tr>
+<tr class="memdesc:a7f88b61df301f0052fd653d99d53df97"><td class="mdescLeft">&#160;</td><td class="mdescRight">Multiplies two matrix using matrix multiplication.  <a href="#a7f88b61df301f0052fd653d99d53df97">More...</a><br/></td></tr>
+<tr class="separator:a7f88b61df301f0052fd653d99d53df97"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
@@ -152,8 +158,13 @@ float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="str
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-attribs"></a>
 Static Public Attributes</h2></td></tr>
 <tr class="memitem:afcdd95e781c1af028d3d8dcea3c2713e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="afcdd95e781c1af028d3d8dcea3c2713e"></a>
-static const <a class="el" href="structd_1_1mat4f.html">mat4f</a>&#160;</td><td class="memItemRight" valign="bottom"><b>IDENTITY</b></td></tr>
+static const <a class="el" href="structd_1_1mat4f.html">mat4f</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structd_1_1mat4f.html#afcdd95e781c1af028d3d8dcea3c2713e">IDENTITY</a></td></tr>
+<tr class="memdesc:afcdd95e781c1af028d3d8dcea3c2713e"><td class="mdescLeft">&#160;</td><td class="mdescRight">defines the identity matrix <br/></td></tr>
 <tr class="separator:afcdd95e781c1af028d3d8dcea3c2713e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7ffac40984591b4008c3a501ca3dfbf0"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a7ffac40984591b4008c3a501ca3dfbf0"></a>
+static const <a class="el" href="structd_1_1mat4f.html">mat4f</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structd_1_1mat4f.html#a7ffac40984591b4008c3a501ca3dfbf0">ZERO</a></td></tr>
+<tr class="memdesc:a7ffac40984591b4008c3a501ca3dfbf0"><td class="mdescLeft">&#160;</td><td class="mdescRight">defines a zero matrix <br/></td></tr>
+<tr class="separator:a7ffac40984591b4008c3a501ca3dfbf0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Represents a 4x4 matrix. </p>
@@ -269,6 +280,31 @@ static const <a class="el" href="structd_1_1mat4f.html">mat4f</a>&#160;</td><td 
   </table>
   </dd>
 </dl>
+
+</div>
+</div>
+<a class="anchor" id="a7f88b61df301f0052fd653d99d53df97"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="structd_1_1mat4f.html">mat4f</a> mat4f::operator* </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="structd_1_1mat4f.html">mat4f</a> &amp;&#160;</td>
+          <td class="paramname"><em>m</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Multiplies two matrix using matrix multiplication. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">m</td><td>The matrix operand </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The resulting matrix </dd></dl>
 
 </div>
 </div>
@@ -399,13 +435,13 @@ static const <a class="el" href="structd_1_1mat4f.html">mat4f</a>&#160;</td><td 
 </div>
 </div>
 <hr/>The documentation for this struct was generated from the following files:<ul>
-<li><a class="el" href="matrix_8h_source.html">matrix.h</a></li>
-<li>matrix.cpp</li>
+<li>d/include/<a class="el" href="matrix_8h_source.html">matrix.h</a></li>
+<li>d/src/matrix.cpp</li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sun Dec 29 2013 22:40:20 for d Physics by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Dec 30 2013 00:32:10 for d Physics by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>
