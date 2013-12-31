@@ -1,7 +1,7 @@
 #ifndef RE_FREELISTALLOCATOR_H
 #define RE_FREELISTALLOCATOR_H
 
-#include "react/memory/baseallocator.h"
+#include "react/memory/BaseAllocator.h"
 
 namespace re {
   class FreeListAllocator : public BaseAllocator {
@@ -14,10 +14,14 @@ namespace re {
     
     u32 used() const override;
     u32 numAllocs() const override;
+    u32 size() const override;
+    void* ptr() const override;
     
   private:
     u32 _used;
     u32 _numAllocs;
+    const u32 _size;
+    void* _ptr;
     
     struct Header {
       u32 size;
@@ -30,7 +34,7 @@ namespace re {
     };
     
     /** prevent copying */
-    FreeListAllocator(const FreeListAllocator&) : BaseAllocator() { }
+    FreeListAllocator(const FreeListAllocator&) : BaseAllocator(), _size(0) { }
     /** prevent copying */
     FreeListAllocator& operator=(const FreeListAllocator&) { return *this; }
     
@@ -43,6 +47,14 @@ namespace re {
   
   inline u32 FreeListAllocator::numAllocs() const {
     return _numAllocs;
+  }
+  
+  inline u32 FreeListAllocator::size() const {
+    return _size;
+  }
+  
+  inline void* FreeListAllocator::ptr() const {
+    return _ptr;
   }
 }
 

@@ -22,13 +22,12 @@ int main(int, char**) {
 //  
 //  glutMainLoop();
 
-  re::Sphere sphere;
+  re::Sphere sphere(1.0);
   
   re::World world;
-  re::Factory factory = world.factory().as(re::Entity::RIGID);
   
   for (int i = 0; i < 5; i++) {
-    factory.make();
+    world.newRigidBody().withShape(sphere).at(1, 1, 1);
   }
   
   printf("Hurray no problems!\n");

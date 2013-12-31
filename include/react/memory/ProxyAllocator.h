@@ -1,7 +1,9 @@
 #ifndef RE_PROXYALLOCATOR_H
 #define RE_PROXYALLOCATOR_H
 
-#include "react/memory/baseallocator.h"
+#include "react/memory/BaseAllocator.h"
+
+#include <cstdio>
 
 namespace re {
   class ProxyAllocator : public AbsAllocator {
@@ -12,6 +14,7 @@ namespace re {
     void* alloc(u32 size, u8 alignment) override;
     void dealloc(void* ptr) override;
     
+    void show();
     BaseAllocator* allocator();
     
   private:

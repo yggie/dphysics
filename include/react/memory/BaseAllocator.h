@@ -1,7 +1,7 @@
 #ifndef RE_BASEALLOCATOR_H
 #define RE_BASEALLOCATOR_H
 
-#include "react/memory/absallocator.h"
+#include "react/memory/AbsAllocator.h"
 
 namespace re {
   class BaseAllocator : public AbsAllocator {
@@ -18,6 +18,8 @@ namespace re {
     // memory monitoring functions
     virtual u32 used() const = 0;
     virtual u32 numAllocs() const = 0;
+    virtual u32 size() const = 0;
+    virtual void* ptr() const = 0;
   
   private:
     /** prevent copy */

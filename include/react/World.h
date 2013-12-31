@@ -8,7 +8,8 @@
 namespace re {
   
   class RigidBody;
-  class Entity;
+  class Ent;
+  class Shape;
   class Factory;
   class AbsAllocator;
   
@@ -23,11 +24,14 @@ namespace re {
     
     void clear();
     
-    void step(reFloat dt);
+    RigidBody& newRigidBody();
+    Shape& copyOf(const Shape& shape);
+    
+    void add(Ent& entity);
     
     AbsAllocator& allocator();
-    Factory factory();
-    void add(Entity& entity);
+    
+    void step(reFloat dt);
   
   protected:
     std::vector<RigidBody*> _bodies;

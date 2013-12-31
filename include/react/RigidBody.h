@@ -1,30 +1,29 @@
 #ifndef RE_RIGIDBODY_H
 #define RE_RIGIDBODY_H
 
-#include "react/absbody.h"
+#include "react/Solid.h"
 
 namespace re {
   
   /**
-   * A subset of AbsBody, representing bodies with non-deformable shells
+   * A type of Solid with a non-deformable shell
    * 
-   * @see AbsBody
+   * @see Solid
    */
   
-  class RigidBody : public AbsBody {
+  class RigidBody : public Solid {
   public:
     RigidBody();
     virtual ~RigidBody();
     
-    Entity::Type type() const;
+    Ent::Type type() const;
     
-    const vec pos() const override;
-    const mat rot() const override;
     const vec vel() const override;
     const mat rotVel() const override;
     
     reFloat mass() const override;
     const mat inertia() const override;
+    reFloat density() const override;
     
   protected:
     vec _vPos;
@@ -34,18 +33,11 @@ namespace re {
     
     reFloat _sMass;
     mat _mInertia;
+    reFloat _sDensity;
   };
   
-  inline Entity::Type RigidBody::type() const {
+  inline Ent::Type RigidBody::type() const {
     return RIGID;
-  }
-  
-  inline const vec RigidBody::pos() const {
-    return _vPos;
-  }
-  
-  inline const mat RigidBody::rot() const {
-    return _mRot;
   }
   
   inline const vec RigidBody::vel() const {
@@ -62,6 +54,10 @@ namespace re {
   
   inline const mat RigidBody::inertia() const {
     return _mInertia;
+  }
+  
+  inline reFloat RigidBody::density() const {
+    return _sDensity;
   }
 }
 

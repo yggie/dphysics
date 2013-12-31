@@ -1,4 +1,6 @@
-#include "react/memory/freelistallocator.h"
+#include "react/memory/FreeListAllocator.h"
+
+#include <cstring>
 
 #include "react/common.h"
 
@@ -12,8 +14,13 @@ using namespace re;
  */
 
 FreeListAllocator::FreeListAllocator(u32 size, void* start) : BaseAllocator(),
+_used(0), _numAllocs(0), _size(size), _ptr(start),
 _freeBlocks((FreeBlock*)start) {
   RE_ASSERT(size > sizeof(FreeBlock), "Allocated memory is too small!")
+  
+#ifdef RE_ZERO_MEMORY
+  memset(start, RE_ZERO_MEM_VAL, size);
+#endif
   
   _freeBlocks->size = size;
   _freeBlocks->next = nullptr;
@@ -89,6 +96,10 @@ void FreeListAllocator::dealloc(void* ptr) {
   uptr blockStart = (uptr)ptr - header->adjustment;
   uptr blockEnd = blockStart + size;
   u32 blockSize = size;
+  
+#ifdef RE_ZERO_MEMORY
+  memset((void*)blockStart, RE_ZERO_MEM_VAL, blockSize);
+#endif
   
   bool blockMerged = false;
   

@@ -6,15 +6,13 @@
 #include "react/vector.h"
 #include "react/matrix.h"
 
-#include "react/absshape.h"
-#include "react/sphere.h"
+#include "react/Shape.h"
+#include "react/Sphere.h"
 
-#include "react/entity.h"
-#include "react/absbody.h"
-#include "react/rigidbody.h"
+#include "react/Ent.h"
+#include "react/Solid.h"
+#include "react/RigidBody.h"
 
-#include "react/world.h"
-
-#include "react/factory.h"
+#include "react/World.h"
 
 #endif
