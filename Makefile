@@ -1,16 +1,27 @@
 .PHONY : clean all
 
-INCLUDE_PATH=-Iinclude
+# paths
 BIN_PATH=bin
 SRC_PATH=src
+
+# compiler choice
 CC=g++
-CFLAGS=-std=c++11 -Wall -Wextra $(INCLUDE_PATH)
+# compiler include flags
+INC_FLAGS=-Iinclude
+# compiler debug flags
+DFLAGS=-g -DDEBUG
+# compiler flags
+CFLAGS=-std=c++11 -Wall -Wextra $(INC_FLAGS) $(DFLAGS)
+# library options
 LIBS=-lGL -lglut
+
+# project files
 SOURCES=$(shell find $(SRC_PATH)/ -type f -name '*.cpp')
 OBJECTS=$(patsubst $(SRC_PATH)/%.cpp, %.o, $(SOURCES))
 DEPENDENCIES=$(OBJECTS:.o=.d)
 EXECUTABLE=demo
 
+# file search paths
 vpath %.d $(BIN_PATH)/
 vpath %.o $(BIN_PATH)/
 

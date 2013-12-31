@@ -2,15 +2,25 @@
 
 #include "react/rigidbody.h"
 #include "react/factory.h"
+#include "react/memory/proxyallocator.h"
+#include "react/memory/freelistallocator.h"
 
 using namespace re;
 
+char buffer[1024*1024];
+
 World::World() : _bodies() {
-  // do nothing
+  FreeListAllocator* tmp = new FreeListAllocator(1024*1024, &buffer[0]);
+  _allocator = new ProxyAllocator(tmp);
 }
 
 World::~World() {
   clear();
+  
+  ProxyAllocator* proxy = (ProxyAllocator*)_allocator;
+  BaseAllocator* allocer = proxy->allocator();
+  delete _allocator;
+  delete allocer;
 }
 
 void World::clear() {
@@ -18,7 +28,7 @@ void World::clear() {
   std::vector<RigidBody*>::iterator itEnd = _bodies.end();
   
   for (it = _bodies.begin(); it != itEnd; it++) {
-    delete (*it);
+    _allocator->alloc_delete(*it);
   }
   
   _bodies.clear();
@@ -36,7 +46,7 @@ Factory World::factory() {
 void World::add(Entity& entity) {
   switch (entity.type()) {
     case Entity::RIGID:
-      _bodies.push_back(static_cast<RigidBody*>(&entity));
+      _bodies.push_back((RigidBody*)(&entity));
       break;
     
     case Entity::STATIC:

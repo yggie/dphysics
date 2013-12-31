@@ -2,6 +2,7 @@
 
 #include "react/world.h"
 #include "react/rigidbody.h"
+#include "react/memory/absallocator.h"
 
 using namespace re;
 
@@ -17,7 +18,7 @@ Entity* Factory::make() {
   switch (_type) {
     case Entity::RIGID:
       {
-        RigidBody* body = new RigidBody();
+        RigidBody* body = _world->allocator().alloc_new<RigidBody>();
         _world->add(*body);
         return body;
       }

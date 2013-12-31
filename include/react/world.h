@@ -10,6 +10,7 @@ namespace re {
   class RigidBody;
   class Entity;
   class Factory;
+  class AbsAllocator;
   
   /**
    * Represents a physical world
@@ -24,12 +25,25 @@ namespace re {
     
     void step(reFloat dt);
     
+    AbsAllocator& allocator();
     Factory factory();
     void add(Entity& entity);
   
   protected:
     std::vector<RigidBody*> _bodies;
+    
+    AbsAllocator* _allocator;
   };
+  
+  /**
+   * Returns the general purpose memory allocator used by the world object
+   * 
+   * @return The memory allocator used
+   */
+  
+  inline AbsAllocator& World::allocator() {
+    return *_allocator;
+  }
 }
 
 #endif
