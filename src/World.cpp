@@ -56,12 +56,22 @@ Shape& World::copyOf(const Shape& shape) {
     case Shape::RECTANGLE:
       RE_NOT_IMPLEMENTED
       break;
+    
+    case Shape::COMPOUND:
+      RE_NOT_IMPLEMENTED
+      break;
   }
   
   RE_IMPOSSIBLE
   
   return *_allocator->alloc_new<Sphere>(1.0);
 }
+
+/**
+ * Registers the input Ent to the World's engine.
+ * 
+ * @param entity The entity to attach
+ */
 
 void World::add(Ent& entity) {
   

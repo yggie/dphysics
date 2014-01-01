@@ -4,6 +4,14 @@
 #include "react/memory/BaseAllocator.h"
 
 namespace re {
+  
+  /**
+   * @ingroup memory
+   * Implements a free list memory allocator
+   * 
+   * @see BaseAllocator
+   */
+  
   class FreeListAllocator : public BaseAllocator {
   public:
     FreeListAllocator(u32 size, void* ptr);

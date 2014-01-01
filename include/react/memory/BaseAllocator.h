@@ -4,6 +4,14 @@
 #include "react/memory/AbsAllocator.h"
 
 namespace re {
+  
+  /**
+   * @ingroup memory
+   * Extends the AbsAllocator to include memory monitoring functions
+   * 
+   * @see AbsAllocator
+   */
+  
   class BaseAllocator : public AbsAllocator {
   public:
     /** Default constructor, does nothing */

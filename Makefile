@@ -1,5 +1,5 @@
 # paths
-MODULES   := memory
+MODULES   := memory demo
 BIN_BASE  := bin
 SRC_BASE  := src
 BIN_PATH  := $(addprefix $(BIN_BASE)/, $(MODULES)) $(BIN_BASE)

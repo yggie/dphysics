@@ -6,6 +6,17 @@
 #include <cstdio>
 
 namespace re {
+  
+  /**
+   * @ingroup memory
+   * Implements a proxy allocator which forwards calls to a BaseAllocator. The
+   * proxy allocator will harvest information about each allocation, useful for
+   * debugging.
+   * 
+   * @see BaseAllocator
+   * @see AbsAllocator
+   */
+  
   class ProxyAllocator : public AbsAllocator {
   public:
     ProxyAllocator(BaseAllocator* allocator);

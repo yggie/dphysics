@@ -6,6 +6,7 @@
 namespace re {
   
   /**
+   * @ingroup shapes
    * Represents an shape with defined geometric qualities
    */
   
@@ -17,7 +18,9 @@ namespace re {
       /** A sphere @see Sphere */
       SPHERE,
       /** A rectangle @see Rectangle */
-      RECTANGLE
+      RECTANGLE,
+      /** A compound shape type */
+      COMPOUND
     };
     
     Shape();
@@ -25,6 +28,7 @@ namespace re {
     
     virtual Type type() const = 0;
     virtual reFloat volume() const = 0;
+    virtual const mat computeInertia() const = 0;
   };
   
   /**
@@ -39,6 +43,13 @@ namespace re {
    * @brief Returns the volume of the shape
    * 
    * @return The calculated volume in user-defined units
+   */
+  
+  /**
+   * @fn const mat computeInertia() const
+   * @brief Returns the inertia tensor assuming unit mass
+   * 
+   * @return The inertia tensor in user-defined units
    */
   
   inline Shape::Shape() { }

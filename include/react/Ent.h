@@ -10,6 +10,7 @@ namespace re {
   class Shape;
   
   /**
+   * @ingroup entities
    * Represents a physical entity, which exists and interacts in the World.
    * 
    * @see World
@@ -51,11 +52,13 @@ namespace re {
     // setter methods which are defined inline
     void setPos(const vec& position);
     void setPos(reFloat x, reFloat y, reFloat z);
-    void setShape(const Shape& shape);
+    virtual void setShape(const Shape& shape);
     void setWorld(World* world);
     Ent& at(const vec& position);
     Ent& at(reFloat x, reFloat y, reFloat z);
     Ent& withShape(const Shape& shape);
+    virtual Ent& withMass(reFloat mass);
+    virtual Ent& withDensity(reFloat mass);
     
     /** a pointer to arbitrary data, defined by the user */
     void* userdata;
@@ -192,8 +195,10 @@ namespace re {
   }
   
   /**
-   * Set the Ent's World
+   * Set the Ent's World, this method skips important steps in the Ent
+   * registration process. Instead, use World::add(Ent&)
    * 
+   * @see World::add(Ent& entity)
    * @param world The new parent World
    */
   
@@ -238,6 +243,11 @@ namespace re {
     setShape(shape);
     return *this;
   }
+  
+  /** This does nothing, only exists for compatibility */
+  inline Ent& Ent::withMass(reFloat) { return *this; }
+  /** This does nothing, only exists for compatibility */
+  inline Ent& Ent::withDensity(reFloat) { return *this; }
 }
 
 #endif

@@ -27,17 +27,15 @@ const reFloat D_FP_TOLERANCE = 1e-5;
   /**
    * If DEBUG is defined, all log outputs will be forwarded to this file
    */
-  static FILE* RE_LOG_OUTPUT = stderr;
+  #define RE_LOG_OUTPUT       stderr
+  #define RE_ZERO_MEMORY
+  #define __RE_FUNC__         __func__
   
   #ifndef RE_SOFT_STOP
     #define _RE_STOP_PROGRAM    __builtin_trap();
   #else
     #define _RE_STOP_PROGRAM
   #endif
-  
-  #define RE_ZERO_MEMORY
-  
-  #define __RE_FUNC__         __func__
   
   #define _RE_MSG(msg)                fprintf(RE_LOG_OUTPUT, "[REACT] %s:%d: %s", __FILE__, __LINE__, msg)
   
@@ -100,5 +98,29 @@ const reFloat D_FP_TOLERANCE = 1e-5;
    */
   #define RE_LOG(...)
 #endif
+
+// DOCUMENTATION FOR DOXYGEN MODULES
+
+/**
+ * @defgroup memory Memory Management
+ * This module implements custom memory management for the engine.
+ */
+
+/**
+ * @defgroup entities Physical Entities
+ * This module defines the various physical entities which can exist in the
+ * World
+ */
+
+/**
+ * @defgroup shapes Shapes
+ * This module defines the various geometric shapes which are supported by the
+ * engine
+ */
+
+/**
+ * @defgroup demo Demo
+ * This module contains demo applications which make use of the engine
+ */
 
 #endif

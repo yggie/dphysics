@@ -10,6 +10,7 @@ namespace re {
   typedef uintptr_t uptr;
   
   /**
+   * @ingroup memory
    * Abstract allocator class, defines the interface for custom memory management
    */
   

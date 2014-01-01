@@ -1,11 +1,13 @@
 #ifndef RE_SPHERE_H
 #define RE_SPHERE_H
 
+#include "react/matrix.h"
 #include "react/Shape.h"
 
 namespace re {
   
   /**
+   * @ingroup shapes
    * Represents a spherical Shape
    * 
    * @see Shape
@@ -19,6 +21,9 @@ namespace re {
     
     Type type() const override;
     reFloat volume() const override;
+    const mat computeInertia() const override;
+    
+    Sphere& withRadius(reFloat radius);
     
   protected:
     reFloat _sRadius;
@@ -30,6 +35,15 @@ namespace re {
   
   inline reFloat Sphere::volume() const {
     return PI * 4.0 * _sRadius*_sRadius*_sRadius / 3.0;
+  }
+  
+  inline const mat Sphere::computeInertia() const {
+    return mat(2.0 * _sRadius * _sRadius / 5.0);
+  }
+  
+  inline Sphere& Sphere::withRadius(reFloat radius) {
+    _sRadius = radius;
+    return *this;
   }
 }
 

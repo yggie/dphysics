@@ -2,10 +2,12 @@
 #define RE_RIGIDBODY_H
 
 #include "react/Solid.h"
+#include "react/Shape.h"
 
 namespace re {
   
   /**
+   * @ingroup entities
    * A type of Solid with a non-deformable shell
    * 
    * @see Solid
@@ -25,15 +27,21 @@ namespace re {
     const mat inertia() const override;
     reFloat density() const override;
     
+    void setMass(reFloat mass) override;
+    void setDensity(reFloat density) override;
+    
   protected:
-    vec _vPos;
-    mat _mRot;
+    /** The RigidBody's velocity */
     vec _vVel;
+    /** The RigidBody's rotational velocity matrix */
     mat _mRotVel;
     
+    /** The RigidBody's mass */
     reFloat _sMass;
+    /** The RigidBody's inertia tensor */
     mat _mInertia;
-    reFloat _sDensity;
+    
+    void updateInertia();
   };
   
   inline Ent::Type RigidBody::type() const {
@@ -57,7 +65,21 @@ namespace re {
   }
   
   inline reFloat RigidBody::density() const {
-    return _sDensity;
+    return _sMass / _shape->volume();
+  }
+  
+  inline void RigidBody::setMass(reFloat mass) {
+    _sMass = mass;
+    updateInertia();
+  }
+  
+  inline void RigidBody::setDensity(reFloat density) {
+    _sMass = density / _shape->volume();
+    updateInertia();
+  }
+  
+  inline void RigidBody::updateInertia() {
+    _mInertia = _shape->computeInertia() * _sMass;
   }
 }
 
