@@ -1,8 +1,8 @@
 #ifndef DEMO_FLYINGCAM_H
 #define DEMO_FLYINGCAM_H
 
-#include "react/vector.h"
-#include "demo/mat4.h"
+#include "glm/vec3.hpp"
+#include "glm/mat4x4.hpp"
 
 namespace demo {
   
@@ -28,14 +28,14 @@ namespace demo {
     void rotUp(float rad);
     void rotDown(float rad);
     
-    mat4 viewMat();
+    glm::mat4 viewMat();
     
   private:
     float _dampingFactor;
-    re::vec _targetPos;
-    re::vec _currPos;
-    re::vec _targetRot;
-    re::vec _currRot;
+    glm::vec3 _targetPos;
+    glm::vec3 _currPos;
+    glm::vec3 _targetRot;
+    glm::vec3 _currRot;
   };
   
   inline FlyingCam::FlyingCam() : _dampingFactor(0.99), _targetPos(), _currPos(), _targetRot(), _currRot() {
@@ -48,10 +48,10 @@ namespace demo {
   }
   
   inline void FlyingCam::reset() {
-    _currPos.set(0, 0, 0);
-    _targetPos.set(0, 0, 0);
-    _currRot.set(0, 0, 0);
-    _targetRot.set(0, 0, 0);
+    _currPos = glm::vec3(0.0f);
+    _targetPos = glm::vec3(0.0f);
+    _currRot = glm::vec3(0.0f);
+    _targetRot = glm::vec3(0.0f);
   }
   
   inline void FlyingCam::pushForward(float dist) {
@@ -86,12 +86,12 @@ namespace demo {
     _targetRot[0] -= rad;
   }
   
-  inline mat4 FlyingCam::viewMat() {
-    mat4 m;
-    m.rotate(_currRot[0], 1, 0, 0);
-    m.rotate(_currRot[1], 0, 1, 0);
-    m.rotateZ(_currRot[2]);
-    m.translate(_currPos[0], _currPos[1], _currPos[2]);
+  inline glm::mat4 FlyingCam::viewMat() {
+    glm::mat4 m(1.0f);
+    m = glm::rotate(m, _currRot[0], glm::vec3(1.0f, 0.0f, 0.0f));
+    m = glm::rotate(m, _currRot[1], glm::vec3(0.0f, 1.0f, 0.0f));
+    m = glm::rotate(m, _currRot[2], glm::vec3(0.0f, 0.0f, 1.0f));
+    m = glm::translate(m, _currPos);
     return m;
   }
 }

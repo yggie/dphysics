@@ -21,11 +21,11 @@ const reFloat D_FP_TOLERANCE = 1e-5;
 #define RE_ZERO_MEM_VAL   0
 #endif
 
-#ifdef DEBUG
+#ifdef NDEBUG
   #include <cstdio>
   
   /**
-   * If DEBUG is defined, all log outputs will be forwarded to this file
+   * If NDEBUG is defined, all log outputs will be forwarded to this file
    */
   #define RE_LOG_OUTPUT       stderr
   #define RE_ZERO_MEMORY
@@ -73,12 +73,12 @@ const reFloat D_FP_TOLERANCE = 1e-5;
   #define RE_NOT_IMPLEMENTED
   /**
    * Marks areas of the code which should be impossible to react. Does nothing
-   * if DEBUG is not defined
+   * if NDEBUG is not defined
    */
   #define RE_IMPOSSIBLE
   /**
    * Asserts a given condition, halting the program and showing a message if it
-   * fails. Does nothing if DEBUG is not defined
+   * fails. Does nothing if NDEBUG is not defined
    * 
    * @param expr The assert condition
    * @param msg The message shown on failure
@@ -86,7 +86,7 @@ const reFloat D_FP_TOLERANCE = 1e-5;
   #define RE_ASSERT(expr, msg)   do { (void)sizeof(expr); } while(0);
   /**
    * Asserts a given condition, showing a message if it fails. Does nothing if
-   * DEBUG is not defined
+   * NDEBUG is not defined
    * 
    * @param expr The assert condition
    * @param msg The message shown on failure
@@ -94,7 +94,7 @@ const reFloat D_FP_TOLERANCE = 1e-5;
   #define RE_ASSERT_WARN(expr, msg)   do { (void)sizeof(expr); } while(0);
   /**
    * Behaves like a prinf statement, but includes additional information such
-   * as line number and file name. Does nothing if DEBUG is not defined
+   * as line number and file name. Does nothing if NDEBUG is not defined
    */
   #define RE_LOG(...)
 #endif

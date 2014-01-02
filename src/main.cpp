@@ -27,6 +27,11 @@ void init(void) {
   app.gInit();
 }
 
+void mmmprint(const glm::mat4& m) {
+  for (int i = 0; i < 4; i++)
+    printf(" | %+6.3f, %+6.3f, %+6.3f, %+6.3f |\n", m[i][0], m[i][1], m[i][2], m[i][3]);
+}
+
 void testDemo(re::World& world, demo::App& app) {
 //  re::RigidBody* body;
   re::Sphere sphere(1.0);

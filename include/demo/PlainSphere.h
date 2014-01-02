@@ -19,18 +19,18 @@ namespace demo {
     
     Type type() const override;
     bool isDynamic() const override;
-    void gDraw(MatrixStack& stack, const Program& program) override;
-    void gSetup(GLint vao, GLint vbo, const MyProgram& program);
+    void draw(Canvas& canvas) override;
+    void setup(GLuint* vao, GLuint* vbo, const Canvas& canvas);
     
     const re::Sphere& shape() const;
     
-    GLint numVAOReq() const override;
-    GLint numVBOReq() const override;
-    GLint numTBOReq() const override;
+    GLuint numVAOReq() const override;
+    GLuint numVBOReq() const override;
+    GLuint numTBOReq() const override;
     
   private:
-    static GLint _globalVAO;
-    static GLint _globalVBO;
+    static GLuint _globalVAO;
+    static GLuint _globalVBO;
   };
   
   inline GfxObj::Type PlainSphere::type() const {
@@ -45,15 +45,15 @@ namespace demo {
     return *((re::Sphere*)_ent->shape());
   }
   
-  inline GLint PlainSphere::numVAOReq() const {
+  inline GLuint PlainSphere::numVAOReq() const {
     return 1;
   }
   
-  inline GLint PlainSphere::numVBOReq() const {
+  inline GLuint PlainSphere::numVBOReq() const {
     return 1;
   }
   
-  inline GLint PlainSphere::numTBOReq() const {
+  inline GLuint PlainSphere::numTBOReq() const {
     return 0;
   }
 }

@@ -7,8 +7,8 @@ SRC_PATH  := $(addprefix $(SRC_BASE)/, $(MODULES)) $(SRC_BASE)
 
 # compiler options
 CC        := g++
-INC_FLAGS := -Iinclude
-DFLAGS    := -g -DDEBUG
+INC_FLAGS := -Iinclude -Ilibs/glm
+DFLAGS    := -g -DNDEBUG
 CFLAGS    := -std=c++11 -Wall -Wextra $(INC_FLAGS) $(DFLAGS)
 LIBS      := -lGL -lglut
 

@@ -1,19 +1,20 @@
 #include "demo/PlainSphere.h"
 
-#include "demo/MyProgram.h"
+#include "react/common.h"
+#include "demo/Canvas.h"
 #include "demo/App.h"
-
 #include "demo/MatrixStack.h"
 
+#include <glm/vec4.hpp>
 #include <cmath>
 
 using namespace demo;
 
-GLint PlainSphere::_globalVAO = -1;
-GLint PlainSphere::_globalVBO = -1;
+GLuint PlainSphere::_globalVAO = 0;
+GLuint PlainSphere::_globalVBO = 0;
 
-const int nSides = 20; // number of sides
-const int nVerts = 2 * (nSides + 1) * (nSides-3);
+const int nSlices = 10; // number of slices
+const int nVerts = nSlices * nSlices * 2;
 
 PlainSphere::PlainSphere(const re::Ent& ent) : GfxObj(ent) {
   // do nothing
@@ -23,81 +24,89 @@ PlainSphere::~PlainSphere() {
   // do nothing
 }
 
-void PlainSphere::gDraw(MatrixStack& stack, const Program& program) {
-  stack.push();
-  stack.top().scale(shape().radius());
-  stack.top().translate(_ent->pos()[0], _ent->pos()[1], _ent->pos()[2]);
-  program.setModelMat(stack.getMatrix());
-  glBindVertexArray(_globalVAO);
-  glBindBuffer(GL_ARRAY_BUFFER, _globalVBO);
+void PlainSphere::draw(Canvas& canvas) {
+//  canvas.modelMat();
+  canvas.push();
+  canvas.translate(_ent->pos()[0], _ent->pos()[1], _ent->pos()[2]);
+  canvas.scale(shape().radius());
+  canvas.applyModelView();
+  glBindVertexArray(PlainSphere::_globalVAO);
+  glBindBuffer(GL_ARRAY_BUFFER, PlainSphere::_globalVBO);
   glDrawArrays(GL_TRIANGLE_STRIP, 0, nVerts);
-  stack.pop();
+  canvas.pop();
 }
 
-void PlainSphere::gSetup(GLint vao, GLint vbo, const MyProgram& program) {
-  if (PlainSphere::_globalVAO != -1 || PlainSphere::_globalVBO != -1) {
+void PlainSphere::setup(GLuint* vao, GLuint* vbo, const Canvas& canvas) {
+  if (PlainSphere::_globalVAO != 0 ||
+      PlainSphere::_globalVBO != 0) {
     printf("[DEMO]  Allocated too many VAO for class PlainSphere");
   }
-  PlainSphere::_globalVAO = vao;
-  PlainSphere::_globalVBO = vbo;
+  PlainSphere::_globalVAO = vao[0];
+  PlainSphere::_globalVBO = vbo[0];
   
-  float vertPos[3 * nVerts];
-  float vertColor[4 * nVerts];
+  glm::vec3 vertPos[nVerts];
+  glm::vec3 vertNorm[nVerts];
+  glm::vec4 vertColor[nVerts];
   
-  int idx = 0;
+  int cnt = 0;
   const double radius = 1;
-  for (int i = 0; i < nSides - 3; i++) {
-    double a1 = PI * (i + 1.0) / (double)(nSides - 1);
-    double a2 = PI * (i + 2.0) / (double)(nSides - 1);
-    
-    float r1 = radius * sin(a1);
-    float r2 = radius * sin(a2);
-    
-    float z1 = radius * cos(a1);
-    float z2 = radius * cos(a2);
-    
-    for (int j = 0; j <= nSides; j++) {
-      double b = 2 * PI * (nSides - j) / (double)nSides;
-      double c = cos(b);
-      double s = sin(b);
-      
-      vertPos[3*idx + 0] = r1 * s;
-      vertPos[3*idx + 1] = r1 * c;
-      vertPos[3*idx + 2] = z1;
-      vertColor[4*idx + 0] = c;
-      vertColor[4*idx + 1] = s;
-      vertColor[4*idx + 2] = 1.0f;
-      vertColor[4*idx + 3] = 0.9f;
-      idx++;
-      vertPos[3*idx + 0] = r2 * s;
-      vertPos[3*idx + 1] = r2 * c;
-      vertPos[3*idx + 2] = z2;
-      vertColor[4*idx + 0] = c;
-      vertColor[4*idx + 1] = s;
-      vertColor[4*idx + 2] = 1.0f;
-      vertColor[4*idx + 3] = 0.9f;
-      idx++;
+  double s[nSlices+1];
+  double c[nSlices+1];
+  double r[nSlices+1];
+  double z[nSlices+1];
+  for (int i = 0; i <= nSlices; i++) {
+    double a = 2 * PI * i / (double)nSlices;
+    double b = a / 2;
+    s[i] = sin(a);
+    c[i] = cos(a);
+    r[i] = radius * sin(b);
+    z[i] = radius * cos(b);
+  }
+  
+  for (int i = 0; i < nSlices; i++) {
+    for (int j = 0; j < nSlices; j++) {
+      for (int k = 0; k < 2; k++) {
+        int ik, jk, ix;
+        if (i % 2 == 0) {
+          ix = -1;
+          ik = i + k;
+          jk = j + k;
+        } else {
+          ix = 1;
+          ik = i + 1 - k;
+          jk = j + k;
+        }
+        vertPos[cnt] = glm::vec3(r[jk]*s[ik], r[jk]*c[ik], z[jk]*ix);
+        vertNorm[cnt] = glm::normalize(vertPos[i]);
+        vertColor[cnt++] = glm::vec4(c[ik], s[ik], 1.0f, 0.9f);
+      }
     }
   }
   
-  printf("Expected: %d got %d\n", nVerts, idx);
-  
   // bind buffers
-  glBindVertexArray(vao);
-  glBindBuffer(GL_ARRAY_BUFFER, vbo);
+  glBindVertexArray(vao[0]);
+  glBindBuffer(GL_ARRAY_BUFFER, vao[0]);
   
   // write data
-  glBufferData(GL_ARRAY_BUFFER, sizeof(vertPos) + sizeof(vertColor),
-               nullptr, GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(vertPos) + sizeof(vertColor) + sizeof(vertNorm), nullptr, GL_STATIC_DRAW);
   
-  glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertPos), vertPos);
-  glBufferSubData(GL_ARRAY_BUFFER, sizeof(vertPos), sizeof(vertColor), vertColor);
+  glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertPos), &vertPos[0][0]);
+  glBufferSubData(GL_ARRAY_BUFFER, sizeof(vertPos), sizeof(vertNorm), &vertNorm[0][0]);
+  glBufferSubData(GL_ARRAY_BUFFER, sizeof(vertPos) + sizeof(vertNorm), sizeof(vertColor), &vertColor[0][0]);
   
-  // program pointers
-  glVertexAttribPointer(program.vertPosAddr(), 3, GL_FLOAT, GL_FALSE, 0, 0);
-  glEnableVertexAttribArray(program.vertPosAddr());
+  // vertex positions attribute
+  glVertexAttribPointer(canvas.attrs().vertPos, 3, GL_FLOAT, GL_FALSE, 0, 0);
+  // vertex norms attribute
+  glVertexAttribPointer(canvas.attrs().vertNorm, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid*)sizeof(vertPos));
+  // vertex colors attribute
+  glVertexAttribPointer(canvas.attrs().vertColor, 4, GL_FLOAT, GL_FALSE, 0, (GLvoid*)(sizeof(vertPos) + sizeof(vertNorm)));
   
-  glVertexAttribPointer(program.vertColorAddr(), 4, GL_FLOAT, GL_FALSE, 0, (GLvoid*)sizeof(vertPos));
-  glEnableVertexAttribArray(program.vertColorAddr());
+  // ensure required attributes are enabled
+  glEnableVertexAttribArray(canvas.attrs().vertPos);
+  glEnableVertexAttribArray(canvas.attrs().vertNorm);
+  glEnableVertexAttribArray(canvas.attrs().vertColor);
+  
+  printf("[DEMO]  Expected: %d got %d\n", nVerts, cnt);
+  RE_ASSERT(cnt == nVerts, "Number expected was wrong");
 }
 

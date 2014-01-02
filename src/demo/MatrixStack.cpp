@@ -1,42 +1,40 @@
 #include "demo/MatrixStack.h"
 
-void MatrixStack::push() {
-    if (++_head < MATRIXSTACK_DEFAULT_SIZE) {
-        _array[_head].setIdentity();
-    } else if (_head < MATRIXSTACK_DEFAULT_SIZE + _heapSize) {
-        _heap[_head - MATRIXSTACK_DEFAULT_SIZE].setIdentity();
-    } else {
-        _increaseHeapSize();
-        _heap[_head - MATRIXSTACK_DEFAULT_SIZE].setIdentity();
-    }
+#include <cassert>
+
+MatrixStack::MatrixStack(int initialCapacity) : _head(0),
+_cacheHead(-1), _capacity(initialCapacity), _heap(nullptr),
+_cached(1.0f) {
+  _heap = new glm::mat4[initialCapacity];
+  _heap[0] = glm::mat4(1.0f);
 }
 
-mat4 MatrixStack::getMatrix() {
-    if (_cacheHead > _head) {
-        _cacheHead = _head;
-        _cache.setIdentity();
-        for (int i = 0; i < _cacheHead; i++) {
-            _cache.preMult(_get(i));
-        }
-    } else if (_cacheHead < _head) {
-        for (int i = _cacheHead + 1; i < _head; i++) {
-            _cache.preMult(_get(i));
-        }
-        _cacheHead = _head;
-    }
-    return (top() * _cache);
+MatrixStack::~MatrixStack() {
+  if (_heap) {
+    delete[] _heap;
+  }
 }
 
-void MatrixStack::_increaseHeapSize() {
-    mat4* newHeap = new mat4[_heapSize + MATRIXSTACK_DEFAULT_SIZE];
-    for (int i = 0; i < _heapSize; i++) {
-        newHeap[i] = _heap[i];
+const glm::mat4 MatrixStack::mat() {
+  assert((_cachedHead < _head) && "Cache must always be behind the head");
+  if (_cacheHead < _head) {
+    for (int i = _cacheHead + 1; i < _head; i++) {
+      _cached = get(i) * _cached;
     }
-    mat4* tmp = _heap;
-    _heap = newHeap;
-    if (tmp) {
-        delete[] tmp;
-    }
-    _heapSize += MATRIXSTACK_DEFAULT_SIZE;
+    _cacheHead = _head - 1;
+  }
+  return (top() * _cached);
 }
 
+void MatrixStack::increaseHeap() {
+  glm::mat4* newHeap = new glm::mat4[_capacity + MATRIXSTACK_DEFAULT_CAPACITY];
+  for (int i = 0; i < _capacity; i++) {
+    newHeap[i] = _heap[i];
+  }
+  glm::mat4* tmp = _heap;
+  _heap = newHeap;
+  if (tmp) {
+    delete[] tmp;
+  }
+  _capacity += MATRIXSTACK_DEFAULT_CAPACITY;
+}

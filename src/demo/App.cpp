@@ -23,14 +23,16 @@ V GetWithDef(const  std::map <K,V> & m, const K & key, const V & defval ) {
 }
 
 App::App() : _screenHeight(0), _screenWidth(0), _aspectRatio(0.0),
-_boundTop(1), _boundBottom(-1), _boundLeft(-1), _boundRight(1),
-_modelMat(), _viewMat(), _projMat(), _VAOs(nullptr), _VBOs(nullptr), _numVAO(0), _numVBO(0), _program(), _demos(), _currentDemo(-1),
-_targetDemo(-1), _world(), _paused(false) {
+_frameTop(1), _frameBottom(-1), _frameLeft(-1), _frameRight(1),
+_frameStart(1), _frameDepth(35), _modelMat(), _viewMat(1.0f),
+_projMat(1.0f), _VAOs(nullptr), _VBOs(nullptr), _numVAO(0),
+_numVBO(0), _canvas(), _demos(), _currentDemo(-1), _targetDemo(-1),
+_world(), _paused(false) {
   // do nothing
 }
 
 App::~App() {
-  _program.del();
+  _canvas.release();
   clearObjects();
 }
 
@@ -172,7 +174,7 @@ void App::gStartDemo() {
   glGenVertexArrays(numVAO, _VAOs);
   
   for_each(requests.begin(), requests.end(), [&](Request req) {
-    req.obj->gSetup(_VAOs[req.vaoIndex], _VBOs[req.vboIndex], _program);
+    req.obj->setup(&_VAOs[req.vaoIndex], &_VBOs[req.vboIndex], _canvas);
   });
   
   _currentDemo = _targetDemo;
@@ -186,20 +188,18 @@ void App::gResizeScreen(int w, int h) {
   
   _aspectRatio = _screenWidth / GLfloat(_screenHeight);
   
-  GLfloat mid = (_boundLeft + _boundRight) / 2.0f;
-  GLfloat left = _aspectRatio * (_boundLeft - mid) + mid;
-  GLfloat right = _aspectRatio * (_boundRight - mid) + mid;
+  GLfloat mid = (_frameLeft + _frameRight) / 2.0f;
+  GLfloat left = _aspectRatio * (_frameLeft - mid) + mid;
+  GLfloat right = _aspectRatio * (_frameRight - mid) + mid;
   
 #ifdef USE_OLD_SYNTAX
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
-  glFrustum(left, right, _boundBottom, _boundTop, 1, 5);
+  glFrustum(left, right, _frameBottom, _frameTop, _frameStart, _frameDepth);
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
 #else
-  _projMat.setIdentity();
-  _projMat.frustum(left, right, _boundBottom, _boundTop, 1, 5);
-  _program.setProjMat(_projMat);
+  _canvas.frustum(left, right, _frameBottom, _frameTop, _frameStart, _frameDepth);
 #endif
 }
 
@@ -216,74 +216,50 @@ void App::gPaint() {
   static float angle = 90;
   
 #ifndef USE_OLD_SYNTAX
+  _canvas.clearStack();
   _cam.step();
-  _program.setViewMat(_cam.viewMat());
-  MatrixStack stack;
-  stack.rotate(angle * PI / 180.0f, 0, 1, 0);
+  _canvas.setViewMat(_cam.viewMat());
+  _canvas.push();
+  _canvas.rotate(angle, 0, 1, 0);
   for_each(_gfxObjs.begin(), _gfxObjs.end(), [&](GfxObj* obj) {
-    obj->gDraw(stack, _program);
+    obj->draw(_canvas);
   });
+//  mprint(_canvas.modelMat());
+//  printf("%f\n\n", angle);
+  _canvas.pop();
 #else
   glPushMatrix();
-  
-  MatrixStack stack;
-  stack.rotate(angle * PI / 180.0f, 0, 1, 0);
-  stack.push();
-  stack.translate(0, 0, -2);
-  mat4 m = stack.getMatrix();
-  stack.pop();
-  
-  float tmp[4][4];
-  for (int i = 0; i < 4; i++)
-    for (int j = 0; j < 4; j++)
-      tmp[j][i] = m.value[i][j];
-  
-  glLoadMatrixf(&tmp[0][0]);
-//  glTranslatef(0, 0, -2);
-//  glRotatef(angle, 0, 1, 0);
+  glTranslatef(0, 0, -2);
+  glRotatef(angle, 0, 1, 0);
   
   glBegin(GL_TRIANGLE_STRIP);//  int idx = 0;
   const int nSides = 20;
   const double radius = 1;
-  for (int i = 0; i < nSides - 3; i++) {
-    double a1 = PI * (i + 1.0) / (double)(nSides - 1);
-    double a2 = PI * (i + 2.0) / (double)(nSides - 1);
-    
-    float r1 = radius * sin(a1);
-    float r2 = radius * sin(a2);
-    
-    float z1 = radius * cos(a1);
-    float z2 = radius * cos(a2);
-    
-    for (int j = 0; j <= nSides; j++) {
-      double b = 2 * PI * (nSides - j) / (double)nSides;
-      double c = cos(b);
-      double s = sin(b);
-      
-      glVertex3f(r1*s, r1*c, z1);
-      glNormal3f(r1*s, r1*c, z1);
-      glColor4f(c, s, 1.0f, 0.9f);
-      glVertex3f(r2*s, r2*c, z2);
-      glNormal3f(r2*s, r2*c, z2);
-      glColor4f(c, s, 1.0f, 0.9f);
-    }
-  }
-  glEnd();
   
-  glBegin(GL_TRIANGLE_FAN);
-  glVertex3f(0, 0, radius);
-  glColor4f(0, 1, 1, 0.9f);
-  glNormal3f(0, 0, 1);
-  double a1 = PI * 1.0 / (double)(nSides - 1);
-  float r1 = radius * sin(a1);
-  float z1 = radius * cos(a1);
+  double s[nSides+1];
+  double c[nSides+1];
+  double r[nSides+1];
+  double z[nSides+1];
   for (int i = 0; i <= nSides; i++) {
-    double b = 2 * PI * (nSides - i) / (double)nSides;
-    double c = cos(b);
-    double s = sin(b);
-    glVertex3f(r1*s, r1*c, z1);
-    glNormal3f(r1*s, r1*c, z1);
-    glColor4f(c, s, 1.0f, 0.9f);
+    double a = 2 * PI * i / (double)nSides;
+    double b = a / 2;
+    s[i] = sin(a);
+    c[i] = cos(a);
+    r[i] = radius * sin(b);
+    z[i] = radius * cos(b);
+  }
+  
+  for (int i = 0; i < nSides; i++) {
+    for (int j = 0; j < nSides; j++) {
+      for (int k = 0; k < 2; k++) {
+        const int ik = i + k;
+        const int jk = j + k;
+        const int ix = (i % 2 == 0) ? 1 : -1;
+        glVertex3f(r[jk]*s[ik], r[jk]*c[ik], z[jk]*ix);
+        glNormal3f(r[jk]*s[ik], r[jk]*c[ik], z[jk]*ix);
+        glColor4f(c[ik], s[ik], 1.0f, 0.9f);
+      }
+    }
   }
   glEnd();
   glPopMatrix();
@@ -318,16 +294,22 @@ void App::gInit() {
   glLineWidth(1);
   glEnable(GL_DEPTH_TEST);
   glClearDepth(1.0f);
-  glPolygonMode(GL_FRONT, GL_FILL);
-  glPolygonMode(GL_BACK, GL_LINE);
+  glPolygonMode(GL_BACK, GL_FILL);
+  glPolygonMode(GL_FRONT, GL_LINE);
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 #ifndef USE_OLD_SYNTAX
-  _program.init();
+  _canvas.init();
   gResizeScreen(_screenWidth, _screenHeight);
 #else
-  glShadeModel(GL_FLAT);
+  glShadeModel(GL_SMOOTH);
+  glEnable(GL_LIGHTING);
+  glEnable(GL_LIGHT0);
+  float lightPos[] = { 0, -1, 0 };
+  float lightColor[] = { 1, 1, 1, 1 };
+  glLightfv(GL_LIGHT0, GL_SPECULAR, lightColor);
+  glLightfv(GL_LIGHT0, GL_POSITION, lightPos);
 #endif
   
 //  glEnable(GL_COLOR_LOGIC_OP);

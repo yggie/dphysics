@@ -4,13 +4,10 @@
 #include "demo/glsetup.h"
 #include "react/Ent.h"
 
-class MatrixStack;
-
 namespace demo {
   
   class App;
-  class Program;
-  class MyProgram;
+  class Canvas;
   
   /**
    * @ingroup demo
@@ -33,11 +30,11 @@ namespace demo {
     virtual Type type() const = 0;
     virtual bool isDynamic() const = 0;
     
-    virtual void gDraw(MatrixStack& stack, const Program& program) = 0;
-    virtual void gSetup(GLint vao, GLint vbo, const MyProgram& program) = 0;
-    virtual GLint numVAOReq() const = 0;
-    virtual GLint numVBOReq() const = 0;
-    virtual GLint numTBOReq() const = 0;
+    virtual void draw(Canvas& canvas) = 0;
+    virtual void setup(GLuint* vao, GLuint* vbo, const Canvas& canvas) = 0;
+    virtual GLuint numVAOReq() const = 0;
+    virtual GLuint numVBOReq() const = 0;
+    virtual GLuint numTBOReq() const = 0;
     
     void setApp(App* app);
     

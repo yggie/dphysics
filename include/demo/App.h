@@ -4,7 +4,7 @@
 #include "react/Ent.h"
 #include "react/World.h"
 #include "demo/MatrixStack.h"
-#include "demo/MyProgram.h"
+#include "demo/SimpleCanvas.h"
 #include "demo/FlyingCam.h"
 
 #include <GL/gl.h>
@@ -57,13 +57,15 @@ namespace demo {
     int _screenHeight;
     int _screenWidth;
     float _aspectRatio;
-    float _boundTop;
-    float _boundBottom;
-    float _boundLeft;
-    float _boundRight;
+    float _frameTop;
+    float _frameBottom;
+    float _frameLeft;
+    float _frameRight;
+    float _frameStart;
+    float _frameDepth;
     MatrixStack _modelMat;
-    mat4 _viewMat;
-    mat4 _projMat;
+    glm::mat4 _viewMat;
+    glm::mat4 _projMat;
     
     GLuint* _VAOs;
     GLuint* _VBOs;
@@ -73,7 +75,7 @@ namespace demo {
     int _numVBO;
 //    int _numTBO;
     
-    MyProgram _program;
+    SimpleCanvas _canvas;
     
     std::vector<GfxObj*> _gfxObjs;
     
