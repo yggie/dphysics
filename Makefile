@@ -15,7 +15,7 @@ LIBS      := -lGL -lglut
 # project files
 SOURCES       := $(foreach dir, $(SRC_PATH), $(wildcard $(dir)/*.cpp))
 OBJECTS       := $(patsubst $(SRC_BASE)/%.cpp, $(BIN_BASE)/%.o, $(SOURCES))
-EXECUTABLE    := demo
+EXECUTABLE    := demotest
 
 # phony rules
 .PHONY : clean all debug
