@@ -19,6 +19,7 @@ namespace re {
     Sphere(const Sphere& sphere);
     ~Sphere();
     
+    reFloat radius() const;
     Type type() const override;
     reFloat volume() const override;
     const mat computeInertia() const override;
@@ -28,6 +29,10 @@ namespace re {
   protected:
     reFloat _sRadius;
   };
+  
+  inline reFloat Sphere::radius() const {
+    return _sRadius;
+  }
   
   inline Shape::Type Sphere::type() const {
     return Shape::SPHERE;

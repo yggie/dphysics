@@ -29,6 +29,11 @@ namespace re {
     
     void setMass(reFloat mass) override;
     void setDensity(reFloat density) override;
+    RigidBody& at(const vec& position) override;
+    RigidBody& at(reFloat x, reFloat y, reFloat z) override;
+    RigidBody& withShape(const Shape& shape) override;
+    RigidBody& withMass(reFloat mass) override;
+    RigidBody& withDensity(reFloat mass) override;
     
   protected:
     /** The RigidBody's velocity */
@@ -80,6 +85,31 @@ namespace re {
   
   inline void RigidBody::updateInertia() {
     _mInertia = _shape->computeInertia() * _sMass;
+  }
+  
+  inline RigidBody& RigidBody::at(const vec& position) {
+    _vPos = position;
+    return *this;
+  }
+  
+  inline RigidBody& RigidBody::at(reFloat x, reFloat y, reFloat z) {
+    _vPos.set(x, y, z);
+    return *this;
+  }
+  
+  inline RigidBody& RigidBody::withShape(const Shape& shape) {
+    setShape(shape);
+    return *this;
+  }
+  
+  inline RigidBody& RigidBody::withMass(reFloat mass) {
+    setMass(mass);
+    return *this;
+  }
+  
+  inline RigidBody& RigidBody::withDensity(reFloat density) {
+    setDensity(density);
+    return *this;
   }
 }
 

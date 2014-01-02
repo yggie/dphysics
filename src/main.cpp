@@ -6,6 +6,7 @@
 
 demo::App app;
 
+// proxy functions, because glut won't accept otherwise
 void keyboardFunc(unsigned char key, int x, int y) {
   app.keyEvent(key, x, y);
 }
@@ -18,6 +19,26 @@ void reshape(int w, int h) {
   app.gResizeScreen(w, h);
 }
 
+void init(void) {
+  app.gInit();
+}
+
+void testDemo(re::World& world, demo::App& app) {
+//  re::RigidBody* body;
+  re::Sphere sphere(10.0);
+  
+  re::RigidBody& body = world.newRigidBody().withShape(sphere).withMass(5.0).at(0, 0, -30);
+  app.newPlainSphere(body);
+  
+//  for (int i = 0; i < 10; i++) {
+//    body = (re::RigidBody*)&world.newRigidBody().withShape(sphere.withRadius(i + 1)).withMass(5.0).at(i-5 , i-5, i-5);
+//    app.newPlainSphere(*body);
+//  }
+  
+//  re::print(body->inertia());
+  re::print(body.inertia());
+}
+
 int main(int argc, char** argv) {
   glutInit(&argc, argv);
   glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
@@ -25,23 +46,15 @@ int main(int argc, char** argv) {
   glutInitWindowPosition(100, 100);
   glutCreateWindow("react Physics Engine Demo");
   
-  glutDisplayFunc(paint);
   glutKeyboardFunc(keyboardFunc);
   glutReshapeFunc(reshape);
   
-//  glClearColor(0.8f, 1.0f, 1.0f, 0.0f);
-
-  re::RigidBody* body;
-  re::Sphere sphere(1.0);
+  app.addDemo(testDemo);
   
-  re::World world;
-  
-  for (int i = 0; i < 5; i++) {
-    body = (re::RigidBody*)&world.newRigidBody().withShape(sphere.withRadius(i + 1)).withMass(5.0).at(1, i, 1);
-  }
-  
-  re::print(body->inertia());
-  
+  // hax to get the init to work
+  glutDisplayFunc(init);
+  glutMainLoopEvent();
+  glutDisplayFunc(paint);
   glutMainLoop();
   
   printf("Hurray no problems!\n");

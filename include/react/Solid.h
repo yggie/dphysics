@@ -27,8 +27,8 @@ namespace re {
     virtual void setDensity(reFloat density) = 0;
     
     void setShape(const Shape& shape);
-    Solid& withMass(reFloat mass);
-    Solid& withDensity(reFloat density);
+    virtual Solid& withMass(reFloat mass) = 0;
+    virtual Solid& withDensity(reFloat density) = 0;
     
   protected:
     virtual void updateInertia() = 0;
@@ -79,15 +79,8 @@ namespace re {
    * change in shape, mass or density properties
    */
   
-  inline Solid::Solid() { }
-  inline Solid::~Solid() { }
-  
-  inline void Solid::setShape(const Shape& shape) {
-    Ent::setShape(shape);
-    updateInertia();
-  }
-  
   /**
+   * @fn Solid& Solid::withMass(reFloat mass)
    * Set the Solid's mass property, this method can be chained. The mass and
    * density properties are not independent, therefore setting one or the other
    * will override the previous setting.
@@ -95,12 +88,8 @@ namespace re {
    * @param mass The mass in user-defined units
    */
   
-  inline Solid& Solid::withMass(reFloat mass) {
-    setMass(mass);
-    return *this;
-  }
-  
   /**
+   * @fn Solid& Solid::withDensity(reFloat density)
    * Set the Solid's density property, this method can be chained. The mass and
    * density properties are not independent, therefore setting one or the other
    * will override the previous setting.
@@ -108,9 +97,12 @@ namespace re {
    * @param density The density in user-defined units
    */
   
-  inline Solid& Solid::withDensity(reFloat density) {
-    setDensity(density);
-    return *this;
+  inline Solid::Solid() { }
+  inline Solid::~Solid() { }
+  
+  inline void Solid::setShape(const Shape& shape) {
+    Ent::setShape(shape);
+    updateInertia();
   }
 }
 

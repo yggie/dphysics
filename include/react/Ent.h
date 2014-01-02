@@ -54,11 +54,11 @@ namespace re {
     void setPos(reFloat x, reFloat y, reFloat z);
     virtual void setShape(const Shape& shape);
     void setWorld(World* world);
-    Ent& at(const vec& position);
-    Ent& at(reFloat x, reFloat y, reFloat z);
-    Ent& withShape(const Shape& shape);
-    virtual Ent& withMass(reFloat mass);
-    virtual Ent& withDensity(reFloat mass);
+    virtual Ent& at(const vec& position) = 0;
+    virtual Ent& at(reFloat x, reFloat y, reFloat z) = 0;
+    virtual Ent& withShape(const Shape& shape) = 0;
+    virtual Ent& withMass(reFloat mass) = 0;
+    virtual Ent& withDensity(reFloat mass) = 0;
     
     /** a pointer to arbitrary data, defined by the user */
     void* userdata;
@@ -93,6 +93,32 @@ namespace re {
    * @brief Returns the Ent's rotational velocity matrix
    * 
    * @return The rotational velocity in matrix form
+   */
+  
+  /**
+   * @fn Ent& Ent::at(const vec& pos)
+   * Set the Ent's position, this method can be chained
+   * 
+   * @param position The new position vector
+   * @return A reference to the Ent
+   */
+  
+  /**
+   * @fn Ent& Ent::at(reFloat x, reFloat y, reFloat z)
+   * Set the Ent's position, this method can be chained
+   * 
+   * @param x The new position x-coordinates
+   * @param y The new position y-coordinates
+   * @param z The new position z-coordinates
+   * @return A reference to the Ent
+   */
+  
+  /**
+   * @fn Ent& Ent::withShape(const Shape& shape)
+   * Set the Ent's Shape, this method can be chained
+   * 
+   * @param shape The new Shape
+   * @return A reference to the Ent
    */
   
   inline Ent::Ent() : userdata(nullptr), _world(nullptr), _shape(nullptr), _vPos(), _mRot() { }
@@ -205,49 +231,6 @@ namespace re {
   inline void Ent::setWorld(World* world) {
     _world = world;
   }
-  
-  /**
-   * Set the Ent's position, this method can be chained
-   * 
-   * @param position The new position vector
-   * @return A reference to the Ent
-   */
-  
-  inline Ent& Ent::at(const vec& position) {
-    _vPos = position;
-    return *this;
-  }
-  
-  /**
-   * Set the Ent's position, this method can be chained
-   * 
-   * @param x The new position x-coordinates
-   * @param y The new position y-coordinates
-   * @param z The new position z-coordinates
-   * @return A reference to the Ent
-   */
-  
-  inline Ent& Ent::at(reFloat x, reFloat y, reFloat z) {
-    _vPos.set(x, y, z);
-    return *this;
-  }
-  
-  /**
-   * Set the Ent's Shape, this method can be chained
-   * 
-   * @param shape The new Shape
-   * @return A reference to the Ent
-   */
-  
-  inline Ent& Ent::withShape(const Shape& shape) {
-    setShape(shape);
-    return *this;
-  }
-  
-  /** This does nothing, only exists for compatibility */
-  inline Ent& Ent::withMass(reFloat) { return *this; }
-  /** This does nothing, only exists for compatibility */
-  inline Ent& Ent::withDensity(reFloat) { return *this; }
 }
 
 #endif
