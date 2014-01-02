@@ -11,6 +11,10 @@ void keyboardFunc(unsigned char key, int x, int y) {
   app.keyEvent(key, x, y);
 }
 
+void specialKeys(int key, int x, int y) {
+  app.specialKeyEvent(key, x, y);
+}
+
 void paint(void) {
   app.gPaint();
 }
@@ -25,9 +29,9 @@ void init(void) {
 
 void testDemo(re::World& world, demo::App& app) {
 //  re::RigidBody* body;
-  re::Sphere sphere(10.0);
+  re::Sphere sphere(1.0);
   
-  re::RigidBody& body = world.newRigidBody().withShape(sphere).withMass(5.0).at(0, 0, -30);
+  re::RigidBody& body = world.newRigidBody().withShape(sphere).withMass(5.0).at(0, 0, -2);
   app.newPlainSphere(body);
   
 //  for (int i = 0; i < 10; i++) {
@@ -48,6 +52,7 @@ int main(int argc, char** argv) {
   
   glutKeyboardFunc(keyboardFunc);
   glutReshapeFunc(reshape);
+  glutSpecialFunc(specialKeys);
   
   app.addDemo(testDemo);
   
