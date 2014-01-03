@@ -3,6 +3,7 @@
 
 #include "demo/GfxObj.h"
 #include "demo/MatrixStack.h"
+#include "react/Ent.h"
 #include "react/Sphere.h"
 
 namespace demo {
@@ -29,6 +30,7 @@ namespace demo {
     GLuint numTBOReq() const override;
     
   private:
+    const re::Ent& _ent;
     static GLuint _globalVAO;
     static GLuint _globalVBO;
   };
@@ -42,7 +44,7 @@ namespace demo {
   }
   
   inline const re::Sphere& PlainSphere::shape() const {
-    return *((re::Sphere*)_ent->shape());
+    return *((re::Sphere*)_ent.shape());
   }
   
   inline GLuint PlainSphere::numVAOReq() const {

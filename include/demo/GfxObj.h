@@ -2,7 +2,6 @@
 #define DEMO_GFXOBJ_H
 
 #include "demo/glsetup.h"
-#include "react/Ent.h"
 
 namespace demo {
   
@@ -11,8 +10,7 @@ namespace demo {
   
   /**
    * @ingroup demo
-   * Represents a graphical entity which can be drawn, wraps around a
-   * re::Ent. Each subclass specializes in drawing certain shapes
+   * Represents a graphical entity which can be drawn
    * 
    * @see re::Ent
    */
@@ -21,10 +19,11 @@ namespace demo {
   public:
     
     enum Type {
-      PLAIN_SPHERE
+      PLAIN_SPHERE,
+      STATIC_GRAPHIC
     };
     
-    GfxObj(const re::Ent& ent);
+    GfxObj();
     virtual ~GfxObj();
     
     virtual Type type() const = 0;
@@ -39,11 +38,10 @@ namespace demo {
     void setApp(App* app);
     
   protected:
-    const re::Ent* _ent;
     App* _app;
   };
   
-  inline GfxObj::GfxObj(const re::Ent& ent) : _ent(&ent), _app(nullptr) { }
+  inline GfxObj::GfxObj() : _app(nullptr) { }
 
   inline GfxObj::~GfxObj() { }
   

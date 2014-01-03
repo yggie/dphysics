@@ -10,7 +10,7 @@ CC        := g++
 INC_FLAGS := -Iinclude -Ilibs/glm
 DFLAGS    := -g -DNDEBUG
 CFLAGS    := -std=c++11 -Wall -Wextra $(INC_FLAGS) $(DFLAGS)
-LIBS      := -lGL -lglut
+LIBS      := -lGL -lGLU -lglut
 
 # project files
 SOURCES       := $(foreach dir, $(SRC_PATH), $(wildcard $(dir)/*.cpp))

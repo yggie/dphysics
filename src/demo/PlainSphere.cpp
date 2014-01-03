@@ -16,8 +16,8 @@ GLuint PlainSphere::_globalVBO = 0;
 const int nSlices = 10; // number of slices
 const int nVerts = nSlices * nSlices * 2;
 
-PlainSphere::PlainSphere(const re::Ent& ent) : GfxObj(ent) {
-  // do nothing
+PlainSphere::PlainSphere(const re::Ent& ent) : _ent(ent) {
+  shape(); // ensure the shape is correct
 }
 
 PlainSphere::~PlainSphere() {
@@ -27,7 +27,7 @@ PlainSphere::~PlainSphere() {
 void PlainSphere::draw(Canvas& canvas) {
 //  canvas.modelMat();
   canvas.push();
-  canvas.translate(_ent->pos()[0], _ent->pos()[1], _ent->pos()[2]);
+  canvas.translate(_ent.pos()[0], _ent.pos()[1], _ent.pos()[2]);
   canvas.scale(shape().radius());
   canvas.applyModelView();
   glBindVertexArray(PlainSphere::_globalVAO);
