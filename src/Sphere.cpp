@@ -1,16 +1,14 @@
-#include "react/Sphere.h"
+#include "react/reSphere.h"
 
-using namespace re;
-
-Sphere::Sphere(reFloat radius) : Shape(), _sRadius(radius) {
+reSphere::reSphere(reFloat radius) : reShape(), _sRadius(radius) {
   // do nothing
 }
 
-Sphere::Sphere(const Sphere& sphere) : Shape(), _sRadius(sphere._sRadius) {
+reSphere::reSphere(const reSphere& sphere) : reShape(), _sRadius(sphere._sRadius) {
   // do nothing
 }
 
-Sphere::~Sphere() {
+reSphere::~reSphere() {
   // do nothing
 }
 

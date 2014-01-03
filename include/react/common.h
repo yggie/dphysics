@@ -1,13 +1,14 @@
 /**
  * @file
- * Contains global definitions used throughout the engine
+ * Contains global definitions used throughout the engine, including logging
+ * and debugging functions
  */
 #ifndef RE_COMMON_H
 #define RE_COMMON_H
 
 /** Default value for the mathematical constant, pi */
-#ifndef PI
-#define PI 3.14159265359
+#ifndef RE_PI
+#define RE_PI 3.14159265359
 #endif
 
 /** a customizable base floating point type */
@@ -98,29 +99,5 @@ const reFloat D_FP_TOLERANCE = 1e-5;
    */
   #define RE_LOG(...)
 #endif
-
-// DOCUMENTATION FOR DOXYGEN MODULES
-
-/**
- * @defgroup memory Memory Management
- * This module implements custom memory management for the engine.
- */
-
-/**
- * @defgroup entities Physical Entities
- * This module defines the various physical entities which can exist in the
- * World
- */
-
-/**
- * @defgroup shapes Shapes
- * This module defines the various geometric shapes which are supported by the
- * engine
- */
-
-/**
- * @defgroup demo Demo
- * This module contains demo applications which make use of the engine
- */
 
 #endif

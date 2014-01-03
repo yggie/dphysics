@@ -41,7 +41,7 @@ void StaticGfx::setup(GLuint* vao, GLuint* vbo, const Canvas&) {
     def.vao = vao[i];
     def.vbo = vbo[i];
     GLuint totalSize = 0;
-    for_each(def.buffers.begin(), def.buffers.end(), [&](StaticGfx::VAODef::BufferObj obj) {
+    for_each(def.buffers.begin(), def.buffers.end(), [&](const StaticGfx::VAODef::BufferObj& obj) {
       totalSize += obj.size;
     });
     
@@ -57,15 +57,18 @@ void StaticGfx::setup(GLuint* vao, GLuint* vbo, const Canvas&) {
     
     // count the cumulative bytes used
     size_t offset = 0;
-    for_each(def.buffers.begin(), def.buffers.end(), [&](StaticGfx::VAODef::BufferObj obj) {
-      // TODO react to errors
-      glBufferSubData(GL_ARRAY_BUFFER, offset, obj.size, obj.data);
-      checkOpenGLError();
-      glVertexAttribPointer(obj.attr, obj.stride, obj.type, GL_FALSE, 0, (GLvoid*)offset);
-      checkOpenGLError();
-      glEnableVertexAttribArray(obj.attr);
-      checkOpenGLError();
-      offset += obj.size;
+    for_each(def.buffers.begin(), def.buffers.end(), [&](StaticGfx::VAODef::BufferObj& obj) {
+      if (obj.data != nullptr) {
+        glBufferSubData(GL_ARRAY_BUFFER, offset, obj.size, obj.data);
+        checkOpenGLError();
+        glVertexAttribPointer(obj.attr, obj.stride, obj.type, GL_FALSE, 0, (GLvoid*)offset);
+        checkOpenGLError();
+        glEnableVertexAttribArray(obj.attr);
+        checkOpenGLError();
+        offset += obj.size;
+        free(obj.data);
+        obj.data = nullptr;
+      }
     });
   }
 }
@@ -77,7 +80,10 @@ vbo(0), drawMode(drawMode), numVerts(numVerts), buffers() {
 
 StaticGfx::VAODef::~VAODef() {
   for_each(buffers.begin(), buffers.end(), [](BufferObj& obj) {
-    free(obj.data);
+    if (obj.data != nullptr) {
+      free(obj.data);
+      obj.data = nullptr;
+    }
   });
   buffers.clear();
 }

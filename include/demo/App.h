@@ -1,8 +1,7 @@
 #ifndef DEMO_APPWINDOW_H
 #define DEMO_APPWINDOW_H
 
-#include "react/Ent.h"
-#include "react/World.h"
+#include "react/reEnt.h"
 #include "demo/MatrixStack.h"
 #include "demo/SimpleCanvas.h"
 #include "demo/FlyingCam.h"
@@ -15,7 +14,7 @@
 
 namespace demo { class App; }
 
-typedef void(*Demo)(re::World& world, demo::App& app);
+typedef void(*Demo)(reWorld& world, demo::App& app);
 
 namespace demo {
   
@@ -33,7 +32,7 @@ namespace demo {
     App();
     ~App();
     
-    PlainSphere& newPlainSphere(const re::Ent& ent);
+    PlainSphere& newPlainSphere(const reEnt& ent);
     StaticGfx& newStaticGfx();
     
     void add(GfxObj& obj);
@@ -87,7 +86,7 @@ namespace demo {
     int _currentDemo;
     int _targetDemo;
     
-    re::World _world;
+    reWorld _world;
     
     bool _paused;
     

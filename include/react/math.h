@@ -1,39 +1,36 @@
+/**
+ * @file
+ * Defines mathematical functions used throughout the engine
+ */
 #ifndef RE_MATH_H
 #define RE_MATH_H
 
 #include <cmath>
 #include "react/common.h"
 
-namespace re {
-  static auto abs = static_cast<double(*)(double)>(std::abs);
-  
-  static auto sqrt = static_cast<double(*)(double)>(std::sqrt);
-  
-  template <class T>
-  inline T sq(T a) {
-    return a*a;
-  }
+static auto reAbs = static_cast<double(*)(double)>(std::abs);
 
-  template <class T>
-  inline T max(T a, T b) {
-    return (a > b) ? a : b;
-  }
+static auto reSqrt = static_cast<double(*)(double)>(std::sqrt);
 
-  template <class T>
-  inline T min(T a, T b) {
-    return (a < b) ? a : b;
-  }
+template <class T>
+inline T reMax(T a, T b) {
+  return (a > b) ? a : b;
+}
 
-  template <class T>
-  inline int sign(T a) {
-    return (a >= -0.0f) ? 1 : -1;
-  }
+template <class T>
+inline T reMin(T a, T b) {
+  return (a < b) ? a : b;
+}
 
-  inline void constrainAngle(double& radians) {
-    if (re::abs(radians - PI) > PI) {
-      double tmp = (radians - PI)/ (2 * PI);
-      radians = (tmp - (int)tmp) * 2 * PI + PI;
-    }
+template <class T>
+inline int reSign(T a) {
+  return (a >= -0.0f) ? 1 : -1;
+}
+
+inline void reConstrainAngle(double& radians) {
+  if (reAbs(radians - RE_PI) > RE_PI) {
+    double tmp = (radians - RE_PI)/ (2 * RE_PI);
+    radians = (tmp - (int)tmp) * 2 * RE_PI + RE_PI;
   }
 }
 

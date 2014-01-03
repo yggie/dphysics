@@ -37,7 +37,7 @@ App::~App() {
   clearObjects();
 }
 
-PlainSphere& App::newPlainSphere(const re::Ent& ent) {
+PlainSphere& App::newPlainSphere(const reEnt& ent) {
   PlainSphere* s = new PlainSphere(ent);
   add(*((GfxObj*)s));
   return *s;

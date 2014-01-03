@@ -16,7 +16,7 @@ GLuint PlainSphere::_globalVBO = 0;
 const int nSlices = 10; // number of slices
 const int nVerts = nSlices * nSlices * 2;
 
-PlainSphere::PlainSphere(const re::Ent& ent) : _ent(ent) {
+PlainSphere::PlainSphere(const reEnt& ent) : _ent(ent) {
   shape(); // ensure the shape is correct
 }
 

@@ -3,8 +3,8 @@
 
 #include "demo/GfxObj.h"
 #include "demo/MatrixStack.h"
-#include "react/Ent.h"
-#include "react/Sphere.h"
+#include "react/reEnt.h"
+#include "react/reSphere.h"
 
 namespace demo {
   
@@ -15,7 +15,7 @@ namespace demo {
   
   class PlainSphere : public GfxObj {
   public:
-    PlainSphere(const re::Ent& ent);
+    PlainSphere(const reEnt& ent);
     ~PlainSphere();
     
     Type type() const override;
@@ -23,14 +23,14 @@ namespace demo {
     void draw(Canvas& canvas) override;
     void setup(GLuint* vao, GLuint* vbo, const Canvas& canvas);
     
-    const re::Sphere& shape() const;
+    const reSphere& shape() const;
     
     GLuint numVAOReq() const override;
     GLuint numVBOReq() const override;
     GLuint numTBOReq() const override;
     
   private:
-    const re::Ent& _ent;
+    const reEnt& _ent;
     static GLuint _globalVAO;
     static GLuint _globalVBO;
   };
@@ -43,8 +43,8 @@ namespace demo {
     return false;
   }
   
-  inline const re::Sphere& PlainSphere::shape() const {
-    return *((re::Sphere*)_ent.shape());
+  inline const reSphere& PlainSphere::shape() const {
+    return *((reSphere*)_ent.shape());
   }
   
   inline GLuint PlainSphere::numVAOReq() const {

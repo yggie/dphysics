@@ -21,113 +21,116 @@ inline void mprint(const glm::mat4& m) {
 }
 #endif
 
-/**
- * @ingroup demo
- * Defines a matrix stack
- */
-
-class MatrixStack {
-public:
-  MatrixStack();
-  MatrixStack(int initialCapacity);
-  ~MatrixStack();     // inline
-
-  int size() const;   // inline
-  void clear();       // inline
-
-  void push();
-  void pop();             // inline
-  glm::mat4& top();       // inline
-  glm::mat4& get(int i);  // inline
-
-  void scale(float s);                                    // inline
-  void scale(float x, float y, float z);                  // inline
-  void translate(float x, float y, float z);              // inline
-  void rotate(float angle, float x, float y, float z);    // inline
-  void loadIdentity();                                    // inline
-  void loadMatrix(const glm::mat4& m);                    // inline
+namespace demo {
   
-  void frustum(float left ,float right, float btm, float top, float near, float far); // inline
+  /**
+   * @ingroup demo
+   * Defines a matrix stack
+   */
 
-  const glm::mat4 mat();
+  class MatrixStack {
+  public:
+    MatrixStack();
+    MatrixStack(int initialCapacity);
+    ~MatrixStack();     // inline
 
-private:
-  void increaseHeap();
+    int size() const;   // inline
+    void clear();       // inline
 
-  /** the current position in the stack */
-  int _head;
-  /** the position in which the matrix has been cached */
-  int _cacheHead;
-  int _capacity;
-  glm::mat4* _heap;
-  glm::mat4 _cached;
-};
+    void push();
+    void pop();             // inline
+    glm::mat4& top();       // inline
+    glm::mat4& get(int i);  // inline
 
-inline MatrixStack::MatrixStack() : MatrixStack(MATRIXSTACK_DEFAULT_CAPACITY) { }
+    void scale(float s);                                    // inline
+    void scale(float x, float y, float z);                  // inline
+    void translate(float x, float y, float z);              // inline
+    void rotate(float angle, float x, float y, float z);    // inline
+    void loadIdentity();                                    // inline
+    void loadMatrix(const glm::mat4& m);                    // inline
+    
+    void frustum(float left ,float right, float btm, float top, float near, float far); // inline
 
-inline int MatrixStack::size() const {
-  return (_head + 1);
-}
+    const glm::mat4 mat();
 
-inline void MatrixStack::clear() {
-  _head = 0;
-  _heap[0] = glm::mat4(1.0f);
-}
+  private:
+    void increaseHeap();
 
-inline void MatrixStack::push() {
-  if (++_head >= _capacity) {
-    increaseHeap();
+    /** the current position in the stack */
+    int _head;
+    /** the position in which the matrix has been cached */
+    int _cacheHead;
+    int _capacity;
+    glm::mat4* _heap;
+    glm::mat4 _cached;
+  };
+
+  inline MatrixStack::MatrixStack() : MatrixStack(MATRIXSTACK_DEFAULT_CAPACITY) { }
+
+  inline int MatrixStack::size() const {
+    return (_head + 1);
   }
-  _heap[_head] = glm::mat4(1.0f);
-}
 
-inline void MatrixStack::pop() {
-  // force cache regeneration
-  if (_cacheHead != -1) {
-    _cacheHead = -1;
-    _cached = glm::mat4(1.0f);
-  }
-  if (_head == 0) {
+  inline void MatrixStack::clear() {
+    _head = 0;
     _heap[0] = glm::mat4(1.0f);
-  } else {
-    _head--;
   }
-}
 
-inline glm::mat4x4& MatrixStack::top() {
-  return get(_head);
-}
+  inline void MatrixStack::push() {
+    if (++_head >= _capacity) {
+      increaseHeap();
+    }
+    _heap[_head] = glm::mat4(1.0f);
+  }
 
-inline glm::mat4& MatrixStack::get(int i) {
-  return _heap[i];
-}
+  inline void MatrixStack::pop() {
+    // force cache regeneration
+    if (_cacheHead != -1) {
+      _cacheHead = -1;
+      _cached = glm::mat4(1.0f);
+    }
+    if (_head == 0) {
+      _heap[0] = glm::mat4(1.0f);
+    } else {
+      _head--;
+    }
+  }
 
-inline void MatrixStack::scale(float s) {
-  top() = glm::scale(top(), glm::vec3(s));
-}
+  inline glm::mat4x4& MatrixStack::top() {
+    return get(_head);
+  }
 
-inline void MatrixStack::scale(float x, float y, float z) {
-  top() = glm::scale(top(), glm::vec3(x, y, z));
-}
+  inline glm::mat4& MatrixStack::get(int i) {
+    return _heap[i];
+  }
 
-inline void MatrixStack::translate(float x, float y, float z) {
-  top() = glm::translate(top(), glm::vec3(x, y, z));
-}
+  inline void MatrixStack::scale(float s) {
+    top() = glm::scale(top(), glm::vec3(s));
+  }
 
-inline void MatrixStack::rotate(float angle, float x, float y, float z) {
-  top() = glm::rotate(top(), float(PI) * angle / 180.0f, glm::vec3(x, y, z));
-}
+  inline void MatrixStack::scale(float x, float y, float z) {
+    top() = glm::scale(top(), glm::vec3(x, y, z));
+  }
 
-inline void MatrixStack::loadIdentity() {
-  top() = glm::mat4(1.0f);
-}
+  inline void MatrixStack::translate(float x, float y, float z) {
+    top() = glm::translate(top(), glm::vec3(x, y, z));
+  }
 
-inline void MatrixStack::loadMatrix(const glm::mat4& m) {
-  top() = m;
-}
+  inline void MatrixStack::rotate(float angle, float x, float y, float z) {
+    top() = glm::rotate(top(), float(PI) * angle / 180.0f, glm::vec3(x, y, z));
+  }
 
-inline void MatrixStack::frustum(float left ,float right, float btm, float top, float near, float far) {
-  this->top() = glm::frustum(left, right, btm, top, near, far);
+  inline void MatrixStack::loadIdentity() {
+    top() = glm::mat4(1.0f);
+  }
+
+  inline void MatrixStack::loadMatrix(const glm::mat4& m) {
+    top() = m;
+  }
+
+  inline void MatrixStack::frustum(float left ,float right, float btm, float top, float near, float far) {
+    this->top() = glm::frustum(left, right, btm, top, near, far);
+  }
 }
 
 #endif // MATRIXSTACK_H

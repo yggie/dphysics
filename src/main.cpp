@@ -33,11 +33,11 @@ void mmmprint(const glm::mat4& m) {
     printf(" | %+6.3f, %+6.3f, %+6.3f, %+6.3f |\n", m[i][0], m[i][1], m[i][2], m[i][3]);
 }
 
-void testDemo(re::World& world, demo::App& app) {
-//  re::RigidBody* body;
-  re::Sphere sphere(1.0);
+void testDemo(reWorld& world, demo::App& app) {
+//  reRigidBody* body;
+  reSphere sphere(1.0);
   
-  re::RigidBody* body = &world.newRigidBody().withShape(sphere).withMass(5.0).at(0, 0, -2);
+  reRigidBody* body = &world.newRigidBody().withShape(sphere).withMass(5.0).at(0, 0, -2);
   app.newPlainSphere(*body);
   
   for (int i = 0; i < 1; i++) {

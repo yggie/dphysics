@@ -1,10 +1,8 @@
-#include "react/memory/FreeListAllocator.h"
+#include "react/memory/reFreeListAllocator.h"
 
 #include <cstring>
 
 #include "react/common.h"
-
-using namespace re;
 
 /**
  * Creates a new allocator with the given size and pointer
@@ -13,7 +11,7 @@ using namespace re;
  * @param start The pointer to the start of the memory pool
  */
 
-FreeListAllocator::FreeListAllocator(u32 size, void* start) : BaseAllocator(),
+reFreeListAllocator::reFreeListAllocator(u32 size, void* start) : reBaseAllocator(),
 _used(0), _numAllocs(0), _size(size), _ptr(start),
 _freeBlocks((FreeBlock*)start) {
   RE_ASSERT(size > sizeof(FreeBlock), "Allocated memory is too small!")
@@ -26,11 +24,11 @@ _freeBlocks((FreeBlock*)start) {
   _freeBlocks->next = nullptr;
 }
 
-FreeListAllocator::~FreeListAllocator() {
+reFreeListAllocator::~reFreeListAllocator() {
   _freeBlocks = nullptr;
 }
 
-void* FreeListAllocator::alloc(u32 size, u8 alignment) {
+void* reFreeListAllocator::alloc(u32 size, u8 alignment) {
   RE_ASSERT(size != 0, "Useless allocation detected")
   
   // check free blocks
@@ -88,7 +86,7 @@ void* FreeListAllocator::alloc(u32 size, u8 alignment) {
   return nullptr;
 }
 
-void FreeListAllocator::dealloc(void* ptr) {
+void reFreeListAllocator::dealloc(void* ptr) {
   Header* header = (Header*)((uptr)ptr - sizeof(Header));
   
   u32 size = header->size;
