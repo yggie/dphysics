@@ -21,6 +21,7 @@ namespace demo {
   
   class GfxObj;
   class PlainSphere;
+  class StaticGfx;
   
   /**
    * @ingroup demo
@@ -33,6 +34,7 @@ namespace demo {
     ~App();
     
     PlainSphere& newPlainSphere(const re::Ent& ent);
+    StaticGfx& newStaticGfx();
     
     void add(GfxObj& obj);
     void init(int argc, char** argv);
@@ -46,6 +48,8 @@ namespace demo {
     void gResizeScreen(int w, int h);
     void gPaint();
     void gInit();
+    
+    const Canvas& canvas() const;
     
     void addDemo(Demo demo);
     
@@ -89,6 +93,10 @@ namespace demo {
     
     FlyingCam _cam;
   };
+  
+  inline const Canvas& App::canvas() const {
+    return _canvas;
+  }
   
   inline void App::addDemo(Demo demo) {
     if (_demos.size() == 0) {

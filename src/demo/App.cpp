@@ -1,6 +1,7 @@
 #include "demo/App.h"
 
 #include "demo/PlainSphere.h"
+#include "demo/StaticGfx.h"
 
 #include <GL/freeglut.h>
 #include <cstdio>
@@ -38,6 +39,12 @@ App::~App() {
 
 PlainSphere& App::newPlainSphere(const re::Ent& ent) {
   PlainSphere* s = new PlainSphere(ent);
+  add(*((GfxObj*)s));
+  return *s;
+}
+
+StaticGfx& App::newStaticGfx() {
+  StaticGfx* s = new StaticGfx();
   add(*((GfxObj*)s));
   return *s;
 }
@@ -263,6 +270,25 @@ void App::gPaint() {
   }
   glEnd();
   glPopMatrix();
+  
+  glPushMatrix();
+  glTranslatef(0, -1, 0);
+  float m = 25.0f;
+  glBegin(GL_TRIANGLE_STRIP);
+  glVertex3f(m, 0, m);
+  glNormal3f(0, 1, 0);
+  glColor3f(0.6, 0.1, 0.0);
+  glVertex3f(-m, 0, m);
+  glNormal3f(0, 1, 0);
+  glColor3f(0.6, 0.1, 0.0);
+  glVertex3f(m, 0, -m);
+  glNormal3f(0, 1, 0);
+  glColor3f(0.6, 0.1, 0.0);
+  glVertex3f(-m, 0, -m);
+  glNormal3f(0, 1, 0);
+  glColor3f(0.6, 0.1, 0.0);
+  glEnd();
+  glPopMatrix();
 #endif
 
   angle += 0.03f;
@@ -306,10 +332,15 @@ void App::gInit() {
   glShadeModel(GL_SMOOTH);
   glEnable(GL_LIGHTING);
   glEnable(GL_LIGHT0);
-  float lightPos[] = { 0, -1, 0 };
-  float lightColor[] = { 1, 1, 1, 1 };
+  float lightPos[] = { 0, 1.5, 0 };
+  float lightColor[] = { 0.3, 0.3, 0.3, 0.3 };
+//  float diffuse[] = { 0.5, 0.5, 0.5, 0.3 };
   glLightfv(GL_LIGHT0, GL_SPECULAR, lightColor);
+//  glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse);
   glLightfv(GL_LIGHT0, GL_POSITION, lightPos);
+  
+  glEnable(GL_COLOR_MATERIAL);
+	glColorMaterial(GL_FRONT, GL_DIFFUSE);
 #endif
   
 //  glEnable(GL_COLOR_LOGIC_OP);

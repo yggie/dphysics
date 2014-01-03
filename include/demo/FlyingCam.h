@@ -28,29 +28,34 @@ namespace demo {
     void rotUp(float rad);
     void rotDown(float rad);
     
-    glm::mat4 viewMat();
+    const glm::mat4& viewMat() const;
     
   private:
     float _dampingFactor;
+    glm::mat4 _viewMat;
     glm::vec3 _targetPos;
-    glm::vec3 _currPos;
     glm::vec3 _targetRot;
-    glm::vec3 _currRot;
   };
   
-  inline FlyingCam::FlyingCam() : _dampingFactor(0.99), _targetPos(), _currPos(), _targetRot(), _currRot() {
+  inline FlyingCam::FlyingCam() : _dampingFactor(0.01), _viewMat(1.0f), _targetPos(0.0f), _targetRot(0.0f) {
     reset();
   }
   
   inline void FlyingCam::step() {
-    _currPos = _currPos * _dampingFactor + _targetPos * (1 - _dampingFactor);
-    _currRot = _currRot * _dampingFactor + _targetRot * (1 - _dampingFactor);
+    const glm::vec3 dPos = _targetPos * _dampingFactor;
+    const glm::vec3 dRot = _targetRot * _dampingFactor;
+    _targetPos *= (1 - _dampingFactor);
+    _targetRot *= (1 - _dampingFactor);
+    glm::mat4 m = glm::translate(glm::mat4(1.0f), dPos);
+    m = glm::rotate(m, dRot[0], glm::vec3(1.0f, 0.0f, 0.0f));
+    m = glm::rotate(m, dRot[1], glm::vec3(0.0f, 1.0f, 0.0f));
+    m = glm::rotate(m, dRot[2], glm::vec3(0.0f, 0.0f, 1.0f));
+    _viewMat = m * _viewMat;
   }
   
   inline void FlyingCam::reset() {
-    _currPos = glm::vec3(0.0f);
+    _viewMat = glm::mat4(1.0f);
     _targetPos = glm::vec3(0.0f);
-    _currRot = glm::vec3(0.0f);
     _targetRot = glm::vec3(0.0f);
   }
   
@@ -63,11 +68,11 @@ namespace demo {
   }
   
   inline void FlyingCam::pushLeft(float dist) {
-    _targetPos[0] -= dist;
+    _targetPos[0] += dist;
   }
   
   inline void FlyingCam::pushRight(float dist) {
-    _targetPos[0] += dist;
+    _targetPos[0] -= dist;
   }
   
   inline void FlyingCam::rotLeft(float rad) {
@@ -86,13 +91,8 @@ namespace demo {
     _targetRot[0] -= rad;
   }
   
-  inline glm::mat4 FlyingCam::viewMat() {
-    glm::mat4 m(1.0f);
-    m = glm::rotate(m, _currRot[0], glm::vec3(1.0f, 0.0f, 0.0f));
-    m = glm::rotate(m, _currRot[1], glm::vec3(0.0f, 1.0f, 0.0f));
-    m = glm::rotate(m, _currRot[2], glm::vec3(0.0f, 0.0f, 1.0f));
-    m = glm::translate(m, _currPos);
-    return m;
+  inline const glm::mat4& FlyingCam::viewMat() const {
+    return _viewMat;
   }
 }
 

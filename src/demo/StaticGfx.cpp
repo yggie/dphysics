@@ -6,7 +6,7 @@
 
 using namespace demo;
 
-StaticGfx::StaticGfx() : _vaoDefs(){
+StaticGfx::StaticGfx() : _vaoDefs(), _pos(0.0f) {
   // do nothing
 }
 
@@ -25,7 +25,13 @@ StaticGfx::VAODef& StaticGfx::newVAO(GLenum drawMode, GLsizei numVerts) {
 
 void StaticGfx::draw(Canvas& canvas) {
   canvas.push();
-  
+  canvas.translate(_pos[0], _pos[1], _pos[2]);
+  canvas.applyModelView();
+  for_each(_vaoDefs.begin(), _vaoDefs.end(), [&](VAODef* def) {
+    glBindVertexArray(def->vao);
+    glBindBuffer(GL_ARRAY_BUFFER, def->vbo);
+    glDrawArrays(def->drawMode, 0, def->numVerts);
+  });
   canvas.pop();
 }
 
@@ -33,6 +39,7 @@ void StaticGfx::setup(GLuint* vao, GLuint* vbo, const Canvas&) {
   for (unsigned int i = 0; i < _vaoDefs.size(); i++) {
     VAODef& def = *_vaoDefs.at(i);
     def.vao = vao[i];
+    def.vbo = vbo[i];
     GLuint totalSize = 0;
     for_each(def.buffers.begin(), def.buffers.end(), [&](StaticGfx::VAODef::BufferObj obj) {
       totalSize += obj.size;
@@ -64,11 +71,14 @@ void StaticGfx::setup(GLuint* vao, GLuint* vbo, const Canvas&) {
 }
 
 StaticGfx::VAODef::VAODef(GLenum drawMode, GLsizei numVerts) : vao(0),
-drawMode(drawMode), numVerts(numVerts), buffers() {
+vbo(0), drawMode(drawMode), numVerts(numVerts), buffers() {
   // do nothing
 }
 
 StaticGfx::VAODef::~VAODef() {
+  for_each(buffers.begin(), buffers.end(), [](BufferObj& obj) {
+    free(obj.data);
+  });
   buffers.clear();
 }
 

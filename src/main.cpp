@@ -1,6 +1,7 @@
 #include "react/react.h"
 #include "react/utils.h"
 #include "demo/App.h"
+#include "demo/StaticGfx.h"
 
 #include <cstdio>
 
@@ -36,16 +37,41 @@ void testDemo(re::World& world, demo::App& app) {
 //  re::RigidBody* body;
   re::Sphere sphere(1.0);
   
-  re::RigidBody& body = world.newRigidBody().withShape(sphere).withMass(5.0).at(0, 0, -2);
-  app.newPlainSphere(body);
+  re::RigidBody* body = &world.newRigidBody().withShape(sphere).withMass(5.0).at(0, 0, -2);
+  app.newPlainSphere(*body);
   
-//  for (int i = 0; i < 10; i++) {
-//    body = (re::RigidBody*)&world.newRigidBody().withShape(sphere.withRadius(i + 1)).withMass(5.0).at(i-5 , i-5, i-5);
-//    app.newPlainSphere(*body);
-//  }
+  for (int i = 0; i < 1; i++) {
+    body = &world.newRigidBody().withShape(sphere.withRadius(1)).withMass(5.0).at(2*i - 3 , 1, -5);
+    app.newPlainSphere(*body);
+  }
   
-//  re::print(body->inertia());
-  re::print(body.inertia());
+  const float m = 10.0f;
+  const float pos[] = {
+    m, -1, m,
+    -m, -1, m,
+    m, -1, -m,
+    -m, -1, -m
+  };
+  
+  const float color[] = {
+    0.6f, 0.1f, 0.0f,
+    0.6f, 0.1f, 0.0f,
+    0.6f, 0.1f, 0.0f,
+    0.6f, 0.1f, 0.0f
+  };
+  
+  const float norm[] = {
+    0, 1, 0,
+    0, 1, 0,
+    0, 1, 0,
+    0, 1, 0
+  };
+  
+  demo::StaticGfx& floor = app.newStaticGfx();
+  floor.newVAO(GL_TRIANGLE_STRIP, 4)
+          .withAttrib(app.canvas().attrs().vertPos, sizeof(pos), &pos[0], 3)
+          .withAttrib(app.canvas().attrs().vertNorm, sizeof(norm), &norm[0], 3)
+          .withAttrib(app.canvas().attrs().vertColor, sizeof(color), &color[0], 3);
 }
 
 int main(int argc, char** argv) {

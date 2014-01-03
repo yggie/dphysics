@@ -41,7 +41,7 @@ void SimpleCanvas::postInit() {
     throw 0;
   }
   if (_uniforms.modelViewMat == -1) {
-    INVALID_ATTRIBUTE_INDEX("vModelView")
+    INVALID_ATTRIBUTE_INDEX("mModelView")
     throw 0;
   }
   if (_uniforms.projMat == -1) {

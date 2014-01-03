@@ -3,7 +3,10 @@
 
 #include "demo/GfxObj.h"
 
+#include <glm/vec3.hpp>
 #include <vector>
+#include <cstring>
+#include <cstdlib>
 
 namespace demo {
   
@@ -21,6 +24,7 @@ namespace demo {
     public:
       
       struct BufferObj {
+        BufferObj() : data(nullptr), attr(0), size(0), type(0), stride(0) { }
         GLvoid* data;
         GLint attr;
         GLsizei size;
@@ -32,9 +36,10 @@ namespace demo {
       ~VAODef();
       
       template <typename T>
-      StaticGfx::VAODef& withAttrib(GLint attr, GLuint byteSize, T* data, GLsizei stride);
+      StaticGfx::VAODef& withAttrib(GLint attr, GLuint numBytes, T* data, GLsizei stride);
       
       GLuint vao;
+      GLuint vbo;
       GLenum drawMode;
       GLsizei numVerts;
       std::vector<BufferObj> buffers;
@@ -56,6 +61,7 @@ namespace demo {
     
   private:
     std::vector<VAODef*> _vaoDefs;
+    glm::vec3 _pos;
   };
   
   inline GfxObj::Type StaticGfx::type() const {
@@ -79,16 +85,31 @@ namespace demo {
   }
 
   template <typename T>
-  inline StaticGfx::VAODef& StaticGfx::VAODef::withAttrib(GLint attr, GLuint byteSize, T* data, GLsizei stride) {
+  inline StaticGfx::VAODef& StaticGfx::VAODef::withAttrib(GLint, GLuint, T*, GLsizei) {
     // do nothing
+    printf("[DEMO]  Incompatible attribute type\n");
     return *this;
   }
 
   template <>
-  inline StaticGfx::VAODef& StaticGfx::VAODef::withAttrib<float>(GLint attr, GLuint byteSize, float* data, GLsizei stride) {
+  inline StaticGfx::VAODef& StaticGfx::VAODef::withAttrib<float>(GLint attr, GLuint numBytes, float* data, GLsizei stride) {
     StaticGfx::VAODef::BufferObj obj;
-    obj.data = data;
-    obj.size = byteSize;
+    obj.data = malloc(numBytes);
+    memcpy(obj.data, data, numBytes);
+    obj.size = numBytes;
+    obj.type = GL_FLOAT;
+    obj.attr = attr;
+    obj.stride = stride;
+    buffers.push_back(obj);
+    return *this;
+  }
+
+  template <>
+  inline StaticGfx::VAODef& StaticGfx::VAODef::withAttrib<const float>(GLint attr, GLuint numBytes, const float* data, GLsizei stride) {
+    StaticGfx::VAODef::BufferObj obj;
+    obj.data = malloc(numBytes);
+    memcpy(obj.data, data, numBytes);
+    obj.size = numBytes;
     obj.type = GL_FLOAT;
     obj.attr = attr;
     obj.stride = stride;
