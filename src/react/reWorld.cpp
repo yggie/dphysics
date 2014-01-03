@@ -6,7 +6,7 @@
 #include "react/reRigidBody.h"
 #include "react/reSphere.h"
 
-const int MEM_ALLOC = 1024*5;
+const int MEM_ALLOC = 1024*1024*5;
 //const int MEM_ALLOC = 350;
 
 char buffer[MEM_ALLOC];

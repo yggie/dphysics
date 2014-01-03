@@ -5,7 +5,7 @@
 #ifndef RE_SPHERE_H
 #define RE_SPHERE_H
 
-#include "react/reMatrix.h"
+#include "react/math.h"
 #include "react/reShape.h"
 
 /**

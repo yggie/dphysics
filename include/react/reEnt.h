@@ -5,8 +5,7 @@
 #ifndef RE_ENT_H
 #define RE_ENT_H
 
-#include "react/reVector.h"
-#include "react/reMatrix.h"
+#include "react/math.h"
 #include "react/reWorld.h"
 
 class reShape;

@@ -17,12 +17,14 @@ public:
   
   /** The types of shapes supported by the engine */
   enum Type {
-    /** A sphere @see Sphere */
+    /** A sphere @see reSphere */
     SPHERE,
-    /** A rectangle @see Rectangle */
+    /** A rectangle @see reRectangle */
     RECTANGLE,
     /** A compound shape type */
-    COMPOUND
+    COMPOUND,
+    /** A planar triangle @see reTriangle */
+    TRIANGLE
   };
   
   reShape();

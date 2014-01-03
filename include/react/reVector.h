@@ -5,7 +5,7 @@
 #ifndef RE_VECTOR_H
 #define RE_VECTOR_H
 
-#include "react/math.h"
+#include "react/mathutils.h"
 
 /**
  * Represents a single vector in homogenous coordinates
