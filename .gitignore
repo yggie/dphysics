@@ -15,8 +15,11 @@
 # Gedit backup files
 *~
 
-# Ignore build folder
-/build
+# Ignore build files
+CMakeCache.txt*
+CMakeFiles
+cmake_install.cmake*
+Makefile*
 
 # Ignore generated executable
 /demo
