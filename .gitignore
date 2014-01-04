@@ -16,8 +16,8 @@
 *~
 
 # Ignore generated executable
-./demo
-./ray
+/demo
+/ray
 
 # Ignore generated Makefiles
 *.d
