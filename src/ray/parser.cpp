@@ -73,7 +73,9 @@ RayScene createSceneFromFile(const char* filename) {
   glm::vec3 specular(0.0, 0.0, 0.0);
   float shininess = 0.0f;
   
-  int size = 0;
+  // UNKNOWN COUNT
+  unsigned int unknowns = 0;
+  
   demo::MatrixStack stack;
   
   for (std::string line; std::getline(file, line); ) {
@@ -249,9 +251,6 @@ RayScene createSceneFromFile(const char* filename) {
     } else if (cmd == "pushTransform") {
       stack.push();
       RAY_PRINTF("    %-32s%3d", "PUSH", stack.size())
-      if (stack.size() > size) {
-        size = stack.size();
-      }
       
     } else if (cmd == "popTransform") {
       stack.pop();
@@ -260,7 +259,31 @@ RayScene createSceneFromFile(const char* filename) {
       /**
        * LIGHTING RELATED COMMANDS
        */
-      
+
+    } else if (cmd == "directional") {
+      float a[6];
+      readFloats(6, &a[0]);
+      scene.addDirectionalLightSource(reVector(&a[0]), reVector(&a[3]));
+      RAY_PRINTF("    %-22s%3.1f, %3.1f, %3.1f", "DIRECTIONAL LIGHT", a[3], a[4], a[5]);
+
+    } else if (cmd == "point") {
+      float a[6];
+      readFloats(6, &a[0]);
+      scene.addSpotLightSource(reVector(&a[0]), reVector(&a[3]));
+      RAY_PRINTF("    %-22s%3.1f, %3.1f, %3.1f", "SPOT LIGHT", a[3], a[4], a[5]);
+
+    } else if (cmd == "attenuation") {
+      float a[3];
+      readFloats(3, &a[0]);
+      scene.setAttenuation(reVector(&a[0]));
+      RAY_PRINTF("    %-22s%3.1f, %3.1f, %3.1f", "ATTENUATION", a[0], a[1], a[2]);
+
+    } else if (cmd == "ambient") {
+      float a[3];
+      readFloats(3, &a[0]);
+      scene.setAmbient(reVector(&a[0]));
+      RAY_PRINTF("    %-22s%3.1f, %3.1f, %3.1f", "AMBIENT", a[0], a[1], a[2]);
+
       /**
        * MATERIALS RELATED COMMANDS
        */
@@ -277,20 +300,20 @@ RayScene createSceneFromFile(const char* filename) {
       readFloats(3, &emission[0]);
       RAY_PRINTF("    %-22s%3.1f, %3.1f, %3.1f", "EMISSION", emission[0], emission[1], emission[2])
       
-    } else if (cmd == "specular") {
+    } else if (cmd == "shininess") {
       readFloats(1, &shininess);
       RAY_PRINTF("    %-30s%5.1f", "SHININESS", shininess)
       
     } else {
-      continue;
       RAY_PRINTF("    %-35s", "!!UNKNOWN!!")
+      unknowns++;
     }
     
     RAY_PRINTF("   (%s)\n", line.c_str())
   }
   
   printf("[PARSE]  End of file \"%s\"\n", filename);
-  printf("[PARSE]  Max stack size: %d\n", size);
+  printf("[PARSE]  Unknown count: %d\n", unknowns);
   
   file.close();
   

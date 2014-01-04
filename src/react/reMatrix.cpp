@@ -24,4 +24,3 @@ const reMatrix reMatrix::operator*(const reMatrix& m) const {
   
   return tmp;
 }
-

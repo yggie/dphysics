@@ -3,12 +3,12 @@ file(GLOB react_SOURCE_FILES
   "memory/*.cpp"
 )
 
-file(GLOB react_HEADERS
+file(GLOB react_HEADER_FILES
   "${react_SOURCE_DIR}/include/react/*.h"
   "${react_SOURCE_DIR}/include/react/memory/*.h"
 )
 
-include_directories(${react_SOURCE_DIR}/include)
+set(MY_HEADERS ${react_HEADER_FILES})
 
 add_library(react STATIC
   ${react_SOURCE_FILES}

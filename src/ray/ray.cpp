@@ -86,7 +86,14 @@ int main(int argc, char** argv) {
 //  glutMainLoopEvent();
 //  glutDisplayFunc(displayFunc);
 
-  createSceneFromFile("res/ray/samples/scene4-specular.test");
+  for (int i = 0; i < argc; i++) {
+    printf("%d: \"%s\"\n", i, argv[i]);
+  }
+  if (argc == 1) {
+    createSceneFromFile("../res/ray/samples/scene4-specular.test");
+  } else {
+    createSceneFromFile(argv[1]);
+  }
   
 //  glutMainLoop();
   return 0;

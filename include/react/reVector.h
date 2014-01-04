@@ -8,14 +8,15 @@
 #include "react/mathutils.h"
 
 /**
- * Represents a single vector in homogenous coordinates
+ * @brief Represents a single vector in homogenous coordinates
  */
 
 struct reVector {
   /** default constructor zeroes all values */
   reVector();
-  /** copy constructor */
+  /** copy constructor @param a The reVector to copy */
   reVector(const reVector& a);
+  reVector(const reFloat* array);
   /** initializes the vector with the input coordinates */
   reVector(reFloat _x, reFloat _y, reFloat _z, reFloat _w = 0.0);
   
@@ -79,10 +80,24 @@ struct reVector {
 // inline constructors
 inline reVector::reVector() : v{0.0} { }
 inline reVector::reVector(const reVector& a) : x(a.x), y(a.y), z(a.z), w(0.0) { }
+
+/**
+ * @brief Copies the first 3 elements of the input array into the reVector
+ *
+ * @param array An array of values
+ */
+
+inline reVector::reVector(const reFloat* array) : v{0.0} {
+  for (int i = 0; i < 3; i++) {
+    v[i] = array[i];
+  }
+  v[3] = 1.0;
+}
+
 inline reVector::reVector(reFloat _x, reFloat _y, reFloat _z, reFloat _w) : x(_x), y(_y), z(_z), w(_w) { }
 
 /**
- * Access an element in the vector
+ * @brief Access an element in the vector
  * 
  * @param i The position in the vector to access
  * @return The value of the element in the vector

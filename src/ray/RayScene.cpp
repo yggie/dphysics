@@ -10,9 +10,9 @@
 #include <glm/vec4.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-RayScene::RayScene() : _image(), _width(0), _height(0),
-_maxBounces(5), _outputFile(), _fovy(120.0f), _projMat(1.0f),
-_viewMat(1.0f), _world() {
+RayScene::RayScene() : _image(), _width(0), _height(0), _maxBounces(5),
+  _outputFile(), _fovy(120.0f), _projMat(1.0f), _viewMat(1.0f), _world(),
+  _ambient(0.2, 0.2, 0.2), _attenuation(1,0,0), _lights() {
   // do nothing
 }
 
@@ -61,4 +61,16 @@ RayObject& RayScene::addTriangle(const glm::vec3& a, const glm::vec3& b, const g
   RayObject* obj = new RayObject();
   ent.userdata = obj;
   return *obj;
+}
+
+RayLightSource& RayScene::addSpotLightSource(const reVector& color, const reVector& pos) {
+  RayLightSource& src = *(new RayLightSource());
+  _lights.push_back(&src);
+  return src.withColor(color).withVect(pos).asDirectional(false);
+}
+
+RayLightSource& RayScene::addDirectionalLightSource(const reVector &color, const reVector &dir) {
+  RayLightSource& src = *(new RayLightSource());
+  _lights.push_back(&src);
+  return src.withColor(color).withVect(dir).asDirectional(true);
 }
