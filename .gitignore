@@ -15,6 +15,9 @@
 # Gedit backup files
 *~
 
+# Ignore build folder
+/build
+
 # Ignore generated executable
 /demo
 /ray
