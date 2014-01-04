@@ -5,8 +5,10 @@
 
 #include "react/reRigidBody.h"
 #include "react/reSphere.h"
+#include "react/reTriangle.h"
+#include "react/reDistortedShape.h"
 
-const int MEM_ALLOC = 1024*1024*5;
+const int MEM_ALLOC = 1024*1024*1;
 //const int MEM_ALLOC = 350;
 
 char buffer[MEM_ALLOC];
@@ -33,7 +35,7 @@ void reWorld::clear() {
 //  reProxyAllocator* proxy = (reProxyAllocator*)_allocator;
   for (it = _bodies.begin(); it != itEnd; it++) {
 //    proxy->show();
-    _allocator->alloc_delete<reShape>((*it)->shape());
+    remove(*(*it)->shape());
     _allocator->alloc_delete<reEnt>(*it);
   }
   
@@ -58,6 +60,12 @@ reShape& reWorld::copyOf(const reShape& shape) {
     case reShape::COMPOUND:
       RE_NOT_IMPLEMENTED
       break;
+    
+    case reShape::TRIANGLE:
+      return *_allocator->alloc_new<reTriangle>((const reTriangle&)shape);
+    
+    case reShape::DISTORTED:
+      return (*_allocator->alloc_new<reDistortedShape>((const reDistortedShape&)shape)).withWorld(*this);
   }
   
   RE_IMPOSSIBLE
@@ -97,6 +105,32 @@ void reWorld::add(reEnt& entity) {
       RE_IMPOSSIBLE
       break;
   }
+}
+
+void reWorld::remove(reShape& shape) {
+  switch (shape.type()) {
+    case reShape::SPHERE:
+      _allocator->alloc_delete<reSphere>(&((reSphere&)shape));
+      return;
+    
+    case reShape::RECTANGLE:
+      RE_NOT_IMPLEMENTED
+      break;
+    
+    case reShape::COMPOUND:
+      RE_NOT_IMPLEMENTED
+      break;
+    
+    case reShape::TRIANGLE:
+      _allocator->alloc_delete<reTriangle>((&(reTriangle&)shape));
+      return;
+    
+    case reShape::DISTORTED:
+      _allocator->alloc_delete<reDistortedShape>(&((reDistortedShape&) shape));
+      return;
+  }
+  
+  RE_IMPOSSIBLE
 }
 
 void reWorld::step(reFloat dt) {

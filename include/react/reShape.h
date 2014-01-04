@@ -24,7 +24,9 @@ public:
     /** A compound shape type */
     COMPOUND,
     /** A planar triangle @see reTriangle */
-    TRIANGLE
+    TRIANGLE,
+    /** A special extension of shapes allow arbitrary operations @see reDistortedShape */
+    DISTORTED
   };
   
   reShape();

@@ -17,6 +17,7 @@ class reTriangle : public reShape {
 public:
   /** Default constructor does nothing */
   reTriangle();
+  reTriangle(const reTriangle& other);
   reTriangle(const reVector& a, const reVector& b, const reVector& c);
   /** Destructor does nothing */
   ~reTriangle();
@@ -36,6 +37,18 @@ private:
 
 inline reTriangle::reTriangle() : _verts() {
   // do nothing
+}
+
+/**
+ * Copy constructor
+ * 
+ * @param other The other reTriangle to copy
+ */
+
+inline reTriangle::reTriangle(const reTriangle& other) : _verts() {
+  for (int i = 0; i < 3; i++) {
+    _verts[i] = other._verts[i];
+  }
 }
 
 /**
@@ -90,6 +103,7 @@ inline const reVector& reTriangle::vert(int i) const {
 
 inline reTriangle& reTriangle::withVertex(int i, const reVector& vert) {
   _verts[i] = vert;
+  return *this;
 }
 
 /**
@@ -112,8 +126,8 @@ inline reFloat reTriangle::volume() const {
   return 0.0;
 }
 
-const reMatrix computeInertia() const {
-  RE_NOT_IMPLEMENTED
+inline const reMatrix reTriangle::computeInertia() const {
+//  RE_NOT_IMPLEMENTED
   return reMatrix(1.0f);
 }
 

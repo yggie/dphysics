@@ -61,10 +61,10 @@ $(DEMO_EXECUTABLE) : $(REACT_OBJECTS) $(DEMO_OBJECTS)
 	$(CC) $^ $(DEMO_LIBS) -o $@
 
 $(RAY_EXECUTABLE) : $(REACT_OBJECTS) $(RAY_OBJECTS)
-	$(CC) $^ $(RAY_LIBS) -o $@
+	$(CC) $^ bin/demo/MatrixStack.o $(RAY_LIBS) -o $@
 
 # includes the list of dependencies which are already made
--include $(foreach dir, $(BIN_PATH), $(wildcard *.d))
+-include $(foreach dir, $(BIN_PATH), $(wildcard $(dir)/*.d))
 
 #debug : echo_files all
 

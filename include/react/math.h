@@ -8,5 +8,6 @@
 #include "react/mathutils.h"
 #include "react/reVector.h"
 #include "react/reMatrix.h"
+#include "react/reTMatrix.h"
 
 #endif

@@ -13,6 +13,7 @@ class reRigidBody;
 class reEnt;
 class reShape;
 class reAllocator;
+class reDistortedShape;
 
 /**
  * Represents a physical world
@@ -25,10 +26,13 @@ public:
   
   void clear();
   
+  reDistortedShape& newDistortedShape(const reShape& shape);
   reRigidBody& newRigidBody();
   reShape& copyOf(const reShape& shape);
   
   void add(reEnt& entity);
+  
+  void remove(reShape& shape);
   
   reAllocator& allocator();
   

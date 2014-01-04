@@ -7,11 +7,10 @@
 
 #include "react/common.h"
 #include "react/math.h"
-#include "react/reVector.h"
-#include "react/reMatrix.h"
 
 #include "react/reShape.h"
 #include "react/reSphere.h"
+#include "react/reTriangle.h"
 
 #include "react/reEnt.h"
 #include "react/reSolid.h"

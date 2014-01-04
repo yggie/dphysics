@@ -96,7 +96,7 @@ void reFreeListAllocator::dealloc(void* ptr) {
   u32 blockSize = size;
   
 #ifdef RE_ZERO_MEMORY
-  memset((void*)blockStart, RE_ZERO_MEM_VAL, blockSize);
+//  memset((void*)blockStart, RE_ZERO_MEM_VAL, blockSize);
 #endif
   
   bool blockMerged = false;

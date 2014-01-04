@@ -70,6 +70,8 @@ void reshapeFunc(int w, int h) {
   glutPostRedisplay();
 }
 
+#include "ray/RayScene.h"
+
 int main(int argc, char** argv) {
 //  glutInit(&argc, argv);
 //  glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB | GLUT_DEPTH);
@@ -83,7 +85,7 @@ int main(int argc, char** argv) {
 //  glutDisplayFunc(initFunc);
 //  glutMainLoopEvent();
 //  glutDisplayFunc(displayFunc);
-  
+
   createSceneFromFile("res/ray/samples/scene4-specular.test");
   
 //  glutMainLoop();

@@ -1,6 +1,8 @@
 #include "ray/parser.h"
 
 #include "ray/RayScene.h"
+#include "ray/RayObject.h"
+#include "demo/MatrixStack.h"
 
 #define GLM_FORCE_RADIANS
 
@@ -11,7 +13,6 @@
 #include <fstream>
 #include <sstream>
 #include <vector>
-#include <stack>
 
 #define RAY_PRINTF(...)   printf(__VA_ARGS__);
 
@@ -61,6 +62,19 @@ RayScene createSceneFromFile(const char* filename) {
   
   // SPHERE DEFINITION
   unsigned int cSpheres = 0;
+  
+  // TRIANGLE DEFINITION
+  unsigned int cTri = 0;
+  unsigned int cTriNorm = 0;
+  
+  // MATERIALS DEFINITION
+  glm::vec3 diffuse(0.0, 0.0, 0.0);
+  glm::vec3 emission(0.0, 0.0, 0.0);
+  glm::vec3 specular(0.0, 0.0, 0.0);
+  float shininess = 0.0f;
+  
+  int size = 0;
+  demo::MatrixStack stack;
   
   for (std::string line; std::getline(file, line); ) {
     if (!(line.find_first_not_of(" \t\r\n") != std::string::npos) ||
@@ -139,7 +153,11 @@ RayScene createSceneFromFile(const char* filename) {
     } else if (cmd == "sphere") {
       float v[4];
       readFloats(4, &v[0]);
-      scene.addSphere(v[0], v[1], v[2], v[3]);
+      scene.addSphere(v[0], v[1], v[2], v[3], stack.mat())
+            .withDiffuse(diffuse[0], diffuse[1], diffuse[2])
+            .withSpecular(specular[0], specular[1], specular[2])
+            .withEmission(emission[0], emission[1], emission[2])
+            .withShininess(shininess);
       RAY_PRINTF("    %-6s%6d%5.1fR %+4.1f, %+4.1f, %+4.1f",
                  "SPHERE", cSpheres++, v[3], v[0], v[1], v[2])
 
@@ -182,19 +200,86 @@ RayScene createSceneFromFile(const char* filename) {
       }
       
     } else if (cmd == "tri") {
-      float a[6];
-      readFloats(3, &a[0]);
-      Pair p;
-      p.vert = glm::vec3(a[0], a[1], a[2]);
-      p.norm = glm::vec3(a[3], a[4], a[5]);
-      vertsWithNorms.push_back(p);
-      RAY_PRINTF(
-        "    %-6s#%-5d%+4.1f,%+4.1f,%+4.1f,%+2.0f,%+2.0f,%+2.0f",
-        "NORMAL", cNorms, a[0], a[1], a[2], a[3], a[4], a[5])
-      if (cNorms++ >= maxNorms) {
-        printf("Exceeded max vertex with normals!!\n");
-        throw 0;
+      unsigned int inds[3];
+      readUInts(3, &inds[0]);
+      scene.addTriangle(
+        verts.at(inds[0]),
+        verts.at(inds[1]),
+        verts.at(inds[2]),
+        stack.mat()
+      ).withDiffuse(diffuse[0], diffuse[1], diffuse[2])
+       .withSpecular(specular[0], specular[1], specular[2])
+       .withEmission(emission[0], emission[1], emission[2])
+       .withShininess(shininess);
+      RAY_PRINTF("    %-6s%6d%13d,%4d,%4d",
+                 "TRI", cTri++, inds[0], inds[1], inds[2])
+      
+    } else if (cmd == "trinormal") {
+      unsigned int inds[6];
+      readUInts(6, &inds[0]);
+      cTriNorm++;
+      printf("YOU SHOULD NOT BE HERE!\n");
+      throw 0;
+      
+      /**
+       * TRANSFORMATION COMMANDS
+       */
+      
+    } else if (cmd == "translate") {
+      float t[3];
+      readFloats(3, &t[0]);
+      stack.translate(t[0], t[1], t[2]);
+      RAY_PRINTF("    %-12s%+11.1f, %+4.1f, %+4.1f",
+                 "TRANSLATE", t[0], t[1], t[2])
+      
+    } else if (cmd == "rotate") {
+      float r[4];
+      readFloats(4, &r[0]);
+      stack.rotate(r[3], r[0], r[1], r[2]);
+      RAY_PRINTF("    %-12s%6.1f %+4.1f, %+4.1f, %+4.1f",
+                 "ROTATE", r[3], r[0], r[1], r[2])
+      
+    } else if (cmd == "scale") {
+      float s[3];
+      readFloats(3, &s[0]);
+      stack.scale(s[0], s[1], s[2]);
+      RAY_PRINTF("    %-19s%+4.1f, %+4.1f, %+4.1f",
+                 "SCALE", s[0], s[1], s[2])
+      
+    } else if (cmd == "pushTransform") {
+      stack.push();
+      RAY_PRINTF("    %-32s%3d", "PUSH", stack.size())
+      if (stack.size() > size) {
+        size = stack.size();
       }
+      
+    } else if (cmd == "popTransform") {
+      stack.pop();
+      RAY_PRINTF("    %-32s%3d", "POP", stack.size())
+      
+      /**
+       * LIGHTING RELATED COMMANDS
+       */
+      
+      /**
+       * MATERIALS RELATED COMMANDS
+       */
+      
+    } else if (cmd == "diffuse") {
+      readFloats(3, &diffuse[0]);
+      RAY_PRINTF("    %-22s%3.1f, %3.1f, %3.1f", "DIFFUSE", diffuse[0], diffuse[1], diffuse[2])
+      
+    } else if (cmd == "specular") {
+      readFloats(3, &specular[0]);
+      RAY_PRINTF("    %-22s%3.1f, %3.1f, %3.1f", "SPECULAR", specular[0], specular[1], specular[2])
+      
+    } else if (cmd == "emission") {
+      readFloats(3, &emission[0]);
+      RAY_PRINTF("    %-22s%3.1f, %3.1f, %3.1f", "EMISSION", emission[0], emission[1], emission[2])
+      
+    } else if (cmd == "specular") {
+      readFloats(1, &shininess);
+      RAY_PRINTF("    %-30s%5.1f", "SHININESS", shininess)
       
     } else {
       continue;
@@ -205,6 +290,7 @@ RayScene createSceneFromFile(const char* filename) {
   }
   
   printf("[PARSE]  End of file \"%s\"\n", filename);
+  printf("[PARSE]  Max stack size: %d\n", size);
   
   file.close();
   

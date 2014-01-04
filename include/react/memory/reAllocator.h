@@ -29,7 +29,8 @@ public:
   
   // convenient allocation functions
   template <class T> T* alloc_new();
-  template <class T1, class T2> T1* alloc_new(T2 args);
+  template <class T1, class T2> T1* alloc_new(T2 arg);
+  template <class T1, class T2, class T3> T1* alloc_new(T2 arg1, T3 arg2);
   template <class T> void alloc_delete(T* ptr);
   
   void* nextAlignedAddress(void* ptr, u8 alignment) const;
@@ -75,6 +76,19 @@ template <class T> inline T* reAllocator::alloc_new() {
 
 template <class T1, class T2> inline T1* reAllocator::alloc_new(T2 arg) {
   return new (alloc(sizeof(T1), __alignof(T1))) T1(arg);
+}
+
+/**
+ * Allocates memory for the object using a constructor with a two arguments
+ * 
+ * @param arg1 The first argument
+ * @param arg2 The second argument
+ * @return The allocated instance
+ */
+
+
+template <class T1, class T2, class T3> inline T1* reAllocator::alloc_new(T2 arg1, T3 arg2) {
+  return new (alloc(sizeof(T1), __alignof(T1))) T1(arg1, arg2);
 }
 
 /**
