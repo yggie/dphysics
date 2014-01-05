@@ -28,7 +28,9 @@ void* reProxyAllocator::alloc(u32 size, u8 alignment) {
 }
 
 void reProxyAllocator::dealloc(void* ptr) {
-  int uu = _allocator->used();
+#ifdef NDEBUG
+//  unsigned int uu = _allocator->used();
+#endif
   _allocator->dealloc(ptr);
 //  RE_LOG("dealloc: {#%02d-%5d}", _allocator->numAllocs(), uu - _allocator->used())
 }

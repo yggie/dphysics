@@ -31,6 +31,10 @@ public:
   reFloat volume() const override;
   const reMatrix computeInertia() const;
   
+  const reVector faceNorm() const;
+  
+  bool rayIntersect(const reVector& origin, const reVector& dir, reVector* intersect = nullptr, reVector* normal = nullptr) const override;
+  
 private:
   reVector _verts[3];
 };
@@ -129,6 +133,10 @@ inline reFloat reTriangle::volume() const {
 inline const reMatrix reTriangle::computeInertia() const {
 //  RE_NOT_IMPLEMENTED
   return reMatrix(1.0f);
+}
+
+inline const reVector reTriangle::faceNorm() const {
+  return (_verts[0] - _verts[1]).cross(_verts[2] - _verts[1]).normalized();
 }
 
 #endif

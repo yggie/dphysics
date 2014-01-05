@@ -1,100 +1,98 @@
-#include "ray/parser.h"
+#include "demo/glsetup.h"
+#include "demo/DemoApp.h"
+#include "ray/RayTracingDemo.h"
 
-#include "ray/RayScene.h"
+#include "react/react.h"
 
-#include <GL/gl.h>
-#include <GL/freeglut.h>
-#include <stdio.h>
+// declare all demos
+DemoApp* demos[] = {
+  new RayTracingDemo()
+};
 
-int windowWidth, windowHeight;
-int imageWidth, imageHeight;
+
+const int numDemos = sizeof(demos) / sizeof(DemoApp*);
+int currentDemo = 0;
+unsigned int windowWidth = 0;
+unsigned int windowHeight = 0;
+
+void changeDemo(unsigned int index) {
+  currentDemo = index;
+  demos[currentDemo]->init();
+}
 
 void initFunc() {
-  glClearColor(0, 0, 0, 1);
-  glDisable(GL_ALPHA_TEST);
-  glDisable(GL_BLEND);
-  glDisable(GL_DEPTH_TEST);
-  glDisable(GL_FOG);
-  glDisable(GL_LIGHTING);
-  glDisable(GL_LOGIC_OP);
-  glDisable(GL_STENCIL_TEST);
-  glDisable(GL_TEXTURE_1D);
-  glDisable(GL_TEXTURE_2D);
-  glPixelTransferi(GL_MAP_COLOR, GL_FALSE);
-  glPixelTransferi(GL_RED_SCALE, 1);
-  glPixelTransferi(GL_RED_BIAS, 0);
-  glPixelTransferi(GL_GREEN_SCALE, 1);
-  glPixelTransferi(GL_GREEN_BIAS, 0);
-  glPixelTransferi(GL_BLUE_SCALE, 1);
-  glPixelTransferi(GL_BLUE_BIAS, 0);
-  glPixelTransferi(GL_ALPHA_SCALE, 1);
-  glPixelTransferi(GL_ALPHA_BIAS, 0);
-  glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-  glShadeModel(GL_FLAT);
-  glMatrixMode(GL_PROJECTION);
-  glLoadIdentity();
-  glMatrixMode(GL_MODELVIEW);
-  glLoadIdentity();
+  changeDemo(0);
 }
 
 void displayFunc() {
-  glClear(GL_COLOR_BUFFER_BIT);
+  demos[currentDemo]->draw();
 }
 
-void keyFunc(unsigned char key, int, int) {
+void keyFunc(unsigned char key, int x, int y) {
   switch (key) {
-    case 27:
+    case 27:  // ESC
       glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE,
                     GLUT_ACTION_CONTINUE_EXECUTION);
       glutLeaveMainLoop();
       break;
       
     default:
-      printf("Unhandled character input: %c\n", key);
+      demos[currentDemo]->keyEvent(key, x, y);
       break;
   }
 }
 
-void reshapeFunc(int w, int h) {
-  h = (h > 0) ? h : 1;
-  windowHeight = h;
-  windowWidth = w;
-  glViewport(0, 0, w, h);
-  glMatrixMode(GL_PROJECTION);
-  glLoadIdentity();
-  glRasterPos3f(-1.0f, 1.0f, -0.5f);
-  glPixelZoom(windowWidth/double(imageWidth), -windowHeight/double(imageHeight));
-  glOrtho(0, imageWidth, 0, imageHeight, -1.0f, 1.0f);
-  glMatrixMode(GL_MODELVIEW);
-  glLoadIdentity();
-  glutPostRedisplay();
+void specialKeyFunc(int key, int x, int y) {
+  demos[currentDemo]->specialKeyEvent(key, x, y);
 }
 
-#include "ray/RayScene.h"
+void reshapeFunc(int w, int h) {
+  windowHeight = (h > 0) ? h : 1;
+  windowWidth = w;
+  glViewport(0, 0, windowWidth, windowHeight);
+  demos[currentDemo]->setWindowSize(windowWidth, windowHeight);
+  demos[currentDemo]->onResize();
+}
 
 int main(int argc, char** argv) {
-//  glutInit(&argc, argv);
-//  glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB | GLUT_DEPTH);
-//  glutInitWindowSize(640, 480);
-//  glutInitWindowPosition(200, 150);
-//  glutCreateWindow("Simple Ray Tracing");
-//  
-//  glutReshapeFunc(reshapeFunc);
-//  glutKeyboardFunc(keyFunc);
-//  
-//  glutDisplayFunc(initFunc);
-//  glutMainLoopEvent();
-//  glutDisplayFunc(displayFunc);
-
-  for (int i = 0; i < argc; i++) {
-    printf("%d: \"%s\"\n", i, argv[i]);
-  }
-  if (argc == 1) {
-    createSceneFromFile("../res/ray/samples/scene4-specular.test");
-  } else {
-    createSceneFromFile(argv[1]);
-  }
+  glutInit(&argc, argv);
+  glutInitDisplayMode(GLUT_SINGLE | GLUT_RGBA | GLUT_DEPTH);
+  glutInitWindowSize(640, 480);
+  glutInitWindowPosition(200, 150);
+  glutCreateWindow("react Demo Applications");
   
-//  glutMainLoop();
+  glutReshapeFunc(reshapeFunc);
+  glutKeyboardFunc(keyFunc);
+  glutSpecialFunc(specialKeyFunc);
+  
+  glutDisplayFunc(initFunc);
+  glutMainLoopEvent();
+  glutDisplayFunc(displayFunc);
+    
+  glutMainLoop();
+  
+//  reWorld world;
+//  world.newRigidBody().withShape(
+//    reTriangle(
+//      reVector(-1.0, -0.2,  1.4),
+//      reVector( 1.0,  1.4,  0.2),
+//      reVector(-1.0,  1.4,  0.2)
+//    )
+//  ).at(0, 0, 0);
+//  
+//  reVector origin(1.1, 1.1, 0);
+//  reVector dir(0, 0, -1);
+//  reVector intersect, norm;
+//  if (world.shootRay(origin, dir, &intersect, &norm)) {
+//    printf("INTERSECT: (%+.2f, %+.2f, %+.2f)\n", intersect[0], intersect[1], intersect[2]);
+//    printf("NORMAL:    (%+.2f, %+.2f, %+.2f)\n", norm[0], norm[1], norm[2]);
+//  } else {
+//    printf("NO INTERSECT\n");
+//  }
+  
+  for (int i = 0; i < numDemos; i++) delete demos[i];
+  
+  RE_LOG("SUCCESSFULLY DELETED ALL DEMOS")
+  
   return 0;
 }

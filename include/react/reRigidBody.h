@@ -22,13 +22,16 @@ public:
   
   reEnt::Type type() const;
   
+  // getters for state properties
   const reVector vel() const override;
   const reMatrix rotVel() const override;
   
+  // getters for material properties
   reFloat mass() const override;
   const reMatrix inertia() const override;
   reFloat density() const override;
   
+  // setters for material properties
   void setMass(reFloat mass) override;
   void setDensity(reFloat density) override;
   reRigidBody& at(const reVector& position) override;

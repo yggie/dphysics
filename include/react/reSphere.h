@@ -29,6 +29,8 @@ public:
   void setRadius(reFloat radius);
   reSphere& withRadius(reFloat radius);
   
+  bool rayIntersect(const reVector& origin, const reVector& dir, reVector* intersect = nullptr, reVector* normal = nullptr) const override;
+  
 protected:
   reFloat _sRadius;
 };

@@ -8,6 +8,8 @@
 #include "react/reTriangle.h"
 #include "react/reDistortedShape.h"
 
+#include <algorithm>
+
 const int MEM_ALLOC = 1024*1024*1;
 //const int MEM_ALLOC = 350;
 
@@ -28,14 +30,20 @@ reWorld::~reWorld() {
   }
 }
 
+/**
+ * Removes all entities in the reWorld
+ */
+
 void reWorld::clear() {
   std::vector<reRigidBody*>::iterator it;
   std::vector<reRigidBody*>::iterator itEnd = _bodies.end();
   
+  RE_LOG("No. of bodies = %ld", _bodies.size())
+  
 //  reProxyAllocator* proxy = (reProxyAllocator*)_allocator;
   for (it = _bodies.begin(); it != itEnd; it++) {
 //    proxy->show();
-    remove(*(*it)->shape());
+    remove((*it)->shape());
     _allocator->alloc_delete<reEnt>(*it);
   }
   
@@ -107,10 +115,15 @@ void reWorld::add(reEnt& entity) {
   }
 }
 
-void reWorld::remove(reShape& shape) {
-  switch (shape.type()) {
+void reWorld::remove(reShape* shape) {
+  if (shape == nullptr) {
+    RE_LOG("Attempted to delete NULL shape")
+    return;
+  }
+  
+  switch (shape->type()) {
     case reShape::SPHERE:
-      _allocator->alloc_delete<reSphere>(&((reSphere&)shape));
+      _allocator->alloc_delete<reSphere>((reSphere*)shape);
       return;
     
     case reShape::RECTANGLE:
@@ -122,11 +135,11 @@ void reWorld::remove(reShape& shape) {
       break;
     
     case reShape::TRIANGLE:
-      _allocator->alloc_delete<reTriangle>((&(reTriangle&)shape));
+      _allocator->alloc_delete<reTriangle>((reTriangle*)shape);
       return;
     
     case reShape::DISTORTED:
-      _allocator->alloc_delete<reDistortedShape>(&((reDistortedShape&) shape));
+      _allocator->alloc_delete<reDistortedShape>((reDistortedShape*)shape);
       return;
   }
   
@@ -136,5 +149,36 @@ void reWorld::remove(reShape& shape) {
 void reWorld::step(reFloat dt) {
   // do nothing
   dt += 1;
+}
+
+reEnt* reWorld::shootRay(const reVector& from, const reVector& direction, reVector* intersect, reVector* normal) {
+  reVector intersectPoint;
+  reVector intersectNormal;
+  reFloat maxDist = RE_INFINITY;
+  reEnt* entContact = nullptr;
+  
+  for_each(_bodies.begin(), _bodies.end(), [&](reEnt* ent) {
+    if (ent->rayIntersect(from, direction, &intersectPoint, &intersectNormal)) {
+      reFloat dist = (from - intersectPoint).length();
+      if (dist < maxDist) {
+        entContact = ent;
+        maxDist = dist;
+      }
+    };
+  });
+  
+  if (entContact == nullptr) {
+    return nullptr;
+  }
+  
+  if (intersect != nullptr) {
+    *intersect = intersectPoint;
+  }
+  
+  if (normal != nullptr) {
+    *normal = intersectNormal;
+  }
+  
+  return entContact;
 }
 

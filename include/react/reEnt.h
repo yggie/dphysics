@@ -7,8 +7,7 @@
 
 #include "react/math.h"
 #include "react/reWorld.h"
-
-class reShape;
+#include "react/reShape.h"
 
 /**
  * @ingroup entities
@@ -47,6 +46,7 @@ public:
   const reShape* shape() const;
   const reVector pos() const;
   const reMatrix rot() const;
+  const reTMatrix transform() const;
   reWorld* world();
   const reWorld* world() const;
   
@@ -60,6 +60,8 @@ public:
   virtual reEnt& withShape(const reShape& shape) = 0;
   virtual reEnt& withMass(reFloat mass) = 0;
   virtual reEnt& withDensity(reFloat mass) = 0;
+  
+  bool rayIntersect(const reVector& origin, const reVector& dir, reVector* intersect = nullptr, reVector* normal = nullptr) const;
   
   /** a pointer to arbitrary data, defined by the user */
   void* userdata;
@@ -115,7 +117,7 @@ protected:
  */
 
 /**
- * @fn reEnt& reEnt::withreShape(const reShape& shape)
+ * @fn reEnt& reEnt::withShape(const reShape& shape)
  * Set the reEnt's reShape, this method can be chained
  * 
  * @param shape The new reShape
@@ -165,6 +167,16 @@ inline const reVector reEnt::pos() const {
 
 inline const reMatrix reEnt::rot() const {
   return _mRot;
+}
+
+/**
+ * Returns the reEnt's reTMatrix
+ * 
+ * @return The transformation in matrix form
+ */
+
+inline const reTMatrix reEnt::transform() const {
+  return reTMatrix(rot(), pos());
 }
 
 /**
@@ -231,6 +243,24 @@ inline void reEnt::setShape(const reShape& shape) {
 
 inline void reEnt::setWorld(reWorld* world) {
   _world = world;
+}
+
+/**
+ * Returns true if the reEnt intersects the ray specified
+ * 
+ * @param origin The ray origin
+ * @param dir The ray direction
+ * @param intersect An optional argument which is filled with the intersect
+ *                  point
+ * @param normal An optional argument which is filled with the intersect norm
+ * @return True if the ray intersects
+ */
+
+inline bool reEnt::rayIntersect(const reVector& origin, const reVector& dir, reVector* intersect, reVector* normal) const {
+  if (_shape != nullptr) {
+    return _shape->rayIntersect(this->transform(), origin, dir, intersect, normal);
+  }
+  return false;
 }
 
 #endif

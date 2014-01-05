@@ -5,6 +5,7 @@
 #define GL_GLEXT_PROTOTYPES
 #include <GL/gl.h>
 #include <GL/glu.h>
+#include <GL/freeglut.h>
 #include <cstdio>
 
 const int LOG_BUFFER_LENGTH = 255;

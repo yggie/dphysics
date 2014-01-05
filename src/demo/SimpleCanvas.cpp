@@ -11,8 +11,8 @@
 using namespace demo;
 
 SimpleCanvas::SimpleCanvas() : Canvas(), _attrs(), _uniforms() {
-  _shaders.push_back(new Shader("../src/demo/shader.vert", GL_VERTEX_SHADER));
-  _shaders.push_back(new Shader("../src/demo/shader.frag", GL_FRAGMENT_SHADER));
+  _shaders.push_back(new Shader("src/demo/shader.vert", GL_VERTEX_SHADER));
+  _shaders.push_back(new Shader("src/demo/shader.frag", GL_FRAGMENT_SHADER));
 }
 
 SimpleCanvas::~SimpleCanvas() {

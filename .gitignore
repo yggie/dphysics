@@ -15,7 +15,7 @@
 # Gedit backup files
 *~
 
-# Ignore build files
+# Ignore cmake build files
 CMakeCache.txt*
 CMakeFiles
 cmake_install.cmake*

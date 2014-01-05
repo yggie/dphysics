@@ -15,6 +15,10 @@ public:
   RayLightSource& withColor(const reVector& color);
   RayLightSource& withVect(const reVector& vect);
   RayLightSource& asDirectional(bool directional);
+  
+  const reVector& vect() const;
+  const reVector& color() const;
+  bool isDirectional() const;
 
 private:
   reVector _color;
@@ -43,6 +47,18 @@ inline RayLightSource& RayLightSource::withVect(const reVector& vect) {
 inline RayLightSource& RayLightSource::asDirectional(bool directional) {
   _isSpot = !directional;
   return *this;
+}
+
+inline const reVector& RayLightSource::vect() const {
+  return _vect;
+}
+
+inline const reVector& RayLightSource::color() const {
+  return _color;
+}
+
+inline bool RayLightSource::isDirectional() const {
+  return !_isSpot;
 }
 
 #endif

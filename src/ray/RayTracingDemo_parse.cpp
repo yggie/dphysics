@@ -1,12 +1,16 @@
-#include "ray/parser.h"
+#include "ray/RayTracingDemo.h"
 
-#include "ray/RayScene.h"
+#include "react/reRigidBody.h"
+#include "react/reSphere.h"
+#include "react/reTriangle.h"
+#include "react/reDistortedShape.h"
+#include "ray/RayLightSource.h"
 #include "ray/RayObject.h"
 #include "demo/MatrixStack.h"
 
 #define GLM_FORCE_RADIANS
-
 #include <glm/vec3.hpp>
+#include <glm/vec4.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <cstdio>
 #include <iostream>
@@ -14,35 +18,38 @@
 #include <sstream>
 #include <vector>
 
-#define RAY_PRINTF(...)   printf(__VA_ARGS__);
+//#define RAY_PRINTF(...)   printf(__VA_ARGS__);
+#define RAY_PRINTF(...)   
 
-struct Pair {
-  glm::vec3 vert;
-  glm::vec3 norm;
-};
+namespace {
+  struct Pair {
+    glm::vec3 vert;
+    glm::vec3 norm;
+  };
+  
+  /**
+   * Reads an array of values from the input
+   */
 
-/**
- * Reads an array of values from the input
- */
-
-template <typename T>
-void readArray(std::string line, std::istringstream& ss,
-                int num, T* v) {
-  for (int i = 0; i < num; i++) {
-  ss >> v[i];
-    if (ss.fail()) {
-      printf("Failed to read %s for %d/%d value\n", line.c_str(), i, num);
-      throw 0;
+  template <typename T>
+  void readArray(std::string line, std::istringstream& ss,
+                  int num, T* v) {
+    for (int i = 0; i < num; i++) {
+    ss >> v[i];
+      if (ss.fail()) {
+        printf("Failed to read %s for %d/%d value\n", line.c_str(), i, num);
+        throw 0;
+      }
     }
   }
-}
+};
 
 /**
  * Parses the file and creates the scene
  */
 
-RayScene createSceneFromFile(const char* filename) {
-  RayScene scene;
+void RayTracingDemo::createSceneFromFile(const char* filename) {
+  release();
   std::ifstream file;
   file.open(filename, std::ifstream::in);
   
@@ -103,20 +110,17 @@ RayScene createSceneFromFile(const char* filename) {
     if (cmd == "size") {
       unsigned int s[2];
       readUInts(2, s);
-      scene.setSize(s[0], s[1]);
-      RAY_PRINTF("    %-21s(%5d, %5d)", "SIZE", s[0], s[1])
+      _imageWidth = s[0];
+      _imageHeight = s[1];
+      printf("    %-25s%4d, %4d   (%s)\n", "SIZE", s[0], s[1], line.c_str());
       
     } else if (cmd == "maxdepth") {
-      unsigned int depth;
-      readUInts(1, &depth);
-      scene.setMaxBounces(depth);
-      RAY_PRINTF("    %-30s%5d", "MAX DEPTH", maxVerts)
+      readUInts(1, &_maxDepth);
+      RAY_PRINTF("    %-30s%5d", "MAX DEPTH", _maxDepth)
       
     } else if (cmd == "output") {
-      std::string filename;
-      in >> filename;
-      scene.setOutputFile(filename.c_str());
-      RAY_PRINTF("    %-6s%29s", "OUTPUT", filename.c_str())
+      in >> _outputFile;
+      printf("    %-6s%29s   (%s)\n", "OUTPUT", _outputFile.c_str(), line.c_str());
       
       /**
        * CAMERA RELATED COMMANDS
@@ -129,10 +133,9 @@ RayScene createSceneFromFile(const char* filename) {
 			glm::vec3 eye(values[0], values[1], values[2]);
 			glm::vec3 center(values[3], values[4], values[5]);
 			glm::vec3 up(values[6], values[7], values[8]);
-			// TODO create projection matrix
-			float fovy = values[9];
+			_fovy = values[9];
 
-			float depth = glm::length(eye);
+			const float depth = glm::length(center - eye);
 			glm::vec3 w = glm::normalize(eye - center);
 			glm::vec3 u = glm::normalize(glm::cross(up, w));
 			glm::vec3 v = glm::normalize(glm::cross(w, u));
@@ -142,10 +145,7 @@ RayScene createSceneFromFile(const char* filename) {
 			glm::vec4 d(0, 0, 0, 1);
 			
 			// TODO confirm this
-			glm::mat4 view = glm::translate(glm::mat4(a, b, c, d), -center);
-			
-			scene.setViewMat(view);
-			scene.setFOVY(fovy);
+			_viewMat = glm::mat4(a, b, c, d);
 			RAY_PRINTF("    %-35s", "CAMERA")
       
       /**
@@ -155,13 +155,25 @@ RayScene createSceneFromFile(const char* filename) {
     } else if (cmd == "sphere") {
       float v[4];
       readFloats(4, &v[0]);
-      scene.addSphere(v[0], v[1], v[2], v[3], stack.mat())
-            .withDiffuse(diffuse[0], diffuse[1], diffuse[2])
-            .withSpecular(specular[0], specular[1], specular[2])
-            .withEmission(emission[0], emission[1], emission[2])
-            .withShininess(shininess);
+      glm::mat4 m = stack.mat();
+      reTMatrix tm;
+      for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+          tm[i][j] = m[i][j];
+        }
+      }
+      reEnt& ent = _world.newRigidBody().withShape(
+        reDistortedShape(reSphere(v[3])).withDistortion(tm)
+      ).at(v[0], v[1], v[2]);
+      RayObject* obj = new RayObject();
+      ent.userdata = obj;
+      obj->withDiffuse(diffuse[0], diffuse[1], diffuse[2])
+          .withSpecular(specular[0], specular[1], specular[2])
+          .withEmission(emission[0], emission[1], emission[2])
+          .withShininess(shininess);
       RAY_PRINTF("    %-6s%6d%5.1fR %+4.1f, %+4.1f, %+4.1f",
-                 "SPHERE", cSpheres++, v[3], v[0], v[1], v[2])
+                 "SPHERE", cSpheres, v[3], v[0], v[1], v[2])
+      cSpheres++;
 
     } else if (cmd == "maxverts") {
       readUInts(1, &maxVerts);
@@ -181,6 +193,10 @@ RayScene createSceneFromFile(const char* filename) {
       verts.push_back(vert);
       RAY_PRINTF("    %-6s%6d%+11.1f, %+4.1f, %+4.1f",
                  "VERTEX", cVerts, vert[0], vert[1], vert[2])
+      glm::vec3 inverted(glm::inverse(_viewMat) * glm::vec4(vert, 1.0));
+    RAY_PRINTF("   (%s)\n", line.c_str())
+      RAY_PRINTF("    %-6s%6d%+11.1f, %+4.1f, %+4.1f",
+                 "INVERT", cVerts, inverted[0], inverted[1], inverted[2])
       if (cVerts++ >= maxVerts) {
         printf("Exceeded max vertex!!\n");
         throw 0;
@@ -204,17 +220,25 @@ RayScene createSceneFromFile(const char* filename) {
     } else if (cmd == "tri") {
       unsigned int inds[3];
       readUInts(3, &inds[0]);
-      scene.addTriangle(
-        verts.at(inds[0]),
-        verts.at(inds[1]),
-        verts.at(inds[2]),
-        stack.mat()
-      ).withDiffuse(diffuse[0], diffuse[1], diffuse[2])
-       .withSpecular(specular[0], specular[1], specular[2])
-       .withEmission(emission[0], emission[1], emission[2])
-       .withShininess(shininess);
+      glm::mat4 m = stack.mat();
+      glm::vec4 verts4[3];
+      reVector triVerts[3];
+      for (int i = 0; i < 3; i++) {
+        verts4[i] = m * glm::vec4(verts.at(inds[i]), 1.0f);
+        triVerts[i].set(verts4[i][0], verts4[i][1], verts4[i][2]);
+      }
+      reEnt& ent = _world.newRigidBody().withShape(
+        reTriangle(triVerts[0], triVerts[1], triVerts[2])
+      ).at(0, 0, 0);
+      RayObject* obj = new RayObject();
+      ent.userdata = obj;
+      obj->withDiffuse(diffuse[0], diffuse[1], diffuse[2])
+          .withSpecular(specular[0], specular[1], specular[2])
+          .withEmission(emission[0], emission[1], emission[2])
+          .withShininess(shininess);
       RAY_PRINTF("    %-6s%6d%13d,%4d,%4d",
                  "TRI", cTri++, inds[0], inds[1], inds[2])
+      cTri++;
       
     } else if (cmd == "trinormal") {
       unsigned int inds[6];
@@ -263,25 +287,34 @@ RayScene createSceneFromFile(const char* filename) {
     } else if (cmd == "directional") {
       float a[6];
       readFloats(6, &a[0]);
-      scene.addDirectionalLightSource(reVector(&a[0]), reVector(&a[3]));
+      RayLightSource* light = new RayLightSource();
+      _lights.push_back(light);
+      light->withColor(reVector(&a[0]))
+            .withVect(reVector(&a[3]))
+            .asDirectional(true);
+      
       RAY_PRINTF("    %-22s%3.1f, %3.1f, %3.1f", "DIRECTIONAL LIGHT", a[3], a[4], a[5]);
 
     } else if (cmd == "point") {
       float a[6];
       readFloats(6, &a[0]);
-      scene.addSpotLightSource(reVector(&a[0]), reVector(&a[3]));
+      RayLightSource* light = new RayLightSource();
+      _lights.push_back(light);
+      light->withColor(reVector(&a[0]))
+            .withVect(reVector(&a[3]))
+            .asDirectional(false);
       RAY_PRINTF("    %-22s%3.1f, %3.1f, %3.1f", "SPOT LIGHT", a[3], a[4], a[5]);
 
     } else if (cmd == "attenuation") {
       float a[3];
       readFloats(3, &a[0]);
-      scene.setAttenuation(reVector(&a[0]));
+      _attenuation.set(a[0], a[1], a[2]);
       RAY_PRINTF("    %-22s%3.1f, %3.1f, %3.1f", "ATTENUATION", a[0], a[1], a[2]);
 
     } else if (cmd == "ambient") {
       float a[3];
       readFloats(3, &a[0]);
-      scene.setAmbient(reVector(&a[0]));
+      _ambient.set(a[0], a[1], a[2]);
       RAY_PRINTF("    %-22s%3.1f, %3.1f, %3.1f", "AMBIENT", a[0], a[1], a[2]);
 
       /**
@@ -313,10 +346,11 @@ RayScene createSceneFromFile(const char* filename) {
   }
   
   printf("[PARSE]  End of file \"%s\"\n", filename);
-  printf("[PARSE]  Unknown count: %d\n", unknowns);
+  printf("[PARSE]  Found spheres(%d), tri(%d), trinormal(%d)\n", cSpheres, cTri, cTriNorm);
+  if (unknowns > 0) {
+    printf("[WARN]   Unknown count: %d\n", unknowns);
+  }
   
   file.close();
-  
-  return scene;
 }
 

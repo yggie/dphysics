@@ -34,6 +34,10 @@ public:
   reFloat volume() const override;
   const reMatrix computeInertia() const override;
   
+  bool rayIntersect(const reVector& origin, const reVector& dir, reVector* intersect = nullptr, reVector* normal = nullptr) const override;
+  
+  bool rayIntersect(const reTMatrix& transform, const reVector& origin, const reVector& dir, reVector* intersect = nullptr, reVector* normal = nullptr) const override;
+  
 private:
   void setWorld(reWorld& world);
   reDistortedShape& withWorld(reWorld& world);

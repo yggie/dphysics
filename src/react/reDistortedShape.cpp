@@ -1,5 +1,6 @@
 #include "react/reDistortedShape.h"
 
+#include "react/reEnt.h"
 #include "react/reWorld.h"
 #include "react/reSphere.h"
 #include "react/reTriangle.h"
@@ -44,7 +45,7 @@ reDistortedShape::reDistortedShape(const reShape& base)
 reDistortedShape::~reDistortedShape() {
   if (_shape != nullptr) {
     if (_world != nullptr) {
-      _world->remove(*_shape);
+      _world->remove(_shape);
     } else {
       delete _shape;
     }
@@ -53,7 +54,7 @@ reDistortedShape::~reDistortedShape() {
 
 void reDistortedShape::setBaseShape(const reShape& base) {
   if (_shape != nullptr && _world != nullptr) {
-    _world->remove(*_shape);
+    _world->remove(_shape);
   }
   if (_world != nullptr) {
     _shape = &_world->copyOf(base);
@@ -78,5 +79,21 @@ void reDistortedShape::setWorld(reWorld& world) {
 reDistortedShape& reDistortedShape::withWorld(reWorld& world) {
   setWorld(world);
   return *this;
+}
+
+bool reDistortedShape::rayIntersect(const reVector& origin, const reVector& dir, reVector* intersect, reVector* normal) const {
+  if (_shape != nullptr) {
+    return _shape->rayIntersect(_distortion, origin, dir, intersect, normal);
+  }
+  
+  return false;
+}
+
+bool reDistortedShape::rayIntersect(const reTMatrix& transform, const reVector& origin, const reVector& dir, reVector* intersect, reVector* normal) const {
+  if (_shape != nullptr) {
+    return _shape->rayIntersect(transform * _distortion, origin, dir, intersect, normal);
+  }
+  
+  return false;
 }
 

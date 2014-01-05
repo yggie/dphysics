@@ -8,7 +8,7 @@
 #include "react/mathutils.h"
 
 /**
- * @brief Represents a single vector in homogenous coordinates
+ * @brief Represents a single 3D vector
  */
 
 struct reVector {
@@ -18,7 +18,7 @@ struct reVector {
   reVector(const reVector& a);
   reVector(const reFloat* array);
   /** initializes the vector with the input coordinates */
-  reVector(reFloat _x, reFloat _y, reFloat _z, reFloat _w = 0.0);
+  reVector(reFloat _x, reFloat _y, reFloat _z);
   
   // inline functions
   reFloat& operator[](int i);
@@ -29,6 +29,7 @@ struct reVector {
   reVector& operator=(const reVector& a);
   reVector& operator+=(const reVector& a);
   reVector& operator-=(const reVector& a);
+  reVector& operator*=(const reVector& a);
   
   // compound assignment with scalar inputs
   reVector& operator+=(reFloat s);
@@ -39,6 +40,7 @@ struct reVector {
   // arithmetic with vectors
   const reVector operator+(const reVector& a) const;
   const reVector operator-(const reVector& a) const;
+  const reVector operator*(const reVector& a) const;
   
   // arithmetic with scalars
   const reVector operator+(reFloat s) const;
@@ -54,7 +56,9 @@ struct reVector {
   
   bool equals(const reVector& a) const;
   void normalize();
-  void set(reFloat _x, reFloat _y, reFloat _z, reFloat _w = 0.0);
+  reVector& normalized();
+  const reVector normalized() const;
+  void set(reFloat _x, reFloat _y, reFloat _z);
   void set(const reVector& a);
   void setZero();
   
@@ -67,19 +71,17 @@ struct reVector {
       reFloat y;
       /** z-coordinate of the vector */
       reFloat z;
-      /** w-coordinate of the vector */
-      reFloat w;
     };
     struct {
       /** the vector as an array */
-      reFloat v[4];
+      reFloat v[3];
     };
   };
 };
 
 // inline constructors
 inline reVector::reVector() : v{0.0} { }
-inline reVector::reVector(const reVector& a) : x(a.x), y(a.y), z(a.z), w(0.0) { }
+inline reVector::reVector(const reVector& a) : x(a.x), y(a.y), z(a.z) { }
 
 /**
  * @brief Copies the first 3 elements of the input array into the reVector
@@ -91,10 +93,9 @@ inline reVector::reVector(const reFloat* array) : v{0.0} {
   for (int i = 0; i < 3; i++) {
     v[i] = array[i];
   }
-  v[3] = 1.0;
 }
 
-inline reVector::reVector(reFloat _x, reFloat _y, reFloat _z, reFloat _w) : x(_x), y(_y), z(_z), w(_w) { }
+inline reVector::reVector(reFloat _x, reFloat _y, reFloat _z) : x(_x), y(_y), z(_z) { }
 
 /**
  * @brief Access an element in the vector
@@ -138,7 +139,7 @@ inline const reVector reVector::operator-() const {
  */
 
 inline reVector& reVector::operator=(const reVector& a) {
-  for (int i = 0; i < 4; i++) {
+  for (int i = 0; i < 3; i++) {
     v[i] = a.v[i];
   }
   return *this;
@@ -152,7 +153,7 @@ inline reVector& reVector::operator=(const reVector& a) {
  */
 
 inline reVector& reVector::operator+=(const reVector& a) {
-  for (int i = 0; i < 4; i++) {
+  for (int i = 0; i < 3; i++) {
     v[i] += a.v[i];
   }
   return *this;
@@ -166,8 +167,22 @@ inline reVector& reVector::operator+=(const reVector& a) {
  */
 
 inline reVector& reVector::operator-=(const reVector& a) {
-  for (int i = 0; i < 4; i++) {
+  for (int i = 0; i < 3; i++) {
     v[i] -= a.v[i];
+  }
+  return *this;
+}
+
+/**
+ * Multiplies two vectors component-wise
+ * 
+ * @param a The vector operand
+ * @return A reference to the resulting vector
+ */
+
+inline reVector& reVector::operator*=(const reVector& a) {
+  for (int i = 0; i < 3; i++) {
+    v[i] *= a.v[i];
   }
   return *this;
 }
@@ -180,7 +195,7 @@ inline reVector& reVector::operator-=(const reVector& a) {
  */
 
 inline reVector& reVector::operator+=(reFloat s) {
-  for (int i = 0; i < 4; i++) {
+  for (int i = 0; i < 3; i++) {
     v[i] += s;
   }
   return *this;
@@ -194,7 +209,7 @@ inline reVector& reVector::operator+=(reFloat s) {
  */
 
 inline reVector& reVector::operator-=(reFloat s) {
-  for (int i = 0; i < 4; i++) {
+  for (int i = 0; i < 3; i++) {
     v[i] -= s;
   }
   return *this;
@@ -208,7 +223,7 @@ inline reVector& reVector::operator-=(reFloat s) {
  */
 
 inline reVector& reVector::operator*=(reFloat s) {
-  for (int i = 0; i < 4; i++) {
+  for (int i = 0; i < 3; i++) {
     v[i] *= s;
   }
   return *this;
@@ -222,7 +237,7 @@ inline reVector& reVector::operator*=(reFloat s) {
  */
 
 inline reVector& reVector::operator/=(reFloat s) {
-  for (int i = 0; i < 4; i++) {
+  for (int i = 0; i < 3; i++) {
     v[i] /= s;
   }
   return *this;
@@ -248,6 +263,17 @@ inline const reVector reVector::operator+(const reVector& a) const {
 
 inline const reVector reVector::operator-(const reVector& a) const {
   return reVector(*this) -= a;
+}
+
+/**
+ * Multiplies two vectors component-wise and returns the result
+ * 
+ * @param a The other vector operand
+ * @return The resulting vector
+ */
+
+inline const reVector reVector::operator*(const reVector& a) const {
+  return reVector(*this) *= a;
 }
 
 /**
@@ -302,7 +328,7 @@ inline const reVector reVector::operator/(reFloat s) const {
  */
 
 inline reFloat reVector::dot(const reVector& a) const {
-  return x*a.x + y*a.y + z*a.z + w*a.w;
+  return x*a.x + y*a.y + z*a.z;
 }
 
 /**
@@ -313,7 +339,7 @@ inline reFloat reVector::dot(const reVector& a) const {
  */
 
 inline const reVector reVector::cross(const reVector& a) const {
-  return reVector(y*a.z - z*a.y, z*a.x - x*a.z, x*a.y - y*a.y);
+  return reVector(y*a.z - z*a.y, z*a.x - x*a.z, x*a.y - y*a.x);
 }
 
 /**
@@ -333,7 +359,7 @@ inline reFloat reVector::length() const {
  */
 
 inline reFloat reVector::lengthSq() const {
-  return x*x + y*y + z*z + w*w;
+  return x*x + y*y + z*z;
 }
 
 /**
@@ -344,8 +370,8 @@ inline reFloat reVector::lengthSq() const {
  */
 
 inline bool reVector::equals(const reVector& a) const {
-  for (int i = 0; i < 4; i++) {
-    if (reAbs(v[i] - a.v[i]) > D_FP_TOLERANCE) {
+  for (int i = 0; i < 3; i++) {
+    if (reAbs(v[i] - a.v[i]) > RE_FP_TOLERANCE) {
       return false;
     }
   }
@@ -361,6 +387,29 @@ inline void reVector::normalize() {
 }
 
 /**
+ * Normalizes the vector, this method can be chained
+ * 
+ * @return A reference to the reVector
+ */
+
+inline reVector& reVector::normalized() {
+  normalize();
+  return *this;
+}
+
+/**
+ * Normalizes the vector, this method can be chained
+ * 
+ * Enforces const constraint by creating a copy
+ * 
+ * @return A reference to the reVector
+ */
+
+inline const reVector reVector::normalized() const {
+  return reVector(*this).normalized();
+}
+
+/**
  * Set the vector to the given values
  * 
  * @param _x The new x-coordinate of the vector
@@ -369,11 +418,10 @@ inline void reVector::normalize() {
  * @param _w The new w-coordinate of the vector
  */
 
-inline void reVector::set(reFloat _x, reFloat _y, reFloat _z, reFloat _w) {
+inline void reVector::set(reFloat _x, reFloat _y, reFloat _z) {
   x = _x;
   y = _y;
   z = _z;
-  w = _w;
 }
 
 /**
@@ -391,7 +439,7 @@ inline void reVector::set(const reVector& a) {
  */
 
 inline void reVector::setZero() {
-  x = y = z = w = 0.0;
+  x = y = z = 0.0;
 }
 
 #endif

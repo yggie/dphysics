@@ -7,6 +7,10 @@
 
 #include "react/common.h"
 
+class reTMatrix;
+class reMatrix;
+class reVector;
+
 /**
  * @ingroup shapes
  * Represents an shape with defined geometric qualities
@@ -35,6 +39,9 @@ public:
   virtual Type type() const = 0;
   virtual reFloat volume() const = 0;
   virtual const reMatrix computeInertia() const = 0;
+  
+  virtual bool rayIntersect(const reTMatrix& transform, const reVector& origin, const reVector& dir, reVector* intersect = nullptr, reVector* normal = nullptr) const;
+  virtual bool rayIntersect(const reVector& origin, const reVector& dir, reVector* intersect = nullptr, reVector* normal = nullptr) const = 0;
 };
 
 /**
@@ -56,6 +63,20 @@ public:
  * @brief Returns the inertia tensor assuming unit mass
  * 
  * @return The inertia tensor in user-defined units
+ */
+
+/**
+ * @fn bool reEnt::rayIntersect(const reEnt& parent, const reVector& origin,
+ * const reVector& dir, reVector* intersect = nullptr, reVector* normal =
+ * nullptr) const
+ * @brief Returns true if the ray specified intersects with the shape
+ * 
+ * @param parent The parent reEnt
+ * @param origin The ray origin
+ * @param dir The ray direction
+ * @param intersect An optional argument which is filled with the intersect point
+ * @param normal An optional argument which is filled with the intersect norm
+ * @return True if the ray intersects
  */
 
 inline reShape::reShape() { }

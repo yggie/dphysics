@@ -6,16 +6,8 @@
 #ifndef RE_COMMON_H
 #define RE_COMMON_H
 
-/** Default value for the mathematical constant, pi */
-#ifndef RE_PI
-#define RE_PI 3.14159265359
-#endif
-
 /** a customizable base floating point type */
 typedef float reFloat;
-
-/** tolerance for floating point values */
-const reFloat D_FP_TOLERANCE = 1e-5;
 
 /** If RE_ZERO_MEMORY is defined, this value will be used to set unused memory */
 #ifndef RE_ZERO_MEM_VAL

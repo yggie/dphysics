@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "react/common.h"
+#include "react/math.h"
 
 class reRigidBody;
 class reEnt;
@@ -32,11 +33,13 @@ public:
   
   void add(reEnt& entity);
   
-  void remove(reShape& shape);
+  void remove(reShape* shape);
   
   reAllocator& allocator();
   
   void step(reFloat dt);
+  
+  reEnt* shootRay(const reVector& from, const reVector& direction, reVector* intersect = nullptr, reVector* normal = nullptr);
 
 protected:
   std::vector<reRigidBody*> _bodies;

@@ -11,6 +11,7 @@
 #include "react/reShape.h"
 #include "react/reSphere.h"
 #include "react/reTriangle.h"
+#include "react/reDistortedShape.h"
 
 #include "react/reEnt.h"
 #include "react/reSolid.h"

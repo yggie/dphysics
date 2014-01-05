@@ -8,22 +8,31 @@
 #include <cmath>
 #include "react/common.h"
 
-static auto reAbs = static_cast<double(*)(double)>(std::abs);
+/** Default value for the mathematical constant, pi */
+#define RE_PI         3.14159265359
 
-static auto reSqrt = static_cast<double(*)(double)>(std::sqrt);
+#define RE_INFINITY   1e301
 
-template <class T>
-inline T reMax(T a, T b) {
+/** tolerance for floating point values */
+const reFloat RE_FP_TOLERANCE = 1e-5;
+
+static auto reAbs = static_cast<reFloat(*)(reFloat)>(std::abs);
+
+static auto reSqrt = static_cast<reFloat(*)(reFloat)>(std::sqrt);
+
+#define reSin(x)    sin(x)
+#define reCos(x)    cos(x)
+#define reIsNan(x)  isnan(x)
+
+inline reFloat reMax(reFloat a, reFloat b) {
   return (a > b) ? a : b;
 }
 
-template <class T>
-inline T reMin(T a, T b) {
+inline reFloat reMin(reFloat a, reFloat b) {
   return (a < b) ? a : b;
 }
 
-template <class T>
-inline int reSign(T a) {
+inline int reSign(reFloat a) {
   return (a >= -0.0f) ? 1 : -1;
 }
 
