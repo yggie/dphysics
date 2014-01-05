@@ -152,17 +152,19 @@ void reWorld::step(reFloat dt) {
 }
 
 reEnt* reWorld::shootRay(const reVector& from, const reVector& direction, reVector* intersect, reVector* normal) {
-  reVector intersectPoint;
-  reVector intersectNormal;
+  reVector intersectPoint, intersectNormal;
+  reVector closestPoint, closestNormal;
   reFloat maxDist = RE_INFINITY;
   reEnt* entContact = nullptr;
   
   for_each(_bodies.begin(), _bodies.end(), [&](reEnt* ent) {
     if (ent->rayIntersect(from, direction, &intersectPoint, &intersectNormal)) {
       reFloat dist = (from - intersectPoint).length();
-      if (dist < maxDist) {
+      if (reIsLessThan(dist, maxDist)) {
         entContact = ent;
         maxDist = dist;
+        closestPoint = intersectPoint;
+        closestNormal = intersectNormal;
       }
     };
   });
@@ -172,11 +174,11 @@ reEnt* reWorld::shootRay(const reVector& from, const reVector& direction, reVect
   }
   
   if (intersect != nullptr) {
-    *intersect = intersectPoint;
+    *intersect = closestPoint;
   }
   
   if (normal != nullptr) {
-    *normal = intersectNormal;
+    *normal = closestNormal;
   }
   
   return entContact;

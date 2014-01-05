@@ -63,7 +63,7 @@ void RayTracingDemo::init() {
 
 void RayTracingDemo::restart() {
   release();
-  createSceneFromFile("resources/ray/samples/scene4-emission.test");
+  createSceneFromFile("resources/ray/samples/scene6.test");
   
   renderScene(64, 48);
 }
@@ -149,15 +149,29 @@ reVector RayTracingDemo::shootRay(unsigned int depth, const reVector& origin, co
   reVector color = _ambient + obj->emission();
   
   for_each(_lights.begin(), _lights.end(), [&](const RayLightSource* light) {
-    const reVector ray = (light->vect() - intersect).normalized();
-    reEnt* other = _world.shootRay(intersect, ray);
+    const glm::vec3 inta(glm::vec4(glm::vec3(intersect[0], intersect[1], intersect[2]), 1.0) * _inverseViewMat);
+    const glm::vec3 raya(glm::vec4(glm::vec3(light->vect()[0], light->vect()[1], light->vect()[2]) - glm::vec3(intersect[0], intersect[1], intersect[2]), 0.0) * _inverseViewMat);
+    
+    intersect = reVector(&inta[0]);
+    reVector ray(&raya[0]);
+    ray.normalize();
+    reEnt* other = _world.shootRay(
+      intersect,
+      ray
+    );
     
     if (other == nullptr) {
-      const reVector back = (origin - intersect).normalized();
+      const glm::vec3 ll(glm::vec4(light->vect()[0], light->vect()[1], light->vect()[2], 1.0) * _inverseViewMat);
+      const glm::vec3 nn(glm::vec4(glm::vec3(norm[0], norm[1], norm[2]), 0.0) * _inverseViewMat);
+      norm = reVector(&nn[0]);
+      const reVector lightPos(&ll[0]);
+      const reVector back = (lightPos - intersect).normalized();
       const reVector halfVec = (back + ray).normalized();
       
-      reVector diffuse = obj->diffuse() * reMax(ray.dot(norm), 0.0f);
-      reVector specular = obj->specular() * glm::pow(reMax(norm.dot(halfVec), 0.0f), obj->shininess());
+      const reVector diffuse = obj->diffuse() * reMax(ray.dot(norm), 0.0f);
+      const reVector specular = obj->specular() * glm::pow(reMax(norm.dot(halfVec), 0.0f), obj->shininess());
+      
+//      printf("SPEC=(%.2f, %.2f, %.2f)\n", specular[0], specular[1], specular[2]);
       
       if (light->isDirectional()) {
         color += light->color() * (diffuse + specular);
@@ -218,14 +232,13 @@ void RayTracingDemo::renderScene(GLsizei w, GLsizei h) {
   gettimeofday(&start, nullptr);
   gettimeofday(&lastChecked, nullptr);
   
-  const glm::mat4 inverseView = glm::inverse(_viewMat);
-  const reVector eye(&(glm::vec4(0.0, 0.0, 0.0, 1.0) * inverseView)[0]);
+  const reVector eye(&(glm::vec4(0.0, 0.0, 0.0, 1.0) * _inverseViewMat)[0]);
 
   for (GLsizei i = 0; i < h; i++) {
     float tany = glm::tan(fovy * (i + 0.5f - halfHeight) / halfHeight);
     
     for (GLsizei j = 0; j < w; j++) {
-      glm::vec3 ray(glm::vec4(tanx[j], tany, -1.0, 0.0) * inverseView);
+      glm::vec3 ray(glm::vec4(tanx[j], tany, -1.0, 0.0) * _inverseViewMat);
       colorPixel(
         &_pixels[4*i*w + 4*j],
         shootRay(0, eye, reVector(&ray[0]).normalized())
@@ -246,7 +259,7 @@ void RayTracingDemo::renderScene(GLsizei w, GLsizei h) {
   statusUpdate(100.0, timeBetween(start, now));
   gettimeofday(&lastChecked, nullptr);
   
-  printf("[INFO]  Rendering of %dx%d image complete\n", _renderWidth, _renderHeight);
+  printf("[INFO]  Rendering of %d x %d image complete\n", _renderWidth, _renderHeight);
   
   delete[] tanx;
 }

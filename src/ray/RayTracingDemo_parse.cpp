@@ -18,8 +18,8 @@
 #include <sstream>
 #include <vector>
 
-//#define RAY_PRINTF(...)   printf(__VA_ARGS__);
-#define RAY_PRINTF(...)   
+#define RAY_PRINTF(...)   printf(__VA_ARGS__);
+//#define RAY_PRINTF(...)   
 
 namespace {
   struct Pair {
@@ -146,6 +146,7 @@ void RayTracingDemo::createSceneFromFile(const char* filename) {
 			
 			// TODO confirm this
 			_viewMat = glm::mat4(a, b, c, d);
+			_inverseViewMat = glm::inverse(_viewMat);
 			RAY_PRINTF("    %-35s", "CAMERA")
       
       /**

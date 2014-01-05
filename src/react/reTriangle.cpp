@@ -7,20 +7,26 @@ bool reTriangle::rayIntersect(const reVector& origin, const reVector& dir, reVec
   const reVector faceNormal = v.cross(u).normalized();
   
   // parallel to plane
-  if (reAbs(faceNormal.dot(dir)) < RE_FP_TOLERANCE) {
+  if (reIsGreaterThanOrEqualZero(faceNormal.dot(dir))) {
+    return false;
+  }
+  
+  const reFloat lambda = (faceNormal.dot(_verts[0]) - faceNormal.dot(origin)) / faceNormal.dot(dir);
+  
+  // The solution is not in the direction of the ray
+  if (reIsLessThanOrEqualZero(lambda)) {
     return false;
   }
   
   // compute ray-plane intersection
-  const reFloat lambda = (faceNormal.dot(_verts[0]) - faceNormal.dot(origin)) / faceNormal.dot(dir);
   const reVector intersection = origin + dir*lambda;
   
   // compute parametric coordinates
   reVector w = intersection - _verts[1];
-  if (w.lengthSq() < RE_FP_TOLERANCE) {
+  if (reIsAlmostZero(w.lengthSq())) {
     // TODO handle the degenerate case properly
     w = intersection - _verts[0];
-    if (w.lengthSq() < RE_FP_TOLERANCE) {
+    if (reIsAlmostZero(w.lengthSq())) {
       w = intersection - _verts[2];
     }
   }
@@ -35,9 +41,9 @@ bool reTriangle::rayIntersect(const reVector& origin, const reVector& dir, reVec
   const reFloat s = (uv*vw - vv*uw)/denom;
   const reFloat t = (uv*uw - uu*vw)/denom;
   
-  if (s > -RE_FP_TOLERANCE &&
-      t > -RE_FP_TOLERANCE &&
-      (s + t) < 1.0 + RE_FP_TOLERANCE) {
+  if (reIsGreaterThanOrEqualZero(s) &&
+      reIsGreaterThanOrEqualZero(t) &&
+      reIsLessThanOrEqual((s + t), 1.0)) {
     if (intersect != nullptr) {
       *intersect = intersection;
     }

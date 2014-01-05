@@ -39,6 +39,7 @@ private:
   
   float _fovy;
   glm::mat4 _viewMat;
+  glm::mat4 _inverseViewMat;
   
   reVector _ambient;
   reVector _attenuation;

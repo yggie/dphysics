@@ -21,7 +21,7 @@ bool reSphere::rayIntersect(const reVector& origin, const reVector& dir, reVecto
   const reFloat c = origin.lengthSq() - radius() * radius();
   const reFloat discriminant = b*b - 4*a*c;
   
-  if (discriminant < RE_FP_TOLERANCE) {
+  if (reIsLessThanOrEqualZero(discriminant)) {
     return false;
   }
   
@@ -29,7 +29,7 @@ bool reSphere::rayIntersect(const reVector& origin, const reVector& dir, reVecto
   const reFloat solA = (-b - reSqrt(discriminant)) / (2.0 * a);
   
   // invalid solutions
-  if (solA < RE_FP_TOLERANCE) {
+  if (reIsLessThanOrEqualZero(solA)) {
     return false;
   }
   
