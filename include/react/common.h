@@ -20,6 +20,9 @@ typedef unsigned int reUInt;
 
 #ifdef NDEBUG
   #include <cstdio>
+  #include <string.h>
+  
+  #define RE_FILE (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)
   
   /**
    * If NDEBUG is defined, all log outputs will be forwarded to this file
@@ -34,20 +37,20 @@ typedef unsigned int reUInt;
     #define _RE_STOP_PROGRAM
   #endif
   
-  #define _RE_MSG(msg)                fprintf(RE_LOG_OUTPUT, "[REACT] %s:%d: %s", __FILE__, __LINE__, msg)
+  #define _RE_MSG(msg)                fprintf(RE_LOG_OUTPUT, "[DEBUG] %s:%d: %s", RE_FILE, __LINE__, msg)
   
   #define RE_NOT_IMPLEMENTED \
     fprintf(RE_LOG_OUTPUT, \
-      "[DEBUG] %s:%d: (%s)(%s %s) %s\n", __FILE__, __LINE__, \
+      "[DEBUG] %s:%d: (%s)(%s %s) %s\n", RE_FILE, __LINE__, \
       __RE_FUNC__, __DATE__, __TIME__, "Feature not implemented");
   
   #define RE_IMPOSSIBLE \
-    fprintf(RE_LOG_OUTPUT, "[ALERT] %s:%d: Impossible program flow!\n", __FILE__, __LINE__);
+    fprintf(RE_LOG_OUTPUT, "[ALERT] %s:%d: Impossible program flow!\n", RE_FILE, __LINE__);
   
   #define RE_ASSERT(expr, msg) \
   do { \
     if(!(expr)) { \
-      fprintf(RE_LOG_OUTPUT, "[FATAL] %s:%d: %s\n", __FILE__, __LINE__, msg); \
+      fprintf(RE_LOG_OUTPUT, "[FATAL] %s:%d: %s\n", RE_FILE, __LINE__, msg); \
       _RE_STOP_PROGRAM \
     } \
   } while(0);
@@ -55,7 +58,7 @@ typedef unsigned int reUInt;
   #define RE_ASSERT_WARN(expr, msg) \
     do { \
       if(!(expr)) { \
-        fprintf(RE_LOG_OUTPUT, "[WARN]  %s:%d: %s\n", __FILE__, __LINE__, msg); \
+        fprintf(RE_LOG_OUTPUT, "[WARN]  %s:%d: %s\n", RE_FILE, __LINE__, msg); \
       } \
     } while(0);
   

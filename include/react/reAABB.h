@@ -16,26 +16,22 @@ public:
   reAABB();
   virtual ~reAABB();
   
+  // getters
   reFloat width() const;
   reFloat height() const;
   reFloat depth() const;
-  const reFloat& halfWidth() const;
-  const reFloat& halfHeight() const;
-  const reFloat& halfDepth() const;
-  void setHalfWidth(reFloat halfWidth);
-  void setHalfHeight(reFloat halfHeight);
-  void setHalfDepth(reFloat halfDepth);
-  void set(reFloat halfWidth, reFloat halfHeight, reFloat halfDepth);
+  reVector& dimens();
+  const reVector& dimens() const;
+  
+  // collision queries
   bool intersects(const reAABB& aabb, const reVector& relPos) const;
   bool isPointInAABB(const reVector& point) const;
   
 protected:
-  reFloat _halfWidth;
-  reFloat _halfHeight;
-  reFloat _halfDepth;
+  reVector _dimens;
 };
 
-inline reAABB::reAABB() : _halfWidth(0.0), _halfHeight(0.0), _halfDepth(0.0) {
+inline reAABB::reAABB() : _dimens(0.0, 0.0, 0.0) {
   // do nothing
 }
 
@@ -44,57 +40,35 @@ inline reAABB::~reAABB() {
 }
 
 inline reFloat reAABB::width() const {
-  return _halfWidth * 2.0;
+  return _dimens[0] * 2.0;
 }
 
 inline reFloat reAABB::height() const {
-  return _halfHeight * 2.0;
+  return _dimens[1] * 2.0;
 }
 
 inline reFloat reAABB::depth() const {
-  return _halfDepth * 2.0;
+  return _dimens[2] * 2.0;
 }
 
-inline const reFloat& reAABB::halfWidth() const {
-  return _halfWidth;
+inline reVector& reAABB::dimens() {
+  return _dimens;
 }
 
-inline const reFloat& reAABB::halfHeight() const {
-  return _halfHeight;
-}
-
-inline const reFloat& reAABB::halfDepth() const {
-  return _halfDepth;
-}
-
-inline void reAABB::setHalfWidth(reFloat halfWidth) {
-  _halfWidth = halfWidth;
-}
-
-inline void reAABB::setHalfHeight(reFloat halfHeight) {
-  _halfHeight = halfHeight;
-}
-
-inline void reAABB::setHalfDepth(reFloat halfDepth) {
-  _halfDepth = halfDepth;
-}
-
-inline void reAABB::set(reFloat halfWidth, reFloat halfHeight, reFloat halfDepth) {
-  _halfWidth = halfWidth;
-  _halfHeight = halfHeight;
-  _halfDepth = halfDepth;
+inline const reVector& reAABB::dimens() const {
+  return _dimens;
 }
 
 inline bool reAABB::intersects(const reAABB& aabb, const reVector& relPos) const {
-  return (reAbs(relPos.x) < _halfWidth + aabb._halfWidth + RE_FP_TOLERANCE) &&
-         (reAbs(relPos.y) < _halfHeight + aabb._halfHeight + RE_FP_TOLERANCE) &&
-         (reAbs(relPos.z) < _halfDepth + aabb._halfDepth + RE_FP_TOLERANCE);
+  return (reAbs(relPos.x) < _dimens[0] + aabb._dimens[0] + RE_FP_TOLERANCE) &&
+         (reAbs(relPos.y) < _dimens[1] + aabb._dimens[1] + RE_FP_TOLERANCE) &&
+         (reAbs(relPos.z) < _dimens[2] + aabb._dimens[2] + RE_FP_TOLERANCE);
 }
 
 inline bool reAABB::isPointInAABB(const reVector& point) const {
-  return (reAbs(point.x) < _halfWidth + RE_FP_TOLERANCE) &&
-         (reAbs(point.y) < _halfHeight + RE_FP_TOLERANCE) &&
-         (reAbs(point.z) < _halfDepth + RE_FP_TOLERANCE);
+  return (reAbs(point.x) < _dimens[0] + RE_FP_TOLERANCE) &&
+         (reAbs(point.y) < _dimens[1] + RE_FP_TOLERANCE) &&
+         (reAbs(point.z) < _dimens[2] + RE_FP_TOLERANCE);
 }
 
 #endif

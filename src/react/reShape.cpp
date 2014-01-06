@@ -4,23 +4,15 @@
 #include "react/reAABB.h"
 
 void reShape::updateAABB(const reMatrix& parentRotation) {
-  _aabb.set(0, 0, 0);
+  _aabb.dimens().setZero();
   for (reUInt i = 0; i < numVerts(); i++) {
     const reVector v = parentRotation * vert(i);
     
-    const reFloat nx = reAbs(v.x) + shell();
-    if (nx > _aabb.halfWidth()) {
-      _aabb.setHalfWidth(nx);
-    }
-    
-    const reFloat ny = reAbs(v.y) + shell();
-    if (ny > _aabb.halfHeight()) {
-      _aabb.setHalfWidth(ny);
-    }
-    
-    const reFloat nz = reAbs(v.z) + shell();
-    if (nz > _aabb.halfDepth()) {
-      _aabb.setHalfWidth(nz);
+    for (reUInt j = 0; j < 3; j++) {
+      const reFloat d = reAbs(v[j]) + shell();
+      if (d > _aabb.dimens()[j]) {
+        _aabb.dimens()[j] = d;
+      }
     }
   }
 }

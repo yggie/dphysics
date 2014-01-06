@@ -27,12 +27,14 @@ public:
   
 //  reLinkedList<reEnt*> entities();
   
-  reInt orientation();
-  reUInt size();
+  reUInt orientation();
+  reUInt size() const;
   
 protected:
   void split();
   void merge();
+  
+  void setOrientation(reUInt o);
   
   reWorld* _world;
   reKDTree* _childA;
@@ -43,5 +45,9 @@ protected:
   reVector _pos;
 //  reLinkedList<reEnt*> _entities;
 };
+
+inline reUInt reKDTree::size() const {
+  return _size;
+}
 
 #endif
