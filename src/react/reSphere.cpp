@@ -2,12 +2,12 @@
 
 #include "react/reEnt.h"
 
-reSphere::reSphere(reFloat radius) : reShape(), _sRadius(radius) {
-  // do nothing
+reSphere::reSphere(reFloat radius) : reShape() {
+  _shell = radius;
 }
 
-reSphere::reSphere(const reSphere& sphere) : reShape(), _sRadius(sphere._sRadius) {
-  // do nothing
+reSphere::reSphere(const reSphere& sphere) : reShape() {
+  _shell = sphere.radius();
 }
 
 reSphere::~reSphere() {

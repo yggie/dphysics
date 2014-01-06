@@ -22,12 +22,14 @@ public:
   /** Destructor does nothing */
   ~reTriangle();
   
-  reVector& vert(int i);
-  const reVector& vert(int i) const;
+  reTriangle& withVertex(reUInt i, const reVector& vert);
   
-  reTriangle& withVertex(int i, const reVector& vert);
-  
+  // shape representation
   reShape::Type type() const override;
+  reUInt numVerts() const override;
+  const reVector vert(reUInt i) const override;
+  
+  // physical metrics
   reFloat volume() const override;
   const reMatrix computeInertia() const;
   
@@ -73,27 +75,11 @@ inline reTriangle::~reTriangle() {
   // do nothing
 }
 
-/**
- * Returns the vertex at the specified index
- * 
- * @param i The index of the vertex
- * @return The vertex at the index
- */
-
-inline reVector& reTriangle::vert(int i) {
-  return _verts[i];
+inline reUInt reTriangle::numVerts() const {
+  return 3;
 }
 
-/**
- * Returns the vertex at the specified index
- * 
- * Enforces constant constraint
- * 
- * @param i The index of the vertex
- * @return The vertex at the index
- */
-
-inline const reVector& reTriangle::vert(int i) const {
+inline const reVector reTriangle::vert(reUInt i) const {
   return _verts[i];
 }
 
@@ -105,7 +91,7 @@ inline const reVector& reTriangle::vert(int i) const {
  * @return A reference to the reTriangle
  */
 
-inline reTriangle& reTriangle::withVertex(int i, const reVector& vert) {
+inline reTriangle& reTriangle::withVertex(reUInt i, const reVector& vert) {
   _verts[i] = vert;
   return *this;
 }

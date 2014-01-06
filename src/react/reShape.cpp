@@ -1,6 +1,29 @@
 #include "react/reShape.h"
 
 #include "react/math.h"
+#include "react/reAABB.h"
+
+void reShape::updateAABB(const reMatrix& parentRotation) {
+  _aabb.set(0, 0, 0);
+  for (reUInt i = 0; i < numVerts(); i++) {
+    const reVector v = parentRotation * vert(i);
+    
+    const reFloat nx = reAbs(v.x) + shell();
+    if (nx > _aabb.halfWidth()) {
+      _aabb.setHalfWidth(nx);
+    }
+    
+    const reFloat ny = reAbs(v.y) + shell();
+    if (ny > _aabb.halfHeight()) {
+      _aabb.setHalfWidth(ny);
+    }
+    
+    const reFloat nz = reAbs(v.z) + shell();
+    if (nz > _aabb.halfDepth()) {
+      _aabb.setHalfWidth(nz);
+    }
+  }
+}
 
 bool reShape::rayIntersect(const reTMatrix& transform, const reVector& origin, const reVector& dir, reVector* intersect, reVector* normal) const {
   const reTMatrix inverse = transform.inverse();

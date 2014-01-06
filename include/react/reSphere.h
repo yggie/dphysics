@@ -23,6 +23,8 @@ public:
   
   reFloat radius() const;
   Type type() const override;
+  reUInt numVerts() const override;
+  const reVector vert(reUInt i) const override;
   reFloat volume() const override;
   const reMatrix computeInertia() const override;
   
@@ -30,9 +32,6 @@ public:
   reSphere& withRadius(reFloat radius);
   
   bool rayIntersect(const reVector& origin, const reVector& dir, reVector* intersect = nullptr, reVector* normal = nullptr) const override;
-  
-protected:
-  reFloat _sRadius;
 };
 
 /**
@@ -42,7 +41,7 @@ protected:
  */
 
 inline reFloat reSphere::radius() const {
-  return _sRadius;
+  return _shell;
 }
 
 /**
@@ -55,12 +54,20 @@ inline reShape::Type reSphere::type() const {
   return reShape::SPHERE;
 }
 
+inline reUInt reSphere::numVerts() const {
+  return 1;
+}
+
+inline const reVector reSphere::vert(reUInt) const {
+  return reVector(0.0, 0.0, 0.0);
+}
+
 inline reFloat reSphere::volume() const {
-  return RE_PI * 4.0 * _sRadius*_sRadius*_sRadius / 3.0;
+  return RE_PI * 4.0 * radius()*radius()*radius() / 3.0;
 }
 
 inline const reMatrix reSphere::computeInertia() const {
-  return reMatrix(2.0 * _sRadius * _sRadius / 5.0);
+  return reMatrix(2.0 * radius() * radius() / 5.0);
 }
 
 /**
@@ -70,7 +77,7 @@ inline const reMatrix reSphere::computeInertia() const {
  */
 
 inline void reSphere::setRadius(reFloat radius) {
-  _sRadius = radius;
+  _shell = radius;
 }
 
 /**

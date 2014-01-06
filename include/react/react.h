@@ -17,6 +17,9 @@
 #include "react/reSolid.h"
 #include "react/reRigidBody.h"
 
+#include "react/broadphase/reBroadPhase.h"
+#include "react/broadphase/reKDTree.h"
+
 #include "react/reWorld.h"
 
 // DOCUMENTATION FOR DOXYGEN MODULES
@@ -36,6 +39,12 @@
  * @defgroup shapes Shapes
  * This module defines the various geometric shapes which are supported by the
  * engine
+ */
+
+/**
+ * @defgroup broadphase Broad Phase
+ * This module defines the various implementations for a broad phase collision
+ * detection system
  */
 
 #endif

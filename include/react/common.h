@@ -9,6 +9,10 @@
 /** a customizable base floating point type */
 typedef float reFloat;
 
+typedef int reInt;
+
+typedef unsigned int reUInt;
+
 /** If RE_ZERO_MEMORY is defined, this value will be used to set unused memory */
 #ifndef RE_ZERO_MEM_VAL
 #define RE_ZERO_MEM_VAL   0
