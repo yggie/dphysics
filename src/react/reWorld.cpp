@@ -1,33 +1,21 @@
 #include "react/reWorld.h"
 
-#include "react/memory/reProxyAllocator.h"
-#include "react/memory/reFreeListAllocator.h"
+#include "react/Entities/reRigidBody.h"
+#include "react/Collision/Shapes/shapes.h"
 
-#include "react/reRigidBody.h"
-#include "react/reSphere.h"
-#include "react/reTriangle.h"
-#include "react/reDistortedShape.h"
+#include "react/Collision/reBroadPhase.h"
+#include "react/Collision/reBSPTree.h"
 
 #include <algorithm>
 
-const int MEM_ALLOC = 1024*1024*1;
-//const int MEM_ALLOC = 350;
-
-char buffer[MEM_ALLOC];
-
-reWorld::reWorld() : _bodies() {
-  reFreeListAllocator* tmp = new reFreeListAllocator(MEM_ALLOC, &buffer[0]);
-  _allocator = new reProxyAllocator(tmp);
+reWorld::reWorld() : _bodies(), _broadPhase(nullptr), _updated(false) {
+  _broadPhase = re::alloc_new<reBSPTree>();
 }
 
 reWorld::~reWorld() {
   clear();
   
-  RE_ASSERT(_allocator != nullptr, "No allocator was defined for the world object")
-  if (_allocator != nullptr) {
-    delete _allocator;
-    _allocator = nullptr;
-  }
+  re::alloc_delete<reBSPTree>((reBSPTree*)_broadPhase);
 }
 
 /**
@@ -43,42 +31,20 @@ void reWorld::clear() {
 //  reProxyAllocator* proxy = (reProxyAllocator*)_allocator;
   for (it = _bodies.begin(); it != itEnd; it++) {
 //    proxy->show();
-    remove((*it)->shape());
-    _allocator->alloc_delete<reEnt>(*it);
+    re::alloc_delete((*it)->shape());
+    re::alloc_delete(*it);
   }
   
   _bodies.clear();
+  
+  _broadPhase->clear();
+  _updated = true;
 }
 
 reRigidBody& reWorld::newRigidBody() {
-  reRigidBody* body = _allocator->alloc_new<reRigidBody>();
-  add(*body);
+  reRigidBody* body = re::alloc_new<reRigidBody>();
+  add(body);
   return *body;
-}
-
-reShape& reWorld::copyOf(const reShape& shape) {
-  switch (shape.type()) {
-    case reShape::SPHERE:
-      return *_allocator->alloc_new<reSphere>((const reSphere&)shape);
-    
-    case reShape::RECTANGLE:
-      RE_NOT_IMPLEMENTED
-      break;
-    
-    case reShape::COMPOUND:
-      RE_NOT_IMPLEMENTED
-      break;
-    
-    case reShape::TRIANGLE:
-      return *_allocator->alloc_new<reTriangle>((const reTriangle&)shape);
-    
-    case reShape::DISTORTED:
-      return (*_allocator->alloc_new<reDistortedShape>((const reDistortedShape&)shape)).withWorld(*this);
-  }
-  
-  RE_IMPOSSIBLE
-  
-  return *_allocator->alloc_new<reSphere>(1.0);
 }
 
 /**
@@ -87,14 +53,17 @@ reShape& reWorld::copyOf(const reShape& shape) {
  * @param entity The entity to attach
  */
 
-void reWorld::add(reEnt& entity) {
+void reWorld::add(reEnt* entity) {
+  if (entity == nullptr) {
+    RE_LOG("Attempted to add null entity")
+    return;
+  }
   
-  RE_ASSERT_WARN(entity.world() == nullptr, "The entity was already registered to another world")
-  
-  entity.setWorld(this);
-  switch (entity.type()) {
+  _updated = false;
+  _broadPhase->add(entity);
+  switch (entity->type()) {
     case reEnt::RIGID:
-      _bodies.push_back((reRigidBody*)(&entity));
+      _bodies.push_back((reRigidBody*)(entity));
       break;
     
     case reEnt::STATIC:
@@ -115,50 +84,21 @@ void reWorld::add(reEnt& entity) {
   }
 }
 
-void reWorld::remove(reShape* shape) {
-  if (shape == nullptr) {
-    RE_LOG("Attempted to delete NULL shape")
-    return;
-  }
-  
-  switch (shape->type()) {
-    case reShape::SPHERE:
-      _allocator->alloc_delete<reSphere>((reSphere*)shape);
-      return;
-    
-    case reShape::RECTANGLE:
-      RE_NOT_IMPLEMENTED
-      break;
-    
-    case reShape::COMPOUND:
-      RE_NOT_IMPLEMENTED
-      break;
-    
-    case reShape::TRIANGLE:
-      _allocator->alloc_delete<reTriangle>((reTriangle*)shape);
-      return;
-    
-    case reShape::DISTORTED:
-      _allocator->alloc_delete<reDistortedShape>((reDistortedShape*)shape);
-      return;
-  }
-  
-  RE_IMPOSSIBLE
-}
-
 void reWorld::step(reFloat dt) {
   // do nothing
   dt += 1;
 }
 
 reEnt* reWorld::shootRay(const reVector& from, const reVector& direction, reVector* intersect, reVector* normal) {
+  ensureUpdate();
+//  return _broadPhase->queryWithRay(from, direction, intersect, normal);
   reVector intersectPoint, intersectNormal;
   reVector closestPoint, closestNormal;
   reFloat maxDist = RE_INFINITY;
   reEnt* entContact = nullptr;
   
   for_each(_bodies.begin(), _bodies.end(), [&](reEnt* ent) {
-    if (ent->rayIntersect(from, direction, &intersectPoint, &intersectNormal)) {
+    if (ent->intersectsRay(from, direction, &intersectPoint, &intersectNormal)) {
       reFloat dist = (from - intersectPoint).length();
       if (reIsLessThan(dist, maxDist)) {
         entContact = ent;
@@ -182,5 +122,15 @@ reEnt* reWorld::shootRay(const reVector& from, const reVector& direction, reVect
   }
   
   return entContact;
+}
+
+void reWorld::ensureUpdate() {
+  if (!_updated) {
+    for_each(_bodies.begin(), _bodies.end(), [](reEnt* ent) {
+      ent->update();
+    });
+    _broadPhase->update();
+    _updated = true;
+  }
 }
 

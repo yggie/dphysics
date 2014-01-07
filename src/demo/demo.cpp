@@ -1,5 +1,5 @@
 #include "react/react.h"
-#include "react/utils.h"
+#include "react/debug.h"
 #include "demo/App.h"
 #include "demo/StaticGfx.h"
 

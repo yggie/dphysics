@@ -16,6 +16,8 @@ public:
   RayLightSource& withVect(const reVector& vect);
   RayLightSource& asDirectional(bool directional);
   
+  reVector& transformedVect();
+  const reVector& transformedVect() const;
   const reVector& vect() const;
   const reVector& color() const;
   bool isDirectional() const;
@@ -23,6 +25,7 @@ public:
 private:
   reVector _color;
   reVector _vect;
+  reVector _transformedVect;
   bool _isSpot;
 };
 
@@ -47,6 +50,14 @@ inline RayLightSource& RayLightSource::withVect(const reVector& vect) {
 inline RayLightSource& RayLightSource::asDirectional(bool directional) {
   _isSpot = !directional;
   return *this;
+}
+
+inline reVector& RayLightSource::transformedVect() {
+  return _transformedVect;
+}
+
+inline const reVector& RayLightSource::transformedVect() const {
+  return _transformedVect;
 }
 
 inline const reVector& RayLightSource::vect() const {

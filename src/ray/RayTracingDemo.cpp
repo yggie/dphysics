@@ -1,6 +1,6 @@
 #include "ray/RayTracingDemo.h"
 
-#include "react/reEnt.h"
+#include "react/Entities/reEnt.h"
 #include "ray/RayObject.h"
 
 #define GLM_FORCE_RADIANS
@@ -28,8 +28,8 @@ namespace {
   }
 }
 
-RayTracingDemo::RayTracingDemo() : DemoApp(), _world(), _maxDepth(5), _imageWidth(1), _imageHeight(1), _outputFile(), _fovy(45.0), _viewMat(1.0), _ambient(0.2f, 0.2f, 0.2f), _attenuation(1.0f, 0.0f, 0.0f), _lights(), _pixels(nullptr), _renderWidth(128), _renderHeight(96), _infinityColor(0.0, 0.0, 0.0) {
-  // do nothing
+RayTracingDemo::RayTracingDemo() : DemoApp(), _world(), _maxDepth(5), _imageWidth(1), _imageHeight(1), _outputFile(), _fovy(45.0), _viewMat(1.0), _ambient(0.2f, 0.2f, 0.2f), _attenuation(1.0f, 0.0f, 0.0f), _lights(), _pixels(nullptr), _renderWidth(128), _renderHeight(96), _infinityColor(0.0, 0.0, 0.0), _sceneFile(), _lightNo(0), usingGL(false) {
+  _sceneFile = "resources/ray/samples/scene4-diffuse.test";
 }
 
 RayTracingDemo::~RayTracingDemo() {
@@ -37,7 +37,8 @@ RayTracingDemo::~RayTracingDemo() {
 }
 
 void RayTracingDemo::init() {
-  glClearColor(1, 0, 0, 1);
+  glClearColor(0, 0, 0, 1);
+  glClearDepth(0.0);
 	glDisable(GL_ALPHA_TEST);
 	glDisable(GL_BLEND);
 	glDisable(GL_DEPTH_TEST);
@@ -63,7 +64,7 @@ void RayTracingDemo::init() {
 
 void RayTracingDemo::restart() {
   release();
-  createSceneFromFile("resources/ray/samples/scene6.test");
+  createSceneFromFile(_sceneFile.c_str(), false);
   
   renderScene(64, 48);
 }
@@ -83,7 +84,7 @@ void RayTracingDemo::release() {
 void RayTracingDemo::draw() {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   
-  if (_pixels != nullptr) {
+  if (_pixels != nullptr && !usingGL) {
     glDrawPixels(_renderWidth, _renderHeight, GL_RGBA, GL_UNSIGNED_BYTE, &_pixels[0]);
     checkOpenGLError();
   }
@@ -119,6 +120,10 @@ void RayTracingDemo::keyEvent(unsigned char key, int, int) {
     case 'f':
       renderScene(_imageWidth, _imageHeight);
       break;
+      
+    case 'q':
+      createSceneFromFile(_sceneFile.c_str(), true);
+      break;
   }
 }
 
@@ -149,27 +154,31 @@ reVector RayTracingDemo::shootRay(unsigned int depth, const reVector& origin, co
   reVector color = _ambient + obj->emission();
   
   for_each(_lights.begin(), _lights.end(), [&](const RayLightSource* light) {
-    const glm::vec3 inta(glm::vec4(glm::vec3(intersect[0], intersect[1], intersect[2]), 1.0) * _inverseViewMat);
-    const glm::vec3 raya(glm::vec4(glm::vec3(light->vect()[0], light->vect()[1], light->vect()[2]) - glm::vec3(intersect[0], intersect[1], intersect[2]), 0.0) * _inverseViewMat);
+    intersect = _inverseViewMat.mult(intersect, 1.0);
     
-    intersect = reVector(&inta[0]);
-    reVector ray(&raya[0]);
+    reVector ray;
+    if (light->isDirectional()) {
+      ray = -light->transformedVect();
+    } else {
+      ray = light->transformedVect() - intersect;
+    }
     ray.normalize();
-    reEnt* other = _world.shootRay(
-      intersect,
-      ray
-    );
     
+    // query using the ray
+    reEnt* other = _world.shootRay(intersect, ray);
+    
+    // if query is successful
     if (other == nullptr) {
-      const glm::vec3 ll(glm::vec4(light->vect()[0], light->vect()[1], light->vect()[2], 1.0) * _inverseViewMat);
-      const glm::vec3 nn(glm::vec4(glm::vec3(norm[0], norm[1], norm[2]), 0.0) * _inverseViewMat);
-      norm = reVector(&nn[0]);
-      const reVector lightPos(&ll[0]);
+      norm = _inverseViewMat.mult(norm, 0.0).normalized();
+      const reVector lightPos = light->transformedVect();
       const reVector back = (lightPos - intersect).normalized();
       const reVector halfVec = (back + ray).normalized();
       
+      const reVector reflec = dir + norm * (-2 * dir.dot(norm));
       const reVector diffuse = obj->diffuse() * reMax(ray.dot(norm), 0.0f);
-      const reVector specular = obj->specular() * glm::pow(reMax(norm.dot(halfVec), 0.0f), obj->shininess());
+      const reVector specular = 
+            obj->specular() * shootRay(depth + 1, intersect, reflec) +
+            obj->specular() * rePow(reMax(norm.dot(halfVec), 0.0f), obj->shininess());
       
 //      printf("SPEC=(%.2f, %.2f, %.2f)\n", specular[0], specular[1], specular[2]);
       
@@ -208,6 +217,7 @@ void RayTracingDemo::resizeImage(GLsizei w, GLsizei h) {
  */
 
 void RayTracingDemo::renderScene(GLsizei w, GLsizei h) {
+  usingGL = false;
   resizeImage(w, h);
   const float aspectRatio = w / float(h);
   const float fovy = glm::radians(_fovy / 2.0);
@@ -215,6 +225,14 @@ void RayTracingDemo::renderScene(GLsizei w, GLsizei h) {
   
   const float halfWidth = w / 2.0f;
   const float halfHeight = h / 2.0f;
+  
+  for (auto& light : _lights) {
+    if (light->isDirectional()) {
+      light->transformedVect() = _inverseViewMat.mult(light->vect(), 0.0);
+    } else {
+      light->transformedVect() = _inverseViewMat.mult(light->vect(), 1.0);
+    }
+  }
   
   // precompute tan(x)
   float* tanx = new float[w];
@@ -232,29 +250,30 @@ void RayTracingDemo::renderScene(GLsizei w, GLsizei h) {
   gettimeofday(&start, nullptr);
   gettimeofday(&lastChecked, nullptr);
   
-  const reVector eye(&(glm::vec4(0.0, 0.0, 0.0, 1.0) * _inverseViewMat)[0]);
+  const reVector eye = _inverseViewMat.mult(reVector(0,0,0), 1.0);
 
   for (GLsizei i = 0; i < h; i++) {
     float tany = glm::tan(fovy * (i + 0.5f - halfHeight) / halfHeight);
     
     for (GLsizei j = 0; j < w; j++) {
-      glm::vec3 ray(glm::vec4(tanx[j], tany, -1.0, 0.0) * _inverseViewMat);
-      colorPixel(
-        &_pixels[4*i*w + 4*j],
-        shootRay(0, eye, reVector(&ray[0]).normalized())
-      );
+      const reVector ray = _inverseViewMat.mult(
+        reVector(tanx[j], tany, -1.0), 0.0).normalized();
       
-      // give useful feedback to the user
-      numProcessed++;
-      gettimeofday(&now, nullptr);
-      if (timeBetween(lastChecked, now) > PERIOD) {
-        statusUpdate(100.0*numProcessed/double(numPixels), timeBetween(start, now));
-        draw();
-        gettimeofday(&lastChecked, nullptr);
-      }
+      colorPixel(&_pixels[4*i*w + 4*j], shootRay(0, eye, ray));
+    }
+    
+    // give useful feedback to the user after a certain period
+    numProcessed += w;
+    gettimeofday(&now, nullptr);
+    if (timeBetween(lastChecked, now) > PERIOD) {
+      statusUpdate(100.0 * numProcessed/double(numPixels),
+                   timeBetween(start, now));
+      draw();
+      gettimeofday(&lastChecked, nullptr);
     }
   }
   
+  // compute total time taken
   gettimeofday(&now, nullptr);
   statusUpdate(100.0, timeBetween(start, now));
   gettimeofday(&lastChecked, nullptr);

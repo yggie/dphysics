@@ -8,17 +8,14 @@
 #include "react/common.h"
 #include "react/math.h"
 
-#include "react/reShape.h"
-#include "react/reSphere.h"
-#include "react/reTriangle.h"
-#include "react/reDistortedShape.h"
+#include "react/Collision/Shapes/shapes.h"
 
-#include "react/reEnt.h"
-#include "react/reSolid.h"
-#include "react/reRigidBody.h"
+#include "react/Entities/reEnt.h"
+#include "react/Entities/reSolid.h"
+#include "react/Entities/reRigidBody.h"
 
-#include "react/broadphase/reBroadPhase.h"
-#include "react/broadphase/reKDTree.h"
+#include "react/Collision/reBroadPhase.h"
+#include "react/Collision/reBSPTree.h"
 
 #include "react/reWorld.h"
 
@@ -38,13 +35,13 @@
 /**
  * @defgroup shapes Shapes
  * This module defines the various geometric shapes which are supported by the
- * engine
+ * engine. Spatial queries eventually filter down to this module.
  */
 
 /**
- * @defgroup broadphase Broad Phase
- * This module defines the various implementations for a broad phase collision
- * detection system
+ * @defgroup collision Collision
+ * This module defines the various classes used to speed up collision queries.
+ * Successful queries are passed on to the Shapes module
  */
 
 #endif

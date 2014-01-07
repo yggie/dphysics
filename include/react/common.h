@@ -99,4 +99,48 @@ typedef unsigned int reUInt;
   #define RE_LOG(...)
 #endif
 
+#include "react/Memory/reBaseAllocator.h"
+
+class reShape;
+class reEnt;
+
+namespace re {
+  
+  /** A single shared allocator instance to allocate memory for the engine */
+  extern reAllocator* globalAllocator;
+
+  /**
+   * Uses the global allocator to allocate memory for the object using the
+   * default constructor
+   * 
+   * @return The allocated instance
+   */
+  
+  template <class T> T* alloc_new() {
+//  return new T();
+  return new (globalAllocator->alloc(sizeof(T), __alignof(T))) T();
+  }
+
+  /**
+   * Uses the global allocator to allocate memory for the object using a
+   * constructor with a single argument
+   * 
+   * @param arg A single argument
+   * @return The allocated instance
+   */
+  
+  template <class T, class Y> T* alloc_new(Y arg) {
+//    return new T(arg);
+    return globalAllocator->alloc_new<T, Y>(arg);
+  }
+  
+  template <class T> void alloc_delete(T* ptr) {
+//    delete ptr;
+    globalAllocator->alloc_delete<T>(ptr);
+  }
+  
+  reShape* copyOf(const reShape& shape);
+  template <> void alloc_delete<reShape>(reShape* shape);
+};
+
 #endif

@@ -29,7 +29,8 @@ private:
   void colorPixel(GLubyte* rgbaPixel, const reVector& color);
   void resizeImage(GLsizei w, GLsizei h);
   void renderScene(GLsizei w, GLsizei h);
-  void createSceneFromFile(const char* filename);
+  void createSceneFromFile(const char* filename, bool useOpenGL);
+  GLenum newOpenGLLight();
   
   reWorld _world;
   GLuint _maxDepth;
@@ -38,8 +39,8 @@ private:
   std::string _outputFile;
   
   float _fovy;
-  glm::mat4 _viewMat;
-  glm::mat4 _inverseViewMat;
+  reTMatrix _viewMat;
+  reTMatrix _inverseViewMat;
   
   reVector _ambient;
   reVector _attenuation;
@@ -52,6 +53,10 @@ private:
   GLsizei _renderHeight;
   
   reVector _infinityColor;
+  
+  std::string _sceneFile;
+  unsigned int _lightNo;
+  bool usingGL;
 };
 
 inline void RayTracingDemo::colorPixel(GLubyte* rgbaPixel, const reVector& color) {

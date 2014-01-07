@@ -3,8 +3,8 @@
 
 #include "demo/GfxObj.h"
 #include "demo/MatrixStack.h"
-#include "react/reEnt.h"
-#include "react/reSphere.h"
+#include "react/Entities/reEnt.h"
+#include "react/Collision/Shapes/reSphere.h"
 
 namespace demo {
   

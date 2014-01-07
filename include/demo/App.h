@@ -1,7 +1,8 @@
 #ifndef DEMO_APPWINDOW_H
 #define DEMO_APPWINDOW_H
 
-#include "react/reEnt.h"
+#include "react/Entities/reEnt.h"
+#include "react/reWorld.h"
 #include "demo/MatrixStack.h"
 #include "demo/SimpleCanvas.h"
 #include "demo/FlyingCam.h"

@@ -10,10 +10,10 @@
 #include "react/common.h"
 #include "react/math.h"
 
+class reBroadPhase;
 class reRigidBody;
 class reEnt;
 class reShape;
-class reAllocator;
 class reDistortedShape;
 
 /**
@@ -23,38 +23,31 @@ class reDistortedShape;
 class reWorld {
 public:
   reWorld();
+  /** Prohibit copying */
+  reWorld(const reWorld&) = delete;
   ~reWorld();
+  
+  /** Prohibit copying */
+  reWorld& operator=(const reWorld&) = delete;
   
   void clear();
   
   reDistortedShape& newDistortedShape(const reShape& shape);
   reRigidBody& newRigidBody();
-  reShape& copyOf(const reShape& shape);
   
-  void add(reEnt& entity);
-  
-  void remove(reShape* shape);
-  
-  reAllocator& allocator();
+  void add(reEnt* entity);
   
   void step(reFloat dt);
   
   reEnt* shootRay(const reVector& from, const reVector& direction, reVector* intersect = nullptr, reVector* normal = nullptr);
 
 protected:
-  std::vector<reRigidBody*> _bodies;
+  void ensureUpdate();
   
-  reAllocator* _allocator;
+  std::vector<reRigidBody*> _bodies;
+  reBroadPhase* _broadPhase;
+  
+  bool _updated;
 };
-
-/**
- * Returns the general purpose memory allocator used by the world object
- * 
- * @return The memory allocator used
- */
-
-inline reAllocator& reWorld::allocator() {
-  return *_allocator;
-}
 
 #endif

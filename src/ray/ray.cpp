@@ -4,9 +4,12 @@
 
 #include "react/react.h"
 
+#include "react/Memory/reFreeListAllocator.h"
+#include "react/Memory/reProxyAllocator.h"
+
 // declare all demos
 DemoApp* demos[] = {
-  new RayTracingDemo()
+  nullptr,
 };
 
 
@@ -61,6 +64,13 @@ int main(int argc, char** argv) {
   glutInitWindowPosition(200, 150);
   glutCreateWindow("react Demo Applications");
   
+  const reUInt SZ = 1024*1024*1;
+  char* buffer = new char[SZ];
+  reFreeListAllocator* tmp = new reFreeListAllocator(SZ, &buffer[0]);
+  re::globalAllocator = new reProxyAllocator(tmp);
+  
+  demos[0] = new RayTracingDemo();
+  
   glutReshapeFunc(reshapeFunc);
   glutKeyboardFunc(keyFunc);
   glutSpecialFunc(specialKeyFunc);
@@ -70,6 +80,23 @@ int main(int argc, char** argv) {
   glutDisplayFunc(displayFunc);
     
   glutMainLoop();
+  
+//  reAABB aa, bb;
+//  reVector a(0,0,0), b(2,5,0);
+//  
+//  aa.dimens() = reVector(1,10,1);
+//  bb.dimens() = reVector(1,1,1);
+//  
+//  if (aa.intersects(bb, a - b)) {
+//    printf("SHOOOOOOOOOES\n");
+//  } else {
+//    printf("WKKAKAKAKAKAK\n");
+//    printf("WKKAKAKAKAKAK\n");
+//    printf("WKKAKAKAKAKAK\n");
+//    printf("WKKAKAKAKAKAK\n");
+//    printf("WKKAKAKAKAKAK\n");
+//    printf("WKKAKAKAKAKAK\n");
+//  }
   
 //  reWorld world;
 //  world.newRigidBody().withShape(
@@ -89,10 +116,13 @@ int main(int argc, char** argv) {
 //  } else {
 //    printf("NO INTERSECT\n");
 //  }
-  
+
   for (int i = 0; i < numDemos; i++) delete demos[i];
   
   RE_LOG("SUCCESSFULLY DELETED ALL DEMOS")
+  
+  delete re::globalAllocator;
+  delete tmp;
   
   return 0;
 }
