@@ -16,9 +16,6 @@ reProxyAllocator::~reProxyAllocator() {
 //  show();
   
   RE_ASSERT(_allocator != nullptr, "No allocator was used by the proxy")
-  if (_allocator != nullptr) {
-    delete _allocator;
-  }
 }
 
 void* reProxyAllocator::alloc(u32 size, u8 alignment) {

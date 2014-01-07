@@ -1,6 +1,7 @@
 #include "ray/RayTracingDemo.h"
 
 #include "react/Entities/reEnt.h"
+#include "react/Entities/reRigidBody.h"
 #include "ray/RayObject.h"
 
 #define GLM_FORCE_RADIANS
@@ -78,6 +79,14 @@ void RayTracingDemo::restart() {
 }
 
 void RayTracingDemo::release() {
+  std::vector<reRigidBody*>& b = _world.bodies();
+  for (auto it = b.begin(); it != b.end(); it++) {
+    reRigidBody* body = *it;
+    if (body->userdata != nullptr) {
+      delete (RayObject*)(body->userdata);
+      body->userdata = nullptr;
+    }
+  }
   _world.clear();
   for_each(_lights.begin(), _lights.end(), [&](RayLightSource* light) {
     delete light;
@@ -139,6 +148,31 @@ void RayTracingDemo::specialKeyEvent(int, int, int) {
   // do nothing
 }
 
+void RayTracingDemo::mouseEvent(int button, int state, int x, int y) {
+  if (state == GLUT_DOWN) {
+    switch (button) {
+      case GLUT_LEFT_BUTTON:
+        {
+          const int X = (int)(_renderWidth * x / (float)width());
+          const int Y = (int)(_renderHeight * y / (float)height());
+          const GLubyte* pix = &_pixels[4*(_renderHeight - Y - 1)*_renderWidth + 4*X];
+          printf("At (%3d, %3d) : #%02x%02x%02x%02x\n", x, y, pix[0], pix[1], pix[2], pix[3]);
+        }
+        break;
+      
+      case GLUT_RIGHT_BUTTON:
+        break;
+      
+      case GLUT_MIDDLE_BUTTON:
+        break;
+    }
+  } else if (state == GLUT_UP) {
+    // do nothing
+  } else {
+    printf("Unknown button state %d\n", state);
+  }
+}
+
 /**
  * Recursively shoots rays at the image to determine the color
  */
@@ -164,40 +198,40 @@ reVector RayTracingDemo::shootRay(unsigned int depth, const reVector& origin, co
   // initialize color with emission and ambient components
   reVector color = _ambient + obj->emission();
   
-//  // determine lighting contributions
-//  for_each(_lights.begin(), _lights.end(), [&](const RayLightSource* light) {
-//    
-//    // determine direction of shadow rays
-//    reVector ray;
-//    if (light->isDirectional()) {
-//      ray = -light->vect();
-//    } else {
-//      ray = light->vect() - intersect;
-//    }
-//    ray.normalize();
-//    
-//    // trace shadow rays to light sources
-//    reEnt* other = _world.shootRay(intersect, ray);
-//    
-//    // if query is successful
-//    if (other == nullptr) {
-//      const reVector lightPos = light->vect();
-//      const reVector back = (lightPos - intersect).normalized();
-//      const reVector halfVec = (back + ray).normalized();
-//      
-//      const reVector diffuse = obj->diffuse() * reMax(ray.dot(norm), 0.0f);
-//      const reVector specular = obj->specular() * rePow(reMax(norm.dot(halfVec), 0.0f), obj->shininess());
-//      
-////      printf("SPEC=(%.2f, %.2f, %.2f)\n", specular[0], specular[1], specular[2]);
-//      
-//      if (light->isDirectional()) {
-//        color += light->color() * (diffuse + specular);
-//      } else {
-//        float dist = (light->vect() - intersect).length();
-//        color += light->color() * (diffuse + specular) / (_attenuation[0] + _attenuation[1] * dist + _attenuation[2] * dist * dist);
-//      }
-//    }
-//  });
+  // determine lighting contributions
+  for_each(_lights.begin(), _lights.end(), [&](const RayLightSource* light) {
+    
+    // determine direction of shadow rays
+    reVector ray;
+    if (light->isDirectional()) {
+      ray = -light->vect();
+    } else {
+      ray = light->vect() - intersect;
+    }
+    ray.normalize();
+    
+    // trace shadow rays to light sources
+    reEnt* other = _world.shootRay(intersect, ray);
+    
+    // if query is successful
+    if (other == nullptr) {
+      const reVector lightPos = light->vect();
+      const reVector back = (lightPos - intersect).normalized();
+      const reVector halfVec = (back + ray).normalized();
+      
+      const reVector diffuse = obj->diffuse() * reMax(ray.dot(norm), 0.0f);
+      const reVector specular = obj->specular() * rePow(reMax(norm.dot(halfVec), 0.0f), obj->shininess());
+      
+//      printf("SPEC=(%.2f, %.2f, %.2f)\n", specular[0], specular[1], specular[2]);
+      
+      if (light->isDirectional()) {
+        color += light->color() * (diffuse + specular);
+      } else {
+        float dist = (light->vect() - intersect).length();
+        color += light->color() * (diffuse + specular) / (_attenuation[0] + _attenuation[1] * dist + _attenuation[2] * dist * dist);
+      }
+    }
+  });
   
 //  if (obj->specular().lengthSq() > RE_FP_TOLERANCE) {
 //    const reVector reflec = (dir - norm * 2.0 * norm.dot(dir)).normalized();
@@ -215,11 +249,12 @@ reVector RayTracingDemo::shootRay(unsigned int depth, const reVector& origin, co
 void RayTracingDemo::resizeImage(GLsizei w, GLsizei h) {
   if (_pixels != nullptr) {
     delete[] _pixels;
+    _pixels = nullptr;
   }
   
   const GLuint size = w * h * 4;
   _pixels = new GLubyte[size];
-  memset(&_pixels[0], 150, sizeof(GLubyte) * size);
+  memset(&_pixels[0], 123, sizeof(GLubyte) * size);
   
   _renderWidth = w;
   _renderHeight = h;

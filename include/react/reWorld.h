@@ -39,6 +39,8 @@ public:
   
   void step(reFloat dt);
   
+  std::vector<reRigidBody*>& bodies() { return _bodies; }
+  
   reEnt* shootRay(const reVector& from, const reVector& direction, reVector* intersect = nullptr, reVector* normal = nullptr);
 
 protected:

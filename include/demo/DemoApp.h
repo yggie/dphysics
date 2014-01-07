@@ -17,6 +17,7 @@ public:
   virtual void onResize() = 0;
   virtual void keyEvent(unsigned char key, int x, int y) = 0;
   virtual void specialKeyEvent(int key, int x, int y) = 0;
+  virtual void mouseEvent(int button, int state, int x, int y) = 0;
   
   unsigned int width() const;
   unsigned int height() const;

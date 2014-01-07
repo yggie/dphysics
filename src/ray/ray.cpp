@@ -46,6 +46,10 @@ void specialKeyFunc(int key, int x, int y) {
   demos[currentDemo]->specialKeyEvent(key, x, y);
 }
 
+void mouseFunc(int button, int state, int x, int y) {
+  demos[currentDemo]->mouseEvent(button, state, x, y);
+}
+
 void reshapeFunc(int w, int h) {
   windowHeight = (h > 0) ? h : 1;
   windowWidth = w;
@@ -64,6 +68,7 @@ int main(int argc, char** argv) {
   glutReshapeFunc(reshapeFunc);
   glutKeyboardFunc(keyFunc);
   glutSpecialFunc(specialKeyFunc);
+  glutMouseFunc(mouseFunc);
   
   glutDisplayFunc(initFunc);
   glutMainLoopEvent();
@@ -107,7 +112,10 @@ int main(int argc, char** argv) {
 //    printf("NO INTERSECT\n");
 //  }
 
-  for (int i = 0; i < numDemos; i++) delete demos[i];
+  for (int i = 0; i < numDemos; i++) {
+    delete demos[i];
+    demos[i] = nullptr;
+  }
   
   RE_LOG("SUCCESSFULLY DELETED ALL DEMOS")
   

@@ -58,6 +58,7 @@ void reWorld::clear() {
 //  reProxyAllocator* proxy = (reProxyAllocator*)_allocator;
   for (it = _bodies.begin(); it != itEnd; it++) {
 //    proxy->show();
+    RE_ASSERT_WARN((*it)->userdata == nullptr, "This body has a non-null userdata pointer!")
     re::alloc_delete((*it)->shape());
     re::alloc_delete(*it);
   }

@@ -17,7 +17,10 @@
 class reRigidBody : public reSolid {
 public:
   reRigidBody();
+  reRigidBody(const reRigidBody&) = delete;
   virtual ~reRigidBody();
+  
+  reRigidBody& operator=(const reRigidBody&) = delete;
   
   reEnt::Type type() const;
   

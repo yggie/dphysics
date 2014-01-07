@@ -23,6 +23,7 @@ public:
   void onResize() override;
   void keyEvent(unsigned char key, int x, int y) override;
   void specialKeyEvent(int key, int x, int y) override;
+  void mouseEvent(int button, int state, int x, int y) override;
   
 private:
   reVector shootRay(unsigned int depth, const reVector& origin, const reVector& dir);
