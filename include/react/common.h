@@ -117,8 +117,8 @@ namespace re {
    */
   
   template <class T> T* alloc_new() {
-//  return new T();
-  return new (globalAllocator->alloc(sizeof(T), __alignof(T))) T();
+  return new T();
+//  return new (globalAllocator->alloc(sizeof(T), __alignof(T))) T();
   }
 
   /**
@@ -130,13 +130,13 @@ namespace re {
    */
   
   template <class T, class Y> T* alloc_new(Y arg) {
-//    return new T(arg);
-    return globalAllocator->alloc_new<T, Y>(arg);
+    return new T(arg);
+//    return globalAllocator->alloc_new<T, Y>(arg);
   }
   
   template <class T> void alloc_delete(T* ptr) {
-//    delete ptr;
-    globalAllocator->alloc_delete<T>(ptr);
+    delete ptr;
+//    globalAllocator->alloc_delete<T>(ptr);
   }
   
   reShape* copyOf(const reShape& shape);

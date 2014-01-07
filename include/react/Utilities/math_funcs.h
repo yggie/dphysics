@@ -39,6 +39,10 @@ inline reFloat reMin(reFloat a, reFloat b) {
   return (a < b) ? a : b;
 }
 
+inline reFloat reClamp(reFloat a, reFloat min, reFloat max) {
+  return reMax(reMin(a, max), min);
+}
+
 inline int reSign(reFloat a) {
   return (a >= -0.0f) ? 1 : -1;
 }

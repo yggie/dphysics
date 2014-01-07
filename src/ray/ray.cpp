@@ -4,12 +4,9 @@
 
 #include "react/react.h"
 
-#include "react/Memory/reFreeListAllocator.h"
-#include "react/Memory/reProxyAllocator.h"
-
 // declare all demos
 DemoApp* demos[] = {
-  nullptr,
+  new RayTracingDemo(),
 };
 
 
@@ -64,13 +61,6 @@ int main(int argc, char** argv) {
   glutInitWindowPosition(200, 150);
   glutCreateWindow("react Demo Applications");
   
-  const reUInt SZ = 1024*1024*1;
-  char* buffer = new char[SZ];
-  reFreeListAllocator* tmp = new reFreeListAllocator(SZ, &buffer[0]);
-  re::globalAllocator = new reProxyAllocator(tmp);
-  
-  demos[0] = new RayTracingDemo();
-  
   glutReshapeFunc(reshapeFunc);
   glutKeyboardFunc(keyFunc);
   glutSpecialFunc(specialKeyFunc);
@@ -120,9 +110,6 @@ int main(int argc, char** argv) {
   for (int i = 0; i < numDemos; i++) delete demos[i];
   
   RE_LOG("SUCCESSFULLY DELETED ALL DEMOS")
-  
-  delete re::globalAllocator;
-  delete tmp;
   
   return 0;
 }

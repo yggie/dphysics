@@ -26,6 +26,14 @@ namespace {
       printf("%.2f mins\n", ms / 60000.0);
     }
   }
+  
+  const reVector clamp(const reVector& v, reFloat min, reFloat max) {
+    reVector a;
+    for (int i = 0; i < 3; i++) {
+      a[i] = reClamp(v[i], min, max);
+    }
+    return a;
+  }
 }
 
 RayTracingDemo::RayTracingDemo() : DemoApp(), _world(), _maxDepth(5), _imageWidth(1), _imageHeight(1), _outputFile(), _fovy(45.0), _viewMat(1.0), _ambient(0.2f, 0.2f, 0.2f), _attenuation(1.0f, 0.0f, 0.0f), _lights(), _pixels(nullptr), _renderWidth(128), _renderHeight(96), _infinityColor(0.0, 0.0, 0.0), _sceneFile(), _lightNo(0), usingGL(false) {
@@ -142,6 +150,7 @@ reVector RayTracingDemo::shootRay(unsigned int depth, const reVector& origin, co
   }
   
   reVector intersect, norm;
+  // primary ray
   reEnt* ent = _world.shootRay(origin, dir, &intersect, &norm);
   
   // no more objects in this direction
@@ -149,47 +158,52 @@ reVector RayTracingDemo::shootRay(unsigned int depth, const reVector& origin, co
     return _infinityColor;
   }
   
+  // get the material object associated with the entity
   RayObject* obj = (RayObject*)ent->userdata;
   
+  // initialize color with emission and ambient components
   reVector color = _ambient + obj->emission();
   
-  for_each(_lights.begin(), _lights.end(), [&](const RayLightSource* light) {
-    intersect = _inverseViewMat.mult(intersect, 1.0);
-    
-    reVector ray;
-    if (light->isDirectional()) {
-      ray = -light->transformedVect();
-    } else {
-      ray = light->transformedVect() - intersect;
-    }
-    ray.normalize();
-    
-    // query using the ray
-    reEnt* other = _world.shootRay(intersect, ray);
-    
-    // if query is successful
-    if (other == nullptr) {
-      norm = _inverseViewMat.mult(norm, 0.0).normalized();
-      const reVector lightPos = light->transformedVect();
-      const reVector back = (lightPos - intersect).normalized();
-      const reVector halfVec = (back + ray).normalized();
-      
-      const reVector reflec = dir + norm * (-2 * dir.dot(norm));
-      const reVector diffuse = obj->diffuse() * reMax(ray.dot(norm), 0.0f);
-      const reVector specular = 
-            obj->specular() * shootRay(depth + 1, intersect, reflec) +
-            obj->specular() * rePow(reMax(norm.dot(halfVec), 0.0f), obj->shininess());
-      
-//      printf("SPEC=(%.2f, %.2f, %.2f)\n", specular[0], specular[1], specular[2]);
-      
-      if (light->isDirectional()) {
-        color += light->color() * (diffuse + specular);
-      } else {
-        float dist = (light->vect() - intersect).length();
-        color += light->color() * (diffuse + specular) / (_attenuation[0] + _attenuation[1] * dist + _attenuation[2] * dist * dist);
-      }
-    }
-  });
+//  // determine lighting contributions
+//  for_each(_lights.begin(), _lights.end(), [&](const RayLightSource* light) {
+//    
+//    // determine direction of shadow rays
+//    reVector ray;
+//    if (light->isDirectional()) {
+//      ray = -light->vect();
+//    } else {
+//      ray = light->vect() - intersect;
+//    }
+//    ray.normalize();
+//    
+//    // trace shadow rays to light sources
+//    reEnt* other = _world.shootRay(intersect, ray);
+//    
+//    // if query is successful
+//    if (other == nullptr) {
+//      const reVector lightPos = light->vect();
+//      const reVector back = (lightPos - intersect).normalized();
+//      const reVector halfVec = (back + ray).normalized();
+//      
+//      const reVector diffuse = obj->diffuse() * reMax(ray.dot(norm), 0.0f);
+//      const reVector specular = obj->specular() * rePow(reMax(norm.dot(halfVec), 0.0f), obj->shininess());
+//      
+////      printf("SPEC=(%.2f, %.2f, %.2f)\n", specular[0], specular[1], specular[2]);
+//      
+//      if (light->isDirectional()) {
+//        color += light->color() * (diffuse + specular);
+//      } else {
+//        float dist = (light->vect() - intersect).length();
+//        color += light->color() * (diffuse + specular) / (_attenuation[0] + _attenuation[1] * dist + _attenuation[2] * dist * dist);
+//      }
+//    }
+//  });
+  
+//  if (obj->specular().lengthSq() > RE_FP_TOLERANCE) {
+//    const reVector reflec = (dir - norm * 2.0 * norm.dot(dir)).normalized();
+//    // shoot secondary rays
+//    color += obj->specular() * shootRay(depth + 1, intersect, reflec);
+//  }
   
   return color;
 }
@@ -226,21 +240,11 @@ void RayTracingDemo::renderScene(GLsizei w, GLsizei h) {
   const float halfWidth = w / 2.0f;
   const float halfHeight = h / 2.0f;
   
-  for (auto& light : _lights) {
-    if (light->isDirectional()) {
-      light->transformedVect() = _inverseViewMat.mult(light->vect(), 0.0);
-    } else {
-      light->transformedVect() = _inverseViewMat.mult(light->vect(), 1.0);
-    }
-  }
-  
   // precompute tan(x)
   float* tanx = new float[w];
   for (GLsizei i = 0; i < w; i++) {
     tanx[i] = glm::tan(fovx * (i + 0.5f - halfWidth) / halfWidth);
   }
-  
-  // setup the viewing origin
   
   // get useful information to update status
   const GLsizei numPixels = w * h;
@@ -253,13 +257,20 @@ void RayTracingDemo::renderScene(GLsizei w, GLsizei h) {
   const reVector eye = _inverseViewMat.mult(reVector(0,0,0), 1.0);
 
   for (GLsizei i = 0; i < h; i++) {
-    float tany = glm::tan(fovy * (i + 0.5f - halfHeight) / halfHeight);
+    const float tany = glm::tan(fovy * (i + 0.5f - halfHeight) / halfHeight);
     
     for (GLsizei j = 0; j < w; j++) {
       const reVector ray = _inverseViewMat.mult(
-        reVector(tanx[j], tany, -1.0), 0.0).normalized();
+        reVector(-tanx[j], -tany, -1.0).normalized(), 0.0);
       
-      colorPixel(&_pixels[4*i*w + 4*j], shootRay(0, eye, ray));
+      // shoot primary ray
+      const reVector color = shootRay(0, eye, ray);
+      GLubyte* pix = &_pixels[4*(h - i - 1)*w + 4*j];
+      pix[0] = (GLubyte)(255.0 * reClamp(color[0], 0.0, 1.0));
+      pix[1] = (GLubyte)(255.0 * reClamp(color[1], 0.0, 1.0));
+      pix[2] = (GLubyte)(255.0 * reClamp(color[2], 0.0, 1.0));
+      pix[3] = 0xff;
+//      colorPixel(&_pixels[4*(h - i - 1)*w + 4*j], shootRay(0, eye, ray));
     }
     
     // give useful feedback to the user after a certain period

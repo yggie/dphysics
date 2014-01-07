@@ -62,7 +62,7 @@ bool reTriangle::intersectsRay(const reVector& origin, const reVector& dir, reVe
 //    printf("COMPUTED uu%.5f, uv%.5f, uw%.5f, vw%.5f, vv%.5f)\n", uu, uv, uw, vw, vv);
 //    printf("COMPUTED dir = (%.5f, %.5f, %.5f)\n", dir[0], dir[1], dir[2]);
   
-  RE_ASSERT(!reIsNan(s) || !reIsNan(t), "Cannot be NaN");
+//  RE_ASSERT(!reIsNan(s) || !reIsNan(t), "Cannot be NaN");
   
   return false;
 }

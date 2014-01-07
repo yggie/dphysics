@@ -6,16 +6,43 @@
 #include "react/Collision/reBroadPhase.h"
 #include "react/Collision/reBSPTree.h"
 
+#include "react/Memory/reFreeListAllocator.h"
+#include "react/Memory/reProxyAllocator.h"
+
 #include <algorithm>
 
+namespace {
+  const reUInt MEM_SIZE = 1024*1024*1;
+  char buffer[MEM_SIZE];
+
+  reFreeListAllocator* flAlloc = nullptr;
+  reProxyAllocator* proxy = nullptr;
+};
+
 reWorld::reWorld() : _bodies(), _broadPhase(nullptr), _updated(false) {
-  _broadPhase = re::alloc_new<reBSPTree>();
+//  _broadPhase = re::alloc_new<reBSPTree>();
+  if (re::globalAllocator == nullptr) {
+    if (flAlloc == nullptr) {
+      flAlloc = new reFreeListAllocator(MEM_SIZE, &buffer[0]);
+    }
+    if (proxy == nullptr) {
+      proxy = new reProxyAllocator(flAlloc);
+    }
+    re::globalAllocator = proxy;
+  }
 }
 
 reWorld::~reWorld() {
   clear();
   
-  re::alloc_delete<reBSPTree>((reBSPTree*)_broadPhase);
+//  re::alloc_delete<reBSPTree>((reBSPTree*)_broadPhase);
+  if (proxy != nullptr) {
+    delete proxy;
+  }
+  if (flAlloc != nullptr) {
+    delete flAlloc;
+  }
+  re::globalAllocator = nullptr;
 }
 
 /**
@@ -37,7 +64,7 @@ void reWorld::clear() {
   
   _bodies.clear();
   
-  _broadPhase->clear();
+//  _broadPhase->clear();
   _updated = true;
 }
 
@@ -60,7 +87,7 @@ void reWorld::add(reEnt* entity) {
   }
   
   _updated = false;
-  _broadPhase->add(entity);
+//  _broadPhase->add(entity);
   switch (entity->type()) {
     case reEnt::RIGID:
       _bodies.push_back((reRigidBody*)(entity));
@@ -126,10 +153,10 @@ reEnt* reWorld::shootRay(const reVector& from, const reVector& direction, reVect
 
 void reWorld::ensureUpdate() {
   if (!_updated) {
-    for_each(_bodies.begin(), _bodies.end(), [](reEnt* ent) {
-      ent->update();
-    });
-    _broadPhase->update();
+//    for_each(_bodies.begin(), _bodies.end(), [](reEnt* ent) {
+//      ent->update();
+//    });
+//    _broadPhase->update();
     _updated = true;
   }
 }

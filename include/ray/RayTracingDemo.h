@@ -61,8 +61,8 @@ private:
 
 inline void RayTracingDemo::colorPixel(GLubyte* rgbaPixel, const reVector& color) {
   for (int i = 0; i < 3; i++) {
-    float c = (color[i] > 1.0) ? 1.0 : color[i];
-    rgbaPixel[i] = (GLubyte)(255 * ((c < 0.0) ? 0 : c));
+    const float c = (color[i] > 1.0) ? 1.0 : color[i];
+    rgbaPixel[i] = (GLubyte)(255 * ((c < 0.0) ? 0.0 : c));
   }
   rgbaPixel[3] = 0xff;
 }

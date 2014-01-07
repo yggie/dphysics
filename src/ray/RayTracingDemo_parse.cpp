@@ -78,8 +78,6 @@ void RayTracingDemo::createSceneFromFile(const char* filename, bool useOpenGL) {
     glEnable(GL_LIGHTING);
     glShadeModel(GL_SMOOTH);
     glEnable(GL_DEPTH_TEST);
-    glColorMaterial(GL_FRONT, GL_EMISSION);
-    glColor3f(1, 1, 1);
     _lightNo = 0;
     toooogle = !toooogle;
   }
@@ -197,7 +195,6 @@ void RayTracingDemo::createSceneFromFile(const char* filename, bool useOpenGL) {
 			    glLoadIdentity();
 			    glm::mat4 m = glm::frustum(-x, x, -y, y, 0.1f, 100.0f);
 			    glLoadMatrixf(&m[0][0]);
-//			    glFrustum(-x, x, -y, y, near, 100.0f);
 			    gluLookAt(eye[0], eye[1], eye[2], center[0], center[1], center[2], up[0], up[1], up[2]);
   			  glMatrixMode(GL_MODELVIEW);
 			  }
@@ -229,7 +226,7 @@ void RayTracingDemo::createSceneFromFile(const char* filename, bool useOpenGL) {
         reTMatrix tm;
         for (int i = 0; i < 4; i++) {
           for (int j = 0; j < 4; j++) {
-            tm[i][j] = m[i][j];
+            tm[i][j] = m[j][i];
           }
         }
         reEnt& ent = _world.newRigidBody().withShape(
@@ -284,7 +281,7 @@ void RayTracingDemo::createSceneFromFile(const char* filename, bool useOpenGL) {
         throw 0;
       }
       
-    } else if (cmd == "tri") {
+    } else if (cmd == "triaaa") {
       unsigned int inds[3];
       readUInts(3, &inds[0]);
       glm::mat4 m = stack.mat();
@@ -446,34 +443,34 @@ void RayTracingDemo::createSceneFromFile(const char* filename, bool useOpenGL) {
     } else if (cmd == "diffuse") {
       readFloats(3, &diffuse[0]);
       if (useOpenGL) {
-        glColorMaterial(GL_FRONT, GL_DIFFUSE);
+        glColorMaterial(GL_FRONT_AND_BACK, GL_DIFFUSE);
         glColor3f(diffuse[0], diffuse[1], diffuse[2]);
-//        glMaterialfv(GL_FRONT, GL_DIFFUSE, &diffuse[0]);
+//        glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, &diffuse[0]);
       }
       RAY_PRINTF("    %-22s%3.1f, %3.1f, %3.1f", "DIFFUSE", diffuse[0], diffuse[1], diffuse[2])
       
     } else if (cmd == "specular") {
       readFloats(3, &specular[0]);
       if (useOpenGL) {
-        glColorMaterial(GL_FRONT, GL_SPECULAR);
+        glColorMaterial(GL_FRONT_AND_BACK, GL_SPECULAR);
         glColor3f(specular[0], specular[1], specular[2]);
-//        glMaterialfv(GL_FRONT, GL_SPECULAR, &specular[0]);
+//        glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, &specular[0]);
       }
       RAY_PRINTF("    %-22s%3.1f, %3.1f, %3.1f", "SPECULAR", specular[0], specular[1], specular[2])
       
     } else if (cmd == "emission") {
       readFloats(3, &emission[0]);
       if (useOpenGL) {
-        glColorMaterial(GL_FRONT, GL_EMISSION);
+        glColorMaterial(GL_FRONT_AND_BACK, GL_EMISSION);
         glColor3f(emission[0], emission[1], emission[2]);
-//        glMaterialfv(GL_FRONT, GL_EMISSION, &emission[0]);
+//        glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, &emission[0]);
       }
       RAY_PRINTF("    %-22s%3.1f, %3.1f, %3.1f", "EMISSION", emission[0], emission[1], emission[2])
       
     } else if (cmd == "shininess") {
       readFloats(1, &shininess);
       if (useOpenGL) {
-        glMaterialf(GL_FRONT, GL_SHININESS, shininess);
+        glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, shininess);
       }
       RAY_PRINTF("    %-30s%5.1f", "SHININESS", shininess)
       
@@ -500,6 +497,16 @@ void RayTracingDemo::createSceneFromFile(const char* filename, bool useOpenGL) {
     }
     glShadeModel(GL_FLAT);
     glDisable(GL_DEPTH_TEST);
+    checkOpenGLError();
+  } else {
+    // precompute the transformed light vectors
+    for (auto& light : _lights) {
+      if (light->isDirectional()) {
+        light->transformedVect() = _inverseViewMat.mult(light->vect(), 0.0);
+      } else {
+        light->transformedVect() = _inverseViewMat.mult(light->vect(), 1.0);
+      }
+    }
   }
 }
 
