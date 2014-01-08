@@ -30,12 +30,7 @@ public:
   void setRadius(reFloat radius);
   reSphere& withRadius(reFloat radius);
   
-  bool intersectsRay(
-    const reVector& origin,
-    const reVector& dir,
-    reVector* intersect = nullptr,
-    reVector* normal = nullptr
-  ) const override;
+  bool intersectsRay(const reRayQuery& query, reRayQueryResult& result) const override;
 };
 
 /**

@@ -9,6 +9,7 @@
 
 #include "react/common.h"
 #include "react/math.h"
+#include "react/Collision/reSpatialQueries.h"
 
 class reBroadPhase;
 class reRigidBody;
@@ -41,7 +42,7 @@ public:
   
   std::vector<reRigidBody*>& bodies() { return _bodies; }
   
-  reEnt* shootRay(const reVector& from, const reVector& direction, reVector* intersect = nullptr, reVector* normal = nullptr);
+  reEnt* queryWithRay(const reVector& from, const reVector& direction, reVector* intersect = nullptr, reVector* normal = nullptr);
 
 protected:
   void ensureUpdate();

@@ -11,7 +11,7 @@ _allocator(allocator) {
 
 reProxyAllocator::~reProxyAllocator() {
   RE_LOG("STATS  : {#%02d-%5d/%4d}", _allocator->numAllocs(), _allocator->used(), _allocator->size())
-  RE_ASSERT((_allocator->used() == 0 && _allocator->numAllocs() == 0), "Memory leak detected!")
+  RE_ASSERT_WARN((_allocator->numAllocs() == 0 && _allocator->used() == 0), "Memory leak detected!")
   
 //  show();
   

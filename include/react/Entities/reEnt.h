@@ -8,6 +8,7 @@
 #include "react/math.h"
 #include "react/Collision/reAABB.h"
 #include "react/Collision/Shapes/reShape.h"
+#include "react/Collision/reSpatialQueries.h"
 
 /**
  * @ingroup entities
@@ -65,11 +66,15 @@ public:
   virtual reEnt& withDensity(reFloat mass) = 0;
   
   // collision queries
-  bool intersectsRay(const reVector& origin, const reVector& dir, reVector* intersect = nullptr, reVector* normal = nullptr) const;
+  bool intersectsRay(const reRayQuery& query, reRayQueryResult& result);
+  
+  bool intersectsHyperplane(const reHyperplaneQuery& query);
   bool intersectsHyperplane(const reVector& point, const reVector& dir) const;
   
   /** a pointer to arbitrary data, defined by the user */
   void* userdata;
+  
+  static reUInt queriesMade;
   
 protected:
   /** The reEnt's reShape */
@@ -78,6 +83,8 @@ protected:
   reVector _vPos;
   /** The reEnt's rotation matrix */
   reMatrix _mRot;
+  /** Used internally to avoid repeating queries */
+  reUInt _queryID;
 };
 
 /**
@@ -127,7 +134,7 @@ protected:
  * @return A reference to the reEnt
  */
 
-inline reEnt::reEnt() : userdata(nullptr), _shape(nullptr), _vPos(), _mRot() { }
+inline reEnt::reEnt() : userdata(nullptr), _shape(nullptr), _vPos(), _mRot(), _queryID(0) { }
 inline reEnt::~reEnt() { }
 
 /**
@@ -263,19 +270,40 @@ inline void reEnt::setShape(const reShape& shape) {
  * @param intersect An optional argument which is filled with the intersect
  *                  point
  * @param normal An optional argument which is filled with the intersect norm
+ * @param queryID Used internally to avoid redundant queries
  * @return True if the ray intersects
  */
 
-inline bool reEnt::intersectsRay(const reVector& origin, const reVector& dir, reVector* intersect, reVector* normal) const {
+inline bool reEnt::intersectsRay(const reRayQuery& query, reRayQueryResult& result) {
+  if (_queryID == query.ID) {
+    return false; // avoid redundant queries
+  }
+  reEnt::queriesMade++;
+  _queryID = query.ID;
   if (_shape != nullptr) {
-    return _shape->intersectsRay(this->transform(), origin, dir, intersect, normal);
+    return _shape->intersectsRay(this->transform(), query, result);
   }
   return false;
 }
 
+inline bool reEnt::intersectsHyperplane(const reHyperplaneQuery& query) {
+  if (_queryID == query.ID) {
+    return false; // avoid redundant queries
+  }
+  _queryID = query.ID;
+  if (_shape != nullptr) {
+    return _shape->intersectsHyperplane(this->transform(), query);
+  } else {
+    return (_vPos - query.point).dot(query.dir) > 0.0;
+  }
+}
+
 inline bool reEnt::intersectsHyperplane(const reVector& point, const reVector& dir) const {
   if (_shape != nullptr) {
-    return _shape->intersectsHyperplane(this->transform(), point, dir);
+    reHyperplaneQuery query;
+    query.point = point;
+    query.dir = dir;
+    return _shape->intersectsHyperplane(this->transform(), query);
   } else {
     return (_vPos - point).dot(dir) > 0.0;
   }

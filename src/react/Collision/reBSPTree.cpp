@@ -10,8 +10,8 @@ void reBSPTree::show() {
     printf("[NODE]  at (%.1f, %.1f, %.1f) dir (%.1f, %.1f, %.1f) dep %d sz %d\n", _point[0], _point[1], _point[2], _dir[0], _dir[1], _dir[2], _depth, _size);
 }
 
-reBSPTree::reBSPTree() : _child{nullptr}, _dir(), _point(0.0, 0.0, 0.0), _entities(), _depth(0) {
-  
+reBSPTree::reBSPTree() : _child{nullptr}, _size(0), _dir(), _point(0.0, 0.0, 0.0), _entities(), _depth(0) {
+  // do nothing
 }
 
 reBSPTree::~reBSPTree() {
@@ -22,6 +22,7 @@ void reBSPTree::clear() {
   if (hasChildren()) {
     for (reUInt i = 0; i < 2; i++) {
       _child[i]->clear();
+      re::alloc_delete(_child[i]);
       _child[i] = nullptr;
     }
   }
@@ -75,7 +76,7 @@ void reBSPTree::update() {
   printf("[ROOT]  UPDATE %d\n", _depth);
   
   if (hasChildren()) {
-    if (_child[0]->_size + _child[1]->_size < RE_KDTREE_NODE_MAX_SIZE) {
+    if (_child[0]->_size + _child[1]->_size < RE_BSPTREE_NODE_MIN_SIZE) {
       merge();
     } else {
       for (reUInt i = 0; i < 2; i++) {
@@ -92,7 +93,7 @@ void reBSPTree::update() {
       
       RE_ASSERT(_entities.empty(), "reBSPTree list cannot be empty with children")
     }
-  } else if (_size > RE_KDTREE_NODE_MAX_SIZE) {
+  } else if (_size > RE_BSPTREE_NODE_MIN_SIZE) {
     _dir = reVector::random();
     split();
   }
@@ -132,7 +133,7 @@ reLinkedList<reEnt*> reBSPTree::updateNode() {
   printf("[NODE] UPDATE %d\n", _depth);
   
   if (hasChildren()) {
-    if (_child[0]->_size + _child[1]->_size < RE_KDTREE_NODE_MAX_SIZE) {
+    if (_child[0]->_size + _child[1]->_size < RE_BSPTREE_NODE_MIN_SIZE) {
       merge();
       list.append(trim());
     } else {
@@ -150,7 +151,7 @@ reLinkedList<reEnt*> reBSPTree::updateNode() {
     }
   } else {
     list.append(trim());
-    if (_size > RE_KDTREE_NODE_MAX_SIZE && _depth < 4) {
+    if (_size > RE_BSPTREE_NODE_MIN_SIZE && _depth < RE_BSPTREE_DEPTH_LIMIT) {
       split();
     }
   }
@@ -227,53 +228,47 @@ reLinkedList<reEnt*> reBSPTree::trim() {
   return rejected;
 }
 
-reEnt* reBSPTree::queryWithRay(const reVector& origin, const reVector& dir, reVector* intersect, reVector* normal) const {
-  reEnt* result = nullptr;
-    
+reEnt* reBSPTree::queryWithRay(const reRayQuery& query, reRayQueryResult& result) const {
+  
   if (!_entities.empty()) {
     // this must be a leaf node, proceed to entity query
-    reVector intersectPoint, intersectNormal;
-    reVector closestPoint, closestNormal;
+    reRayQueryResult res;
     reFloat maxDistSq = RE_INFINITY;
+    reEnt* resultEnt = nullptr;
     
     for (reEnt* ent : _entities) {
-      if (ent->intersectsRay(origin, dir, &intersectPoint, &intersectNormal)) {
-        const reFloat distSq = (origin - intersectPoint).lengthSq();
-        if (distSq < maxDistSq) {
-          result = ent;
-          maxDistSq = distSq;
-          closestPoint = intersectPoint;
-          closestNormal = intersectNormal;
+      if (ent->intersectsRay(query, res)) {
+        if (res.distSq < maxDistSq) {
+          resultEnt = ent;
+          maxDistSq = res.distSq;
+          result = res;
         }
       }
     }
-  
-    if (result == nullptr) {
-      return nullptr;
-    }
-    if (intersect != nullptr) {
-      *intersect = closestPoint;
-    }
-    if (normal != nullptr) {
-      *normal = closestNormal;
-    }
     
-    return result;
+    return resultEnt;
   } else {
-    // find the index of the hyperplane in ray direction
-    const reUInt i = (dir.dot(_child[0]->_dir) > 0.0) ? 0 : 1;
+    reRayQueryResult res0, res1;
+    reEnt* ent0 = _child[0]->queryWithRay(query, res0);
+    reEnt* ent1 = _child[1]->queryWithRay(query, res1);
     
-    // check if it first encounters the other hyperplane
-    if ((_child[i]->_point - origin).dot(dir) > RE_FP_TOLERANCE) {
-      // this must be the first hyperplane the ray encounters
-      result = _child[1 - i]->queryWithRay(origin, dir, intersect, normal);
-      if (result != nullptr) {
-        return result;
+    if (ent1 != nullptr && ent0 != nullptr) {
+      if (res0.distSq < res1.distSq) {
+        result = res0;
+        return ent0;
+      } else {
+        result = res1;
+        return ent1;
       }
+    } else if (ent1 != nullptr) {
+      result = res1;
+      return ent1;
+    } else if (ent0 != nullptr) {
+      result = res0;
+      return ent0;
     }
     
-    // finally, check the remaining hyperplane
-    return _child[i]->queryWithRay(origin, dir, intersect, normal);
+    return nullptr;
   }
 }
 

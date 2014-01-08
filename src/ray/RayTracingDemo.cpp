@@ -38,7 +38,7 @@ namespace {
 }
 
 RayTracingDemo::RayTracingDemo() : DemoApp(), _world(), _maxDepth(5), _imageWidth(1), _imageHeight(1), _outputFile(), _fovy(45.0), _viewMat(1.0), _ambient(0.2f, 0.2f, 0.2f), _attenuation(1.0f, 0.0f, 0.0f), _lights(), _pixels(nullptr), _renderWidth(128), _renderHeight(96), _infinityColor(0.0, 0.0, 0.0), _sceneFile(), _lightNo(0), usingGL(false) {
-  _sceneFile = "resources/ray/samples/scene6.test";
+  _sceneFile = "resources/ray/samples/scene5.test";
 }
 
 RayTracingDemo::~RayTracingDemo() {
@@ -185,7 +185,7 @@ const reVector RayTracingDemo::shootRay(unsigned int depth, const reVector& orig
   
   reVector intersect, norm;
   // primary ray
-  const reEnt* ent = _world.shootRay(origin, dir, &intersect, &norm);
+  const reEnt* ent = _world.queryWithRay(origin, dir, &intersect, &norm);
   
   // no more objects in this direction
   if (ent == nullptr) {
@@ -212,7 +212,7 @@ const reVector RayTracingDemo::shootRay(unsigned int depth, const reVector& orig
     ray.normalize();
     
     // trace shadow rays to light sources
-    reEnt* other = _world.shootRay(intersect, ray);
+    reEnt* other = _world.queryWithRay(intersect, ray);
     
     // if query is successful
     if (other == nullptr) {
@@ -330,6 +330,9 @@ void RayTracingDemo::renderScene(GLsizei w, GLsizei h) {
   gettimeofday(&lastChecked, nullptr);
   
   printf("[INFO]  Rendering of %d x %d image complete\n", _renderWidth, _renderHeight);
+  
+  printf("[INFO]  Total queries made = %d\n", reEnt::queriesMade);
+  reEnt::queriesMade = 0;
   
   delete[] tanx;
 }

@@ -8,6 +8,7 @@
 #include "react/common.h"
 #include "react/math.h"
 #include "react/Collision/reAABB.h"
+#include "react/Collision/reSpatialQueries.h"
 
 /**
  * @ingroup shapes
@@ -49,26 +50,11 @@ public:
   virtual void updateAABB(const reMatrix& parentRot);
   
   // collision queries
-  virtual bool intersectsRay(
-    const reTMatrix& transform,
-    const reVector& origin,
-    const reVector& dir,
-    reVector* intersect = nullptr,
-    reVector* normal = nullptr
-  ) const;
+  virtual bool intersectsRay(const reTMatrix& transform, const reRayQuery& query, reRayQueryResult& result) const;
   
-  virtual bool intersectsRay(
-    const reVector& origin,
-    const reVector& dir,
-    reVector* intersect = nullptr,
-    reVector* normal = nullptr
-  ) const = 0;
+  virtual bool intersectsRay(const reRayQuery& query, reRayQueryResult& result) const = 0;
   
-  virtual bool intersectsHyperplane(
-    const reTMatrix& transform,
-    const reVector& point,
-    const reVector& dir
-  ) const;
+  virtual bool intersectsHyperplane(const reTMatrix& transform, const reHyperplaneQuery& query) const;
   
 protected:
   reAABB _aabb;

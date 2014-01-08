@@ -1,8 +1,11 @@
 #include "react/common.h"
 
 #include "react/Collision/Shapes/shapes.h"
+#include "react/Collision/reSpatialQueries.h"
 
 reAllocator* re::globalAllocator = nullptr;
+
+reUInt re::globalQueryID = 0;
 
 /**
  * A convenient method to create copies of shapes

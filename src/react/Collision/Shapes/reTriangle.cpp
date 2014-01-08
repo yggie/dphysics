@@ -1,17 +1,17 @@
 #include "react/Collision/Shapes/reTriangle.h"
 
-bool reTriangle::intersectsRay(const reVector& origin, const reVector& dir, reVector* intersect, reVector* normal) const {
+bool reTriangle::intersectsRay(const reRayQuery& query, reRayQueryResult& result) const {
   const reVector u = (_verts[0] - _verts[1]);
   const reVector v = (_verts[2] - _verts[1]);
   
   const reVector faceNormal = v.cross(u).normalized();
   
   // parallel to plane
-  if (reIsGreaterThanOrEqualZero(faceNormal.dot(dir))) {
+  if (reIsGreaterThanOrEqualZero(faceNormal.dot(query.dir))) {
     return false;
   }
   
-  const reFloat lambda = (faceNormal.dot(_verts[0]) - faceNormal.dot(origin)) / faceNormal.dot(dir);
+  const reFloat lambda = (faceNormal.dot(_verts[0]) - faceNormal.dot(query.origin)) / faceNormal.dot(query.dir);
   
   // The solution is not in the direction of the ray
   if (reIsLessThanOrEqualZero(lambda)) {
@@ -19,7 +19,7 @@ bool reTriangle::intersectsRay(const reVector& origin, const reVector& dir, reVe
   }
   
   // compute ray-plane intersection
-  const reVector intersection = origin + dir*lambda;
+  const reVector intersection = query.origin + query.dir*lambda;
   
   // compute parametric coordinates
   reVector w = intersection - _verts[1];
@@ -44,16 +44,13 @@ bool reTriangle::intersectsRay(const reVector& origin, const reVector& dir, reVe
   if (reIsGreaterThanOrEqualZero(s) &&
       reIsGreaterThanOrEqualZero(t) &&
       reIsLessThanOrEqual((s + t), 1.0)) {
-    if (intersect != nullptr) {
-      *intersect = intersection;
+    result.intersect = intersection;
+    if (faceNormal.dot(query.dir) > 0.0) {
+      result.normal = -faceNormal;
+    } else {
+      result.normal = faceNormal;
     }
-    if (normal != nullptr) {
-      if (faceNormal.dot(dir) > 0.0) {
-        *normal = -faceNormal;
-      } else {
-        *normal = faceNormal;
-      }
-    }
+    result.distSq = (query.origin - result.intersect).lengthSq();
     return true;
   }
   

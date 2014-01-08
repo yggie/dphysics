@@ -9,11 +9,12 @@
 #include "react/Collision/reAABB.h"
 #include "react/Utilities/reLinkedList.h"
 
-const reUInt RE_KDTREE_NODE_MAX_SIZE = 20;
+const reUInt RE_BSPTREE_NODE_MIN_SIZE = 5;
+const reUInt RE_BSPTREE_DEPTH_LIMIT   = 3;
 
 /**
  * @ingroup collision
- * A simple k-d tree data structure for spatial queries
+ * A simple BSP tree data structure for spatial queries
  */
 
 class reBSPTree : public reBroadPhase {
@@ -32,12 +33,7 @@ public:
   
   reUInt size() const;
   
-  reEnt* queryWithRay(
-    const reVector& from,
-    const reVector& direction,
-    reVector* intersect = nullptr,
-    reVector* normal = nullptr
-  ) const override;
+  reEnt* queryWithRay(const reRayQuery& query, reRayQueryResult& result) const override;
   
 protected:
   reLinkedList<reEnt*> updateNode();

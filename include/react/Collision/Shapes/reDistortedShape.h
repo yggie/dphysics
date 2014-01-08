@@ -41,9 +41,11 @@ public:
   reFloat volume() const override;
   const reMatrix computeInertia() const override;
   
-  bool intersectsRay(const reVector& origin, const reVector& dir, reVector* intersect = nullptr, reVector* normal = nullptr) const override;
+  bool intersectsRay(const reRayQuery& query, reRayQueryResult& result) const override;
   
-  bool intersectsRay(const reTMatrix& transform, const reVector& origin, const reVector& dir, reVector* intersect = nullptr, reVector* normal = nullptr) const override;
+  bool intersectsRay(const reTMatrix& transform, const reRayQuery& query, reRayQueryResult& result) const override;
+  
+  bool intersectsHyperplane(const reTMatrix& transform, const reHyperplaneQuery& query) const override;
   
 private:
   reTMatrix _distortion;
@@ -119,6 +121,10 @@ inline reFloat reDistortedShape::volume() const {
 inline const reMatrix reDistortedShape::computeInertia() const {
 //  RE_NOT_IMPLEMENTED
   return reMatrix(1.0);
+}
+  
+inline bool reDistortedShape::intersectsHyperplane(const reTMatrix& transform, const reHyperplaneQuery& query) const {
+  return reShape::intersectsHyperplane(transform * _distortion, query);
 }
 
 #endif

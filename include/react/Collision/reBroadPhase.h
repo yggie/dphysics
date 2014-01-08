@@ -6,9 +6,9 @@
 #define RE_BROADPHASE_H
 
 #include "react/common.h"
+#include "react/Collision/reSpatialQueries.h"
 
 class reEnt;
-class reVector;
 
 /**
  * @ingroup collision
@@ -30,12 +30,7 @@ public:
   
   virtual bool contains(const reEnt* ent) const = 0;
   
-  virtual reEnt* queryWithRay(
-    const reVector& from,
-    const reVector& direction,
-    reVector* intersect = nullptr,
-    reVector* normal = nullptr
-  ) const = 0;
+  virtual reEnt* queryWithRay(const reRayQuery& query, reRayQueryResult& result) const = 0;
 };
 
 inline reBroadPhase::reBroadPhase() {
