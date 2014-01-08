@@ -38,7 +38,7 @@ struct reRayQuery : reSpatialQuery {
 };
 
 struct reRayQueryResult {
-  reRayQueryResult() : intersect(), normal(), distSq(0.0) { }
+  reRayQueryResult() : intersect(), normal(), distSq(RE_INFINITY) { }
   reVector intersect;
   reVector normal;
   reFloat distSq;

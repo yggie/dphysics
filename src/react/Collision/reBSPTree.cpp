@@ -248,24 +248,22 @@ reEnt* reBSPTree::queryWithRay(const reRayQuery& query, reRayQueryResult& result
     
     return resultEnt;
   } else {
-    reRayQueryResult res0, res1;
-    reEnt* ent0 = _child[0]->queryWithRay(query, res0);
-    reEnt* ent1 = _child[1]->queryWithRay(query, res1);
+    reRayQueryResult res[2];
+    reEnt* ent[2] = { nullptr };
     
-    if (ent1 != nullptr && ent0 != nullptr) {
-      if (res0.distSq < res1.distSq) {
-        result = res0;
-        return ent0;
-      } else {
-        result = res1;
-        return ent1;
+    for (reUInt i = 0; i < 2; i++) {
+      // check if the hyperplane contains the ray
+      if (query.dir.dot(_child[i]->_dir) > 0.0 || (query.origin - _child[i]->_point).dot(_child[i]->_dir) > 0.0) {
+        ent[i] = _child[i]->queryWithRay(query, res[i]);
       }
-    } else if (ent1 != nullptr) {
-      result = res1;
-      return ent1;
-    } else if (ent0 != nullptr) {
-      result = res0;
-      return ent0;
+    }
+    
+    if (res[0].distSq < res[1].distSq) {
+      result = res[0];
+      return ent[0];
+    } else {
+      result = res[1];
+      return ent[1];
     }
     
     return nullptr;
