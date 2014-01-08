@@ -16,13 +16,17 @@
 class reDistortedShape : public reShape {
 public:
   reDistortedShape();
-  reDistortedShape(const reDistortedShape& other);
+  reDistortedShape(const reDistortedShape&) = delete;
   reDistortedShape(const reShape& base);
   ~reDistortedShape();
   
-  void setBaseShape(const reShape& base);
-  reDistortedShape& withBaseShape(const reShape& base);
+  reDistortedShape& operator=(const reDistortedShape&) = delete;
   
+  const reShape& shape() const;
+  void setShape(const reShape& base);
+  reDistortedShape& withShape(const reShape& base);
+  
+  const reTMatrix& distortion() const;
   void setDistortion(const reTMatrix& distortion);
   reDistortedShape& withDistortion(const reTMatrix& distortion);
   
@@ -46,8 +50,7 @@ private:
   reShape* _shape;
 };
 
-inline reDistortedShape::reDistortedShape() : _distortion(),
-_shape(nullptr) {
+inline reDistortedShape::reDistortedShape() : _distortion(), _shape(nullptr) {
   // do nothing
 }
 
@@ -58,6 +61,14 @@ inline void reDistortedShape::setDistortion(const reTMatrix& distortion) {
 inline reDistortedShape& reDistortedShape::withDistortion(const reTMatrix& distortion) {
   setDistortion(distortion);
   return *this;
+}
+
+inline const reShape& reDistortedShape::shape() const {
+  return *_shape;
+}
+
+inline const reTMatrix& reDistortedShape::distortion() const {
+  return _distortion;
 }
 
 inline reShape::Type reDistortedShape::type() const {

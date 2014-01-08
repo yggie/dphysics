@@ -13,7 +13,7 @@
 
 namespace {
   const reUInt MEM_SIZE = 1024*1024*1;
-  char buffer[MEM_SIZE];
+  char buffer[MEM_SIZE] = {0};
 
   reFreeListAllocator* flAlloc = nullptr;
   reProxyAllocator* proxy = nullptr;
@@ -117,25 +117,25 @@ void reWorld::step(reFloat dt) {
   dt += 1;
 }
 
-reEnt* reWorld::shootRay(const reVector& from, const reVector& direction, reVector* intersect, reVector* normal) {
+reEnt* reWorld::shootRay(const reVector& origin, const reVector& dir, reVector* intersect, reVector* normal) {
   ensureUpdate();
 //  return _broadPhase->queryWithRay(from, direction, intersect, normal);
-  reVector intersectPoint, intersectNormal;
+  reVector intersectPoint(0, 0, 0), intersectNormal(0, 0, 0);
   reVector closestPoint, closestNormal;
-  reFloat maxDist = RE_INFINITY;
+  reFloat maxDistSq = RE_INFINITY;
   reEnt* entContact = nullptr;
-  
-  for_each(_bodies.begin(), _bodies.end(), [&](reEnt* ent) {
-    if (ent->intersectsRay(from, direction, &intersectPoint, &intersectNormal)) {
-      reFloat dist = (from - intersectPoint).length();
-      if (reIsLessThan(dist, maxDist)) {
+
+  for (auto ent : _bodies) {
+    if (ent->intersectsRay(origin, dir, &intersectPoint, &intersectNormal)) {
+      const reFloat distSq = (origin - intersectPoint).lengthSq();
+      if (distSq < maxDistSq) {
         entContact = ent;
-        maxDist = dist;
+        maxDistSq = distSq;
         closestPoint = intersectPoint;
         closestNormal = intersectNormal;
       }
     };
-  });
+  };
   
   if (entContact == nullptr) {
     return nullptr;
@@ -149,6 +149,9 @@ reEnt* reWorld::shootRay(const reVector& from, const reVector& direction, reVect
     *normal = closestNormal;
   }
   
+//  static int s = 0;
+//  const reFloat dep = (origin - closestPoint).length();
+//  printf("%d: %.3f\n", s++, dep);
   return entContact;
 }
 

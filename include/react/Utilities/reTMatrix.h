@@ -86,7 +86,7 @@ inline reTMatrix::reTMatrix(reFloat d) : v{0} {
 inline reTMatrix::reTMatrix(const reMatrix& rotation, const reVector& translation) {
   for (int i = 0; i < 3; i++) {
     (*this)[i][3] = translation[i];
-    (*this)[3][3] = 0.0;
+    (*this)[3][i] = 0.0;
     for (int j = 0; j < 3; j++) {
       (*this)[i][j] = rotation[i][j];
     }

@@ -25,7 +25,14 @@ reShape* re::copyOf(const reShape& shape) {
       return re::alloc_new<reTriangle>((const reTriangle&)shape);
     
     case reShape::DISTORTED:
-      return re::alloc_new<reDistortedShape>((const reDistortedShape&)shape);
+      {
+        // TODO fix very bad bug with distorted shape unable to allocate shapes
+        const reDistortedShape& orig = (const reDistortedShape&)shape;
+        reDistortedShape* copy = re::alloc_new<reDistortedShape>();
+        copy->setShape(orig.shape());
+        copy->setDistortion(orig.distortion());
+        return copy;
+      }
   }
   
   RE_IMPOSSIBLE

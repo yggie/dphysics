@@ -281,7 +281,7 @@ void RayTracingDemo::createSceneFromFile(const char* filename, bool useOpenGL) {
         throw 0;
       }
       
-    } else if (cmd == "triaaa") {
+    } else if (cmd == "tri") {
       unsigned int inds[3];
       readUInts(3, &inds[0]);
       glm::mat4 m = stack.mat();

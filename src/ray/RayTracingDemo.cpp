@@ -28,10 +28,10 @@ namespace {
     }
   }
   
-  const reVector clamp(const reVector& v, reFloat min, reFloat max) {
+  const reVector clamp(const reVector& v) {
     reVector a;
     for (int i = 0; i < 3; i++) {
-      a[i] = reClamp(v[i], min, max);
+      a[i] = reClamp(v[i], 0.0, 1.0);
     }
     return a;
   }
@@ -156,7 +156,7 @@ void RayTracingDemo::mouseEvent(int button, int state, int x, int y) {
           const int X = (int)(_renderWidth * x / (float)width());
           const int Y = (int)(_renderHeight * y / (float)height());
           const GLubyte* pix = &_pixels[4*(_renderHeight - Y - 1)*_renderWidth + 4*X];
-          printf("At (%3d, %3d) : #%02x%02x%02x%02x\n", x, y, pix[0], pix[1], pix[2], pix[3]);
+          printf("At (%3d, %3d) : #%02x%02x%02x%02x        windows size = (%3d, %3d)\n", x, y, pix[0], pix[1], pix[2], pix[3], width(), height());
         }
         break;
       
@@ -177,7 +177,7 @@ void RayTracingDemo::mouseEvent(int button, int state, int x, int y) {
  * Recursively shoots rays at the image to determine the color
  */
 
-reVector RayTracingDemo::shootRay(unsigned int depth, const reVector& origin, const reVector& dir) {
+const reVector RayTracingDemo::shootRay(unsigned int depth, const reVector& origin, const reVector& dir) {
   // reached recursion limit
   if (depth >= _maxDepth) {
     return _infinityColor;
@@ -185,7 +185,7 @@ reVector RayTracingDemo::shootRay(unsigned int depth, const reVector& origin, co
   
   reVector intersect, norm;
   // primary ray
-  reEnt* ent = _world.shootRay(origin, dir, &intersect, &norm);
+  const reEnt* ent = _world.shootRay(origin, dir, &intersect, &norm);
   
   // no more objects in this direction
   if (ent == nullptr) {
@@ -193,13 +193,14 @@ reVector RayTracingDemo::shootRay(unsigned int depth, const reVector& origin, co
   }
   
   // get the material object associated with the entity
-  RayObject* obj = (RayObject*)ent->userdata;
+  const RayObject* obj = (RayObject*)ent->userdata;
   
   // initialize color with emission and ambient components
-  reVector color = _ambient + obj->emission();
+  reVector color = clamp(_ambient + obj->emission());
   
   // determine lighting contributions
-  for_each(_lights.begin(), _lights.end(), [&](const RayLightSource* light) {
+  for (auto it = _lights.begin(); it != _lights.end(); it++) {
+    const RayLightSource* light = *it;
     
     // determine direction of shadow rays
     reVector ray;
@@ -219,25 +220,25 @@ reVector RayTracingDemo::shootRay(unsigned int depth, const reVector& origin, co
       const reVector back = (lightPos - intersect).normalized();
       const reVector halfVec = (back + ray).normalized();
       
-      const reVector diffuse = obj->diffuse() * reMax(ray.dot(norm), 0.0f);
-      const reVector specular = obj->specular() * rePow(reMax(norm.dot(halfVec), 0.0f), obj->shininess());
+      const reVector diffuse = clamp(obj->diffuse() * reMax(ray.dot(norm), 0.0f));
+      const reVector specular = clamp(obj->specular() * rePow(reMax(norm.dot(halfVec), 0.0f), obj->shininess()));
       
 //      printf("SPEC=(%.2f, %.2f, %.2f)\n", specular[0], specular[1], specular[2]);
       
       if (light->isDirectional()) {
-        color += light->color() * (diffuse + specular);
+        color += clamp(light->color() * (diffuse + specular));
       } else {
         float dist = (light->vect() - intersect).length();
-        color += light->color() * (diffuse + specular) / (_attenuation[0] + _attenuation[1] * dist + _attenuation[2] * dist * dist);
+        color += clamp(light->color() * (diffuse + specular) / (_attenuation[0] + _attenuation[1] * dist + _attenuation[2] * dist * dist));
       }
     }
-  });
+  };
   
-//  if (obj->specular().lengthSq() > RE_FP_TOLERANCE) {
-//    const reVector reflec = (dir - norm * 2.0 * norm.dot(dir)).normalized();
-//    // shoot secondary rays
-//    color += obj->specular() * shootRay(depth + 1, intersect, reflec);
-//  }
+  if (obj->specular().lengthSq() > RE_FP_TOLERANCE) {
+    const reVector reflec = (dir - norm * 2.0 * norm.dot(dir)).normalized();
+    // shoot secondary rays
+    color += clamp(obj->specular() * shootRay(depth + 1, intersect, reflec));
+  }
   
   return color;
 }
@@ -285,6 +286,8 @@ void RayTracingDemo::renderScene(GLsizei w, GLsizei h) {
   const GLsizei numPixels = w * h;
   GLsizei numProcessed = 0;
   const long PERIOD = 1 * 1000;
+  
+  // START TIMER
   timeval start, lastChecked, now;
   gettimeofday(&start, nullptr);
   gettimeofday(&lastChecked, nullptr);
@@ -296,15 +299,17 @@ void RayTracingDemo::renderScene(GLsizei w, GLsizei h) {
     
     for (GLsizei j = 0; j < w; j++) {
       const reVector ray = _inverseViewMat.mult(
-        reVector(-tanx[j], -tany, -1.0).normalized(), 0.0);
+        reVector(tanx[j], -tany, -1.0).normalized(), 0.0);
       
       // shoot primary ray
       const reVector color = shootRay(0, eye, ray);
-      GLubyte* pix = &_pixels[4*(h - i - 1)*w + 4*j];
+      const int IDX = 4*(h - i - 1)*w + 4*j;
+      GLubyte* pix = &_pixels[IDX];
       pix[0] = (GLubyte)(255.0 * reClamp(color[0], 0.0, 1.0));
       pix[1] = (GLubyte)(255.0 * reClamp(color[1], 0.0, 1.0));
       pix[2] = (GLubyte)(255.0 * reClamp(color[2], 0.0, 1.0));
       pix[3] = 0xff;
+      RE_ASSERT((IDX < 4*w*h-3 && IDX >= 0), "Buffer overflow")
 //      colorPixel(&_pixels[4*(h - i - 1)*w + 4*j], shootRay(0, eye, ray));
     }
     
@@ -319,7 +324,7 @@ void RayTracingDemo::renderScene(GLsizei w, GLsizei h) {
     }
   }
   
-  // compute total time taken
+  // STOP TIMER
   gettimeofday(&now, nullptr);
   statusUpdate(100.0, timeBetween(start, now));
   gettimeofday(&lastChecked, nullptr);

@@ -30,6 +30,7 @@ bool reShape::intersectsRay(const reTMatrix& transform, const reVector& origin, 
     if (normal != nullptr) {
       *normal = transform.mult(b, 0.0f).normalized();
     }
+    
     return true;
   } else {
     return false;
