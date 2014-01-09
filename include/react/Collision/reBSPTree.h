@@ -10,7 +10,6 @@
 #include "react/Utilities/reLinkedList.h"
 
 const reUInt RE_BSPTREE_NODE_MIN_SIZE = 5;
-// TODO figure out why larger depths cause problems...
 const reUInt RE_BSPTREE_DEPTH_LIMIT   = 3;
 
 /**

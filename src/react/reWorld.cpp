@@ -11,25 +11,7 @@
 
 #include <algorithm>
 
-namespace {
-  const reUInt MEM_SIZE = 1024*1024*1;
-  char buffer[MEM_SIZE] = {0};
-
-  reFreeListAllocator* flAlloc = nullptr;
-  reProxyAllocator* proxy = nullptr;
-};
-
 reWorld::reWorld() : _bodies(), _broadPhase(nullptr), _updated(false) {
-  if (re::globalAllocator == nullptr) {
-    if (flAlloc == nullptr) {
-      flAlloc = new reFreeListAllocator(MEM_SIZE, &buffer[0]);
-    }
-    if (proxy == nullptr) {
-      proxy = new reProxyAllocator(flAlloc);
-    }
-    re::globalAllocator = proxy;
-  }
-  
   _broadPhase = re::alloc_new<reBSPTree>();
 }
 
@@ -37,13 +19,6 @@ reWorld::~reWorld() {
   clear();
   
   re::alloc_delete<reBSPTree>((reBSPTree*)_broadPhase);
-  if (proxy != nullptr) {
-    delete proxy;
-  }
-  if (flAlloc != nullptr) {
-    delete flAlloc;
-  }
-  re::globalAllocator = nullptr;
 }
 
 /**
