@@ -9,8 +9,10 @@
 #include "react/Collision/reAABB.h"
 #include "react/Utilities/reLinkedList.h"
 
-const reUInt RE_BSPTREE_NODE_MIN_SIZE = 5;
+const reUInt RE_BSPTREE_NODE_MIN_SIZE = 10;
 const reUInt RE_BSPTREE_DEPTH_LIMIT   = 3;
+const reUInt RE_BSPTREE_SAMPLE_SIZE   = 8;
+const reUInt RE_BSPTREE_GUESSES       = 3;
 
 /**
  * @ingroup collision

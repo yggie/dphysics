@@ -37,14 +37,15 @@ struct reMatrix {
   // copy operation
   reMatrix& operator=(const reMatrix& m);
   
-  // arithmetic operations (inlined)
+  // arithmetic operations
   reMatrix& operator*=(reFloat s);
   reMatrix& operator/=(reFloat s);
   const reVector operator*(const reVector& v) const;
   const reMatrix operator*(reFloat s) const;
   const reMatrix operator/(reFloat s) const;
   
-  // arithmetic operations (not inlined)
+  // arithmetic operations with matrices
+  reMatrix& operator*=(const reMatrix& m);
   const reMatrix operator*(const reMatrix& m) const;
   
   /** the elements of the matrix stored as an array */
@@ -199,6 +200,17 @@ inline const reMatrix reMatrix::operator*(reFloat s) const {
 
 inline const reMatrix reMatrix::operator/(reFloat s) const {
   return reMatrix(*this) /= s;
+}
+
+/**
+ * Multiplies two matrices together
+ * 
+ * @param m The matrix operand
+ * @return The resulting matrix
+ */
+
+inline const reMatrix reMatrix::operator*(const reMatrix& m) const {
+  return reMatrix(*this) *= m;
 }
 
 #endif

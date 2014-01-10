@@ -53,7 +53,7 @@ bool reDistortedShape::intersectsRay(const reRayQuery& query, reRayQueryResult& 
   return false;
 }
 
-bool reDistortedShape::intersectsRay(const reTMatrix& transform, const reRayQuery& query, reRayQueryResult& result) const {
+bool reDistortedShape::intersectsRay(const reTransform& transform, const reRayQuery& query, reRayQueryResult& result) const {
   if (_shape != nullptr) {
     return _shape->intersectsRay(transform * _distortion, query, result);
   }

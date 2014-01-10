@@ -17,15 +17,15 @@ void reShape::updateAABB(const reMatrix& parentRotation) {
   }
 }
 
-bool reShape::intersectsRay(const reTMatrix& transform, const reRayQuery& query, reRayQueryResult& result) const {
-  const reTMatrix inverse = transform.inverse();
-  reRayQuery newQuery = query;
-  newQuery.origin = inverse.mult(newQuery.origin, 1.0);
-  newQuery.dir = inverse.mult(newQuery.dir, 0.0);
-  
+bool reShape::intersectsRay(const reTransform& transform, const reRayQuery& query, reRayQueryResult& result) const {
+  const reTransform inv = transform.inverse();
+  reRayQuery newQuery;
+  newQuery.origin = inv.multPoint(query.origin);
+  newQuery.dir = inv.multDir(query.dir);
+
   if (intersectsRay(newQuery, result)) {
-    result.intersect = transform.mult(result.intersect, 1.0);
-    result.normal = transform.mult(result.normal, 0.0).normalized();
+    result.intersect = transform.multPoint(result.intersect);
+    result.normal = transform.multDir(result.normal).normalized();
     result.distSq = (query.origin - result.intersect).lengthSq();
     return true;
   } else {
@@ -35,11 +35,11 @@ bool reShape::intersectsRay(const reTMatrix& transform, const reRayQuery& query,
   return false;
 }
 
-bool reShape::intersectsHyperplane(const reTMatrix& transform, const reHyperplaneQuery& query) const {
+bool reShape::intersectsHyperplane(const reTransform& transform, const reHyperplaneQuery& query) const {
   const reUInt N = numVerts();
-  const reTMatrix inv = transform.inverse();
-  const reVector nPoint = inv.mult(query.point, 1.0);
-  const reVector nDir = inv.mult(query.dir, 0.0);
+  const reTransform inv = transform.inverse();
+  const reVector nPoint = inv.multPoint(query.point);
+  const reVector nDir = inv.multDir(query.dir);
   
   for (reUInt i = 0; i < N; i++) {
     if ((vert(i) - nPoint).dot(nDir) + shell() > 0.0) {

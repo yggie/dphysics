@@ -9,5 +9,6 @@
 #include "react/Utilities/reVector.h"
 #include "react/Utilities/reMatrix.h"
 #include "react/Utilities/reTMatrix.h"
+#include "react/Utilities/reTransform.h"
 
 #endif

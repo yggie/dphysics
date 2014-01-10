@@ -223,12 +223,15 @@ void RayTracingDemo::createSceneFromFile(const char* filename, bool useOpenGL) {
         glPopMatrix();
       } else {
         glm::mat4 m = stack.mat();
-        reTMatrix tm;
-        for (int i = 0; i < 4; i++) {
-          for (int j = 0; j < 4; j++) {
-            tm[i][j] = m[j][i];
+        reTransform tm;
+        for (int i = 0; i < 3; i++) {
+          for (int j = 0; j < 3; j++) {
+            tm.m[i][j] = m[j][i];
           }
         }
+        tm.v[0] = m[3][0];
+        tm.v[1] = m[3][1];
+        tm.v[2] = m[3][2];
         reEnt& ent = _world.newRigidBody().withShape(
           reDistortedShape(reSphere(v[3])).withDistortion(tm)
         ).at(v[0], v[1], v[2]);

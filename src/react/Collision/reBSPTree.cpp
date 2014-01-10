@@ -7,7 +7,7 @@
 #include <cstdio>
 
 void reBSPTree::show() {
-    printf("[NODE]  at (%.1f, %.1f, %.1f) dir (%.1f, %.1f, %.1f) dep %d sz %d\n", _point[0], _point[1], _point[2], _dir[0], _dir[1], _dir[2], _depth, _size);
+    printf("[NODE]  (%2d,%4d) at (%+.1f, %+.1f, %+.1f) dir (%+.1f, %+.1f, %+.1f)\n", _depth, _size, _point[0], _point[1], _point[2], _dir[0], _dir[1], _dir[2]);
 }
 
 reBSPTree::reBSPTree() : _child{nullptr}, _size(0), _dir(), _point(0.0, 0.0, 0.0), _entities(), _depth(0) {
@@ -130,12 +130,11 @@ bool reBSPTree::contains(const reEnt* ent) const {
 
 reLinkedList<reEnt*> reBSPTree::updateNode() {
   reLinkedList<reEnt*> list;
-  printf("[NODE] UPDATE %d\n", _depth);
   
   if (hasChildren()) {
     if (_child[0]->_size + _child[1]->_size < RE_BSPTREE_NODE_MIN_SIZE) {
       merge();
-      list.append(trim());
+      return updateNode();
     } else {
       for (reUInt i = 0; i < 2; i++) {
         list.append(_child[i]->updateNode());
@@ -156,8 +155,9 @@ reLinkedList<reEnt*> reBSPTree::updateNode() {
     }
   }
   
-  printf("[NODE] UPDATE COMPLETE %d\n", _depth);
-  show();
+  if (!hasChildren()) {
+    show();
+  }
   
   return list;
 }
@@ -167,21 +167,67 @@ reLinkedList<reEnt*> reBSPTree::updateNode() {
  */
 
 void reBSPTree::split() {
-  printf("[NODE] SPLIT %d\n", _depth);
   
-  reVector ave;
-  for (const reEnt* ent : _entities) {
-    ave += ent->center();
+  reVector splitPoint(0.0, 0.0, 0.0);
+  reVector dirs[RE_BSPTREE_GUESSES] = {
+    reVector::random(),
+    reVector::random(),
+    reVector::random()
+  };
+  reFloat vals[RE_BSPTREE_GUESSES] = { 0.0 };
+  reUInt index = 0;
+  
+  if (_size > 2*RE_BSPTREE_SAMPLE_SIZE) {
+    reUInt num = 0;
+    for (const reEnt* ent : _entities) {
+      if (num < RE_BSPTREE_SAMPLE_SIZE) {
+        splitPoint += ent->center();
+      } else if (num == RE_BSPTREE_SAMPLE_SIZE) {
+        splitPoint /= RE_BSPTREE_SAMPLE_SIZE;
+      } else {
+        for (reUInt i = 0; i < RE_BSPTREE_GUESSES; i++) {
+          vals[i] += dirs[i].dot(splitPoint - ent->center());
+        }
+      }
+      num++;
+      if (num > 2*RE_BSPTREE_SAMPLE_SIZE) {
+        break;
+      }
+    }
+    for (reUInt i = 1; i < RE_BSPTREE_GUESSES; i++) {
+      if (reAbs(vals[i]) < reAbs(vals[index])) {
+        index = i;
+      }
+    }
+  } else {
+    reUInt num = 0;
+    reUInt n = reMin(RE_BSPTREE_SAMPLE_SIZE, _size);
+    for (const reEnt* ent : _entities) {
+      splitPoint += ent->center();
+      if (++num >= n) {
+        break;
+      }
+    }
+    splitPoint /= n;
+    for (reUInt i = 0; i < RE_BSPTREE_GUESSES; i++) {
+      num = 0;
+      for (const reEnt* ent : _entities) {
+        vals[i] += dirs[i].dot(splitPoint - ent->center());
+        if (++num >= n) {
+          break;
+        }
+      }
+      if (i > 0 && reAbs(vals[i]) < reAbs(vals[index])) {
+        index = i;
+      }
+    }
   }
-  ave /= _size;
-  
-  const reVector spawnDir = _dir.cross(reVector::random()).normalized();
   
   // setup each child node
   for (reUInt i = 0; i < 2; i++) {
     _child[i] = re::alloc_new<reBSPTree>();
-    _child[i]->_point = ave;
-    _child[i]->_dir = spawnDir * ((i % 2 == 0) ? -1 : 1);
+    _child[i]->_point = splitPoint;
+    _child[i]->_dir = dirs[index] * ((i % 2 == 0) ? -1 : 1);
     _child[i]->_depth = _depth + 1;
     
     for (reEnt* ent : _entities) {

@@ -95,12 +95,12 @@ inline void reRigidBody::updateInertia() {
 }
 
 inline reRigidBody& reRigidBody::at(const reVector& position) {
-  _vPos = position;
+  setPos(position);
   return *this;
 }
 
 inline reRigidBody& reRigidBody::at(reFloat x, reFloat y, reFloat z) {
-  _vPos.set(x, y, z);
+  setPos(x, y, z);
   return *this;
 }
 

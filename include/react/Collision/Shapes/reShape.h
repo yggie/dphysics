@@ -50,11 +50,11 @@ public:
   virtual void updateAABB(const reMatrix& parentRot);
   
   // collision queries
-  virtual bool intersectsRay(const reTMatrix& transform, const reRayQuery& query, reRayQueryResult& result) const;
+  virtual bool intersectsRay(const reTransform& transform, const reRayQuery& query, reRayQueryResult& result) const;
   
   virtual bool intersectsRay(const reRayQuery& query, reRayQueryResult& result) const = 0;
   
-  virtual bool intersectsHyperplane(const reTMatrix& transform, const reHyperplaneQuery& query) const;
+  virtual bool intersectsHyperplane(const reTransform& transform, const reHyperplaneQuery& query) const;
   
 protected:
   reAABB _aabb;

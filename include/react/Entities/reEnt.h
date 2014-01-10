@@ -52,7 +52,7 @@ public:
   const reShape* shape() const;
   const reVector pos() const;
   const reMatrix rot() const;
-  const reTMatrix transform() const;
+  const reTransform transform() const;
   virtual const reVector center() const;
   
   // setter methods which are defined inline
@@ -79,10 +79,8 @@ public:
 protected:
   /** The reEnt's reShape */
   reShape* _shape;
-  /** The reEnt's position vector */
-  reVector _vPos;
-  /** The reEnt's rotation matrix */
-  reMatrix _mRot;
+  /** The reEnt's transformation matrix */
+  reTransform _transform;
   /** Used internally to avoid repeating queries */
   reUInt _queryID;
 };
@@ -134,7 +132,7 @@ protected:
  * @return A reference to the reEnt
  */
 
-inline reEnt::reEnt() : userdata(nullptr), _shape(nullptr), _vPos(), _mRot(), _queryID(0) { }
+inline reEnt::reEnt() : userdata(nullptr), _shape(nullptr), _transform(), _queryID(0) { }
 inline reEnt::~reEnt() { }
 
 /**
@@ -143,7 +141,7 @@ inline reEnt::~reEnt() { }
 
 inline void reEnt::update() {
   if (shape() != nullptr) {
-    shape()->updateAABB(_mRot);
+    shape()->updateAABB(_transform.m);
   }
 }
 
@@ -151,7 +149,7 @@ inline const reVector reEnt::getAABBLowerCorner() const {
   if (shape() != nullptr) {
     return center() - shape()->aabb().dimens();
   } else {
-    return _vPos;
+    return _transform.v;
   }
 }
 
@@ -159,7 +157,7 @@ inline const reVector reEnt::getAABBUpperCorner() const {
   if (shape() != nullptr) {
     return center() + shape()->aabb().dimens();
   } else {
-    return _vPos;
+    return _transform.v;
   }
 }
 
@@ -192,7 +190,7 @@ inline const reShape* reEnt::shape() const {
  */
 
 inline const reVector reEnt::pos() const {
-  return _vPos;
+  return _transform.v;
 }
 
 /**
@@ -202,17 +200,17 @@ inline const reVector reEnt::pos() const {
  */
 
 inline const reMatrix reEnt::rot() const {
-  return _mRot;
+  return _transform.m;
 }
 
 /**
- * Returns the reEnt's reTMatrix
+ * Returns the reEnt's reTransform
  * 
  * @return The transformation in matrix form
  */
 
-inline const reTMatrix reEnt::transform() const {
-  return reTMatrix(rot(), pos());
+inline const reTransform reEnt::transform() const {
+  return _transform;
 }
 
 /**
@@ -224,9 +222,9 @@ inline const reTMatrix reEnt::transform() const {
 
 inline const reVector reEnt::center() const {
   if (shape() != nullptr) {
-    return _vPos + shape()->offset();
+    return _transform.v + shape()->offset();
   } else {
-    return _vPos;
+    return _transform.v;
   }
 }
 
@@ -237,7 +235,7 @@ inline const reVector reEnt::center() const {
  */
 
 inline void reEnt::setPos(const reVector& position) {
-  _vPos = position;
+  _transform.v = position;
 }
 
 /**
@@ -249,7 +247,7 @@ inline void reEnt::setPos(const reVector& position) {
  */
 
 inline void reEnt::setPos(reFloat x, reFloat y, reFloat z) {
-  _vPos.set(x, y, z);
+  _transform.v.set(x, y, z);
 }
 
 /**
@@ -281,7 +279,7 @@ inline bool reEnt::intersectsRay(const reRayQuery& query, reRayQueryResult& resu
   reEnt::queriesMade++;
   _queryID = query.ID;
   if (_shape != nullptr) {
-    return _shape->intersectsRay(this->transform(), query, result);
+    return _shape->intersectsRay(_transform, query, result);
   }
   return false;
 }
@@ -292,9 +290,9 @@ inline bool reEnt::intersectsHyperplane(const reHyperplaneQuery& query) {
   }
   _queryID = query.ID;
   if (_shape != nullptr) {
-    return _shape->intersectsHyperplane(this->transform(), query);
+    return _shape->intersectsHyperplane(_transform, query);
   } else {
-    return (_vPos - query.point).dot(query.dir) > 0.0;
+    return (_transform.v - query.point).dot(query.dir) > 0.0;
   }
 }
 
@@ -303,9 +301,9 @@ inline bool reEnt::intersectsHyperplane(const reVector& point, const reVector& d
     reHyperplaneQuery query;
     query.point = point;
     query.dir = dir;
-    return _shape->intersectsHyperplane(this->transform(), query);
+    return _shape->intersectsHyperplane(_transform, query);
   } else {
-    return (_vPos - point).dot(dir) > 0.0;
+    return (_transform.v - point).dot(dir) > 0.0;
   }
 }
 

@@ -27,7 +27,7 @@ class Iterator {
 public:
   Iterator(reLinkedNode<T>* start);
   bool operator!=(const Iterator& iter) const;
-  T operator*() const;
+  T& operator*() const;
   const Iterator& operator++();
   reLinkedNode<T>* node;
 };
@@ -172,7 +172,7 @@ bool Iterator<T>::operator!=(const Iterator<T>& iter) const {
 }
 
 template <class T>
-T Iterator<T>::operator*() const {
+T& Iterator<T>::operator*() const {
   return node->value();
 }
 

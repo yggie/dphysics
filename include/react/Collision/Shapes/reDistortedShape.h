@@ -26,9 +26,9 @@ public:
   void setShape(const reShape& base);
   reDistortedShape& withShape(const reShape& base);
   
-  const reTMatrix& distortion() const;
-  void setDistortion(const reTMatrix& distortion);
-  reDistortedShape& withDistortion(const reTMatrix& distortion);
+  const reTransform& distortion() const;
+  void setDistortion(const reTransform& distortion);
+  reDistortedShape& withDistortion(const reTransform& distortion);
   
   // shape representation
   reShape::Type type() const override;
@@ -43,12 +43,12 @@ public:
   
   bool intersectsRay(const reRayQuery& query, reRayQueryResult& result) const override;
   
-  bool intersectsRay(const reTMatrix& transform, const reRayQuery& query, reRayQueryResult& result) const override;
+  bool intersectsRay(const reTransform& transform, const reRayQuery& query, reRayQueryResult& result) const override;
   
-  bool intersectsHyperplane(const reTMatrix& transform, const reHyperplaneQuery& query) const override;
+  bool intersectsHyperplane(const reTransform& transform, const reHyperplaneQuery& query) const override;
   
 private:
-  reTMatrix _distortion;
+  reTransform _distortion;
   reShape* _shape;
 };
 
@@ -56,11 +56,11 @@ inline reDistortedShape::reDistortedShape() : _distortion(), _shape(nullptr) {
   // do nothing
 }
 
-inline void reDistortedShape::setDistortion(const reTMatrix& distortion) {
+inline void reDistortedShape::setDistortion(const reTransform& distortion) {
   _distortion = distortion;
 }
 
-inline reDistortedShape& reDistortedShape::withDistortion(const reTMatrix& distortion) {
+inline reDistortedShape& reDistortedShape::withDistortion(const reTransform& distortion) {
   setDistortion(distortion);
   return *this;
 }
@@ -69,7 +69,7 @@ inline const reShape& reDistortedShape::shape() const {
   return *_shape;
 }
 
-inline const reTMatrix& reDistortedShape::distortion() const {
+inline const reTransform& reDistortedShape::distortion() const {
   return _distortion;
 }
 
@@ -103,9 +103,9 @@ inline reFloat reDistortedShape::shell() const {
 
 inline const reVector reDistortedShape::offset() const {
   if (_shape != nullptr) {
-    return _shape->offset() + reVector(_distortion[0][3], _distortion[1][3], _distortion[2][3]);
+    return _shape->offset() + _distortion.v;
   } else {
-    return reVector(_distortion[0][3], _distortion[1][3], _distortion[2][3]);
+    return _distortion.v;
   }
 }
 
@@ -123,7 +123,7 @@ inline const reMatrix reDistortedShape::computeInertia() const {
   return reMatrix(1.0);
 }
   
-inline bool reDistortedShape::intersectsHyperplane(const reTMatrix& transform, const reHyperplaneQuery& query) const {
+inline bool reDistortedShape::intersectsHyperplane(const reTransform& transform, const reHyperplaneQuery& query) const {
   return reShape::intersectsHyperplane(transform * _distortion, query);
 }
 

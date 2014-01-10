@@ -73,7 +73,7 @@ int main(int argc, char** argv) {
   glutDisplayFunc(initFunc);
   glutMainLoopEvent();
   glutDisplayFunc(displayFunc);
-    
+  
   glutMainLoop();
   
 //  reAABB aa, bb;

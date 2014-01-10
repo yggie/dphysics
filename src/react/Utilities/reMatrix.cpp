@@ -5,22 +5,24 @@ const reMatrix reMatrix::IDENTITY(1.0f);
 const reMatrix reMatrix::ZERO(0.0f);
 
 /**
- * Multiplies two matrix using matrix multiplication
+ * Multiplies the current matrix with the specified matrix
  * 
  * @param m The matrix operand
- * @return The resulting matrix
+ * @return The reference to the matrix
  */
 
-const reMatrix reMatrix::operator*(const reMatrix& m) const {
-  reMatrix tmp(reMatrix::ZERO);
+reMatrix& reMatrix::operator*=(const reMatrix& m) {
+  reMatrix tmp(*this);
   
   for (int i = 0; i < 3; i++) {
     for (int j = 0; j < 3; j++) {
+      (*this)[i][j] = 0.0;
       for (int k = 0; k < 3; k++) {
-        tmp[i][j] += (*this)[i][k] + m[k][i];
+        (*this)[i][j] += tmp[i][k] * m[k][j];
       }
     }
   }
   
-  return tmp;
+  return *this;
 }
+
