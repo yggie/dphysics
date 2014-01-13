@@ -20,3 +20,4 @@ include_directories(
 add_subdirectory(src/react)
 add_subdirectory(src/demo)
 add_subdirectory(src/ray)
+add_subdirectory(tests)
