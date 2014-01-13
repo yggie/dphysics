@@ -22,7 +22,10 @@ struct reSpatialQuery {
   /** A unique query ID to avoid redundant queries */
   const reUInt ID;
 protected:
-  reSpatialQuery() : ID(re::globalQueryID++) { }
+  // ensures the ID is never zero
+  reSpatialQuery() : ID(
+    (++re::globalQueryID == 0) ? ++re::globalQueryID : re::globalQueryID
+  ) { }
 };
 
 /**

@@ -44,4 +44,9 @@
  * Successful queries are passed on to the Shapes module
  */
 
+/**
+ * @defgroup utilities Utility
+ * This module contains various utility classes used internally by many classes
+ */
+
 #endif

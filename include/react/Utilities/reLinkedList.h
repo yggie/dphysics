@@ -1,11 +1,16 @@
 /**
  * @file
- * Contains the definition of the reLinkedNode and reLinkedList class
+ * Contains the definition of the reLinkedNode, reIterator and reLinkedList class
  */
 #ifndef RE_LINKEDLIST_H
 #define RE_LINKEDLIST_H
 
 #include "react/common.h"
+
+/**
+ * @ingroup utilities
+ * Represents a single node in the linked list
+ */
 
 template<class T>
 class reLinkedNode {
@@ -22,13 +27,18 @@ private:
   reLinkedNode* _next;
 };
 
+/**
+ * @ingroup utilities
+ * An iterator to iterate over elements in the list
+ */
+
 template <class T>
-class Iterator {
+class reIterator {
 public:
-  Iterator(reLinkedNode<T>* start);
-  bool operator!=(const Iterator& iter) const;
+  reIterator(reLinkedNode<T>* start);
+  bool operator!=(const reIterator& iter) const;
   T& operator*() const;
-  const Iterator& operator++();
+  const reIterator& operator++();
   reLinkedNode<T>* node;
 };
 
@@ -50,8 +60,8 @@ public:
   void clear();
   bool empty() const;
   
-  Iterator<T> begin() const;
-  Iterator<T> end() const;
+  reIterator<T> begin() const;
+  reIterator<T> end() const;
   
 private:
   reLinkedNode<T>* _first;
@@ -162,34 +172,34 @@ inline void reLinkedList<T>::clear() {
 }
 
 template <class T>
-Iterator<T>::Iterator(reLinkedNode<T>* start) : node(start) {
+reIterator<T>::reIterator(reLinkedNode<T>* start) : node(start) {
   // do nothing
 }
 
 template <class T>
-bool Iterator<T>::operator!=(const Iterator<T>& iter) const {
+bool reIterator<T>::operator!=(const reIterator<T>& iter) const {
   return node != iter.node;
 }
 
 template <class T>
-T& Iterator<T>::operator*() const {
+T& reIterator<T>::operator*() const {
   return node->value();
 }
 
 template <class T>
-const Iterator<T>& Iterator<T>::operator++() {
+const reIterator<T>& reIterator<T>::operator++() {
   node = node->next();
   return *this;
 }
 
 template <class T>
-Iterator<T> reLinkedList<T>::begin() const {
-  return Iterator<T>(_first);
+reIterator<T> reLinkedList<T>::begin() const {
+  return reIterator<T>(_first);
 }
 
 template <class T>
-Iterator<T> reLinkedList<T>::end() const {
-  return Iterator<T>(nullptr);
+reIterator<T> reLinkedList<T>::end() const {
+  return reIterator<T>(nullptr);
 }
 
 

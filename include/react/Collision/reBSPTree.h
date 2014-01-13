@@ -7,10 +7,10 @@
 
 #include "react/Collision/reBroadPhase.h"
 #include "react/Collision/reAABB.h"
-#include "react/Utilities/reLinkedList.h"
+#include "react/Utilities/reEntList.h"
 
 const reUInt RE_BSPTREE_NODE_MIN_SIZE = 10;
-const reUInt RE_BSPTREE_DEPTH_LIMIT   = 3;
+const reUInt RE_BSPTREE_DEPTH_LIMIT   = 5;
 const reUInt RE_BSPTREE_SAMPLE_SIZE   = 8;
 const reUInt RE_BSPTREE_GUESSES       = 3;
 
@@ -29,29 +29,29 @@ public:
   bool remove(reEnt* ent) override;
   void update() override;
   
-  reLinkedList<reEnt*> entities();
-  
-  bool contains(const reEnt* ent) const override;
-  
   reUInt size() const;
   
   reEnt* queryWithRay(const reRayQuery& query, reRayQueryResult& result) const override;
   
 protected:
-  reLinkedList<reEnt*> updateNode();
-  reLinkedList<reEnt*> trim();
+  void add(reQueryable* q);
+  void remove(reQueryable* q);
+  
+  bool contains(const reEnt* ent) const;
+  
+  reEntList updateNode();
+  reEntList trim();
   void split();
   void merge();
-  void resizeToFit();
-  void show();
-  
   bool hasChildren() const;
+  
+  void optimalSplit(reVector& anchor, reVector& dir) const;
   
   reBSPTree* _child[2];
   reUInt _size;
   reVector _dir;
-  reVector _point;
-  reLinkedList<reEnt*> _entities;
+  reVector _anchor;
+  reEntList _entities;
   reUInt _depth;
 };
 

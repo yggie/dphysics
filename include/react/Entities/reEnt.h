@@ -54,6 +54,7 @@ public:
   const reMatrix rot() const;
   const reTransform transform() const;
   virtual const reVector center() const;
+  reUInt id() const;
   
   // setter methods which are defined inline
   void setPos(const reVector& position);
@@ -77,12 +78,16 @@ public:
   static reUInt queriesMade;
   
 protected:
+  /** A unique identifier for the reEnt */
+  const reUInt _id;
   /** The reEnt's reShape */
   reShape* _shape;
   /** The reEnt's transformation matrix */
   reTransform _transform;
   /** Used internally to avoid repeating queries */
   reUInt _queryID;
+  
+  static reUInt globalEntID;
 };
 
 /**
@@ -132,7 +137,7 @@ protected:
  * @return A reference to the reEnt
  */
 
-inline reEnt::reEnt() : userdata(nullptr), _shape(nullptr), _transform(), _queryID(0) { }
+inline reEnt::reEnt() : userdata(nullptr), _id(globalEntID++), _shape(nullptr), _transform(), _queryID(0) { }
 inline reEnt::~reEnt() { }
 
 /**
@@ -226,6 +231,16 @@ inline const reVector reEnt::center() const {
   } else {
     return _transform.v;
   }
+}
+
+/**
+ * Returns the unique identifier for the reEnt
+ * 
+ * @return A unique identifier for the reEnt
+ */
+
+inline reUInt reEnt::id() const {
+  return _id;
 }
 
 /**
