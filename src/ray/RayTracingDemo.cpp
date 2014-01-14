@@ -38,7 +38,7 @@ namespace {
 }
 
 RayTracingDemo::RayTracingDemo() : DemoApp(), _world(), _maxDepth(5), _imageWidth(1), _imageHeight(1), _outputFile(), _fovy(45.0), _viewMat(1.0), _ambient(0.2f, 0.2f, 0.2f), _attenuation(1.0f, 0.0f, 0.0f), _lights(), _pixels(nullptr), _renderWidth(128), _renderHeight(96), _infinityColor(0.0, 0.0, 0.0), _sceneFile(), _lightNo(0), usingGL(false) {
-  _sceneFile = "resources/ray/samples/scene6.test";
+  _sceneFile = "resources/ray/samples/scene5.test";
 }
 
 RayTracingDemo::~RayTracingDemo() {
@@ -209,26 +209,29 @@ const reVector RayTracingDemo::shootRay(unsigned int depth, const reVector& orig
     ray.normalize();
     
     // trace shadow rays to light sources
-    reEnt* other = _world.queryWithRay(intersect, ray);
+    reVector objIntersect;
+    reEnt* other = _world.queryWithRay(intersect, ray, &objIntersect);
     
     // if query is successful
-    if (other == nullptr) {
-      const reVector lightPos = light->vect();
-      const reVector back = (lightPos - intersect).normalized();
+    if (other == nullptr || (!light->isDirectional() && (objIntersect - intersect).lengthSq() > (light->vect() - intersect).lengthSq())) {
+      const reVector back = (light->vect() - intersect).normalized();
       const reVector halfVec = (back + ray).normalized();
       
       const reVector diffuse = clamp(obj->diffuse() * reMax(ray.dot(norm), 0.0f));
       const reVector specular = clamp(obj->specular() * rePow(reMax(norm.dot(halfVec), 0.0f), obj->shininess()));
       
+//      printf("SPECULAR: (%.2f, %.2f, %.2f)\n", specular[0], specular[1], specular[2]);
+      
       if (light->isDirectional()) {
         color += clamp(light->color() * (diffuse + specular));
       } else {
-        float dist = (light->vect() - intersect).length();
+        const float dist = (light->vect() - intersect).length();
         color += clamp(light->color() * (diffuse + specular) / (_attenuation[0] + _attenuation[1] * dist + _attenuation[2] * dist * dist));
       }
     }
   };
   
+  // TODO reflections don't seem to match samples in the discussion
   if (obj->specular().lengthSq() > RE_FP_TOLERANCE) {
     const reVector reflec = (dir - norm * 2.0 * norm.dot(dir)).normalized();
     // shoot secondary rays

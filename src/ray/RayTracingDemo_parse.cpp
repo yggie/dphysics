@@ -237,6 +237,7 @@ void RayTracingDemo::createSceneFromFile(const char* filename, bool useOpenGL) {
         ).at(v[0], v[1], v[2]);
         RayObject* obj = new RayObject();
         ent.userdata = obj;
+//        printf("DIFFUSE: (%.2f, %.2f, %.2f)\n", specular[0], specular[1], specular[2]);
         obj->withDiffuse(diffuse[0], diffuse[1], diffuse[2])
             .withSpecular(specular[0], specular[1], specular[2])
             .withEmission(emission[0], emission[1], emission[2])
