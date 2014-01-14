@@ -22,6 +22,13 @@ void reBSPTree::clear() {
       _child[i] = nullptr;
     }
   }
+  if (_depth == 0) {
+    for (reQueryable& q : _entities) {
+      RE_ASSERT_WARN(q.ent->userdata == nullptr, "This body has a non-null userdata pointer!")
+      re::alloc_delete(q.ent->shape());
+      re::alloc_delete(q.ent);
+    }
+  }
   _entities.clear();
 }
 

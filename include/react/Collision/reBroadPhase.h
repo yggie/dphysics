@@ -28,6 +28,8 @@ public:
   virtual bool remove(reEnt* ent) = 0;
   virtual void update() = 0;
   
+  virtual void forEachEntDo(void(*func)(reEnt* ent)) = 0;
+  
   virtual reEnt* queryWithRay(const reRayQuery& query, reRayQueryResult& result) const = 0;
 };
 

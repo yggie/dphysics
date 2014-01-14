@@ -29,6 +29,8 @@ public:
   bool remove(reEnt* ent) override;
   void update() override;
   
+  void forEachEntDo(void(*func)(reEnt* ent)) override;
+  
   reUInt size() const;
   
   reEnt* queryWithRay(const reRayQuery& query, reRayQueryResult& result) const override;
@@ -54,6 +56,12 @@ protected:
   reEntList _entities;
   reUInt _depth;
 };
+
+inline void reBSPTree::forEachEntDo(void(*func)(reEnt* ent)) {
+  for (reQueryable& q : _entities) {
+    func(q.ent);
+  }
+}
 
 inline reUInt reBSPTree::size() const {
   return _size;

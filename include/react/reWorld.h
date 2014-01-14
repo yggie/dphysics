@@ -5,8 +5,6 @@
 #ifndef RE_WORLD_H
 #define RE_WORLD_H
 
-#include <vector>
-
 #include "react/common.h"
 #include "react/math.h"
 #include "react/Collision/reSpatialQueries.h"
@@ -36,18 +34,17 @@ public:
   reDistortedShape& newDistortedShape(const reShape& shape);
   reRigidBody& newRigidBody();
   
+  void forEachEntDo(void(*func)(reEnt* ent));
+  
   void add(reEnt* entity);
   
   void step(reFloat dt);
-  
-  std::vector<reRigidBody*>& bodies() { return _bodies; }
   
   reEnt* queryWithRay(const reVector& from, const reVector& direction, reVector* intersect = nullptr, reVector* normal = nullptr);
 
 protected:
   void ensureUpdate();
   
-  std::vector<reRigidBody*> _bodies;
   reBroadPhase* _broadPhase;
   
   bool _updated;
