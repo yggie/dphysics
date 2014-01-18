@@ -254,6 +254,7 @@ reEnt* reBSPTree::queryWithRay(const reRayQuery& query, reRayQueryResult& result
       if (q.queryID == query.ID) {
         continue;
       }
+      re::queriesMade++;
       q.queryID = query.ID;
       if (q.ent->intersectsRay(query, res)) {
         if (res.distSq < maxDistSq) {

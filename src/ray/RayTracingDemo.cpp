@@ -2,6 +2,7 @@
 
 #include "react/Entities/reEnt.h"
 #include "react/Entities/reRigidBody.h"
+#include "react/Collision/reBroadPhase.h"
 #include "ray/RayObject.h"
 
 #define GLM_FORCE_RADIANS
@@ -329,8 +330,8 @@ void RayTracingDemo::renderScene(GLsizei w, GLsizei h) {
   
   printf("[INFO]  Rendering of %d x %d image complete\n", _renderWidth, _renderHeight);
   
-  printf("[INFO]  Total queries made = %d\n", reEnt::queriesMade);
-  reEnt::queriesMade = 0;
+  printf("[INFO]  Total queries made = %d\n", re::queriesMade);
+  re::queriesMade = 0;
   
   delete[] tanx;
 }

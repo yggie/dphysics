@@ -16,7 +16,7 @@
 
 class reRigidBody : public reSolid {
 public:
-  reRigidBody();
+  reRigidBody(reWorld* world);
   reRigidBody(const reRigidBody&) = delete;
   virtual ~reRigidBody();
   
@@ -24,7 +24,7 @@ public:
   
   reEnt::Type type() const;
   
-  void step(reFloat dt) override;
+  void update(reFloat dt) override;
   
   // getters for state properties
   const reVector vel() const override;
@@ -62,8 +62,8 @@ inline reEnt::Type reRigidBody::type() const {
   return RIGID;
 }
 
-inline void reRigidBody::step(reFloat dt) {
-  _transform.v += _vVel * dt;
+inline void reRigidBody::update(reFloat) {
+  RE_NOT_IMPLEMENTED
 }
 
 inline const reVector reRigidBody::vel() const {

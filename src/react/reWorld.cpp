@@ -11,14 +11,42 @@
 
 #include <algorithm>
 
-reWorld::reWorld() : _broadPhase(nullptr), _updated(false) {
-  _broadPhase = re::alloc_new<reBSPTree>();
+// strictly for debugging
+namespace {
+  struct SimpleAllocator : public reBaseAllocator {
+  public:
+    SimpleAllocator() : n(0) { }
+    
+    void* alloc(u32 size, u8) { n++; return malloc(size); }
+    void dealloc(void* p) { n--; free(p); }
+    
+    u32 used() const override { return 0; }
+    u32 numAllocs() const override { return n; }
+    u32 size() const override { return 0; }
+    void* ptr() const override { return nullptr; }
+  
+  private:
+    reUInt n;
+  };
+  
+  SimpleAllocator* tmp;
+}
+
+reWorld::reWorld() : _broadPhase(nullptr), _allocator(nullptr), _updated(false) {
+  tmp = new SimpleAllocator();
+  _allocator = new reProxyAllocator(tmp);
+  _broadPhase = allocator().alloc_new<reBSPTree>();
 }
 
 reWorld::~reWorld() {
   clear();
   
-  re::alloc_delete<reBSPTree>((reBSPTree*)_broadPhase);
+  allocator().alloc_delete<reBSPTree>((reBSPTree*)_broadPhase);
+  
+  if (_allocator != nullptr) {
+    delete _allocator;
+    delete tmp;
+  }
 }
 
 /**
@@ -31,7 +59,7 @@ void reWorld::clear() {
 }
 
 reRigidBody& reWorld::newRigidBody() {
-  reRigidBody* body = re::alloc_new<reRigidBody>();
+  reRigidBody* body = allocator().alloc_new<reRigidBody>(this);
   add(body);
   return *body;
 }
@@ -56,7 +84,7 @@ void reWorld::add(reEnt* entity) {
   _broadPhase->add(entity);
 }
 
-void reWorld::step(reFloat dt) {
+void reWorld::update(reFloat dt) {
   // do nothing
 //  _broadPhase->forEachEntDo([](reEnt* ent) {
 //    ent->step(dt);
@@ -92,4 +120,40 @@ void reWorld::ensureUpdate() {
     _updated = true;
   }
 }
+
+/**
+ * A convenient method to create copies of shapes
+ */
+
+reShape& reWorld::copyOf(const reShape& shape) const {
+  switch (shape.type()) {
+    case reShape::SPHERE:
+      return *allocator().alloc_new<reSphere>((const reSphere&)shape);
+    
+    case reShape::RECTANGLE:
+      RE_NOT_IMPLEMENTED
+      break;
+    
+    case reShape::COMPOUND:
+      RE_NOT_IMPLEMENTED
+      break;
+    
+    case reShape::TRIANGLE:
+      return *allocator().alloc_new<reTriangle>((const reTriangle&)shape);
+    
+    case reShape::PROXY:
+      {
+        // TODO fix very bad bug with distorted shape unable to allocate shapes
+        const reProxyShape& orig = (const reProxyShape&)shape;
+        reProxyShape* copy = allocator().alloc_new<reProxyShape>(this);
+        copy->setShape(orig.shape());
+        copy->setTransform(orig.transform());
+        return *copy;
+      }
+  }
+  
+  RE_IMPOSSIBLE
+  return *allocator().alloc_new<reSphere>(1.0);
+}
+
 

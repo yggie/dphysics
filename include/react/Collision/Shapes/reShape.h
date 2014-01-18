@@ -28,8 +28,8 @@ public:
     COMPOUND,
     /** A planar triangle @see reTriangle */
     TRIANGLE,
-    /** A wrapper around shapes allow arbitrary transforms @see reDistortedShape */
-    DISTORTED
+    /** A wrapper around shapes allow arbitrary transforms @see reProxyShape */
+    PROXY
   };
   
   reShape();

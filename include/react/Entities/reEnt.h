@@ -6,6 +6,7 @@
 #define RE_ENT_H
 
 #include "react/math.h"
+#include "react/reWorld.h"
 #include "react/Collision/reAABB.h"
 #include "react/Collision/Shapes/reShape.h"
 #include "react/Collision/reSpatialQueries.h"
@@ -32,8 +33,11 @@ public:
     FIELD
   };
   
-  /** Default constructor does nothing */
-  reEnt();
+  
+  /** Disable default constructor */
+  reEnt() = delete;
+  /** Creates an entity from a parent reWorld object */
+  reEnt(reWorld* world);
   /** Default destructor does nothing */
   virtual ~reEnt();
   
@@ -42,8 +46,7 @@ public:
   virtual const reVector vel() const = 0;
   virtual const reMatrix rotVel() const = 0;
   
-  virtual void step(reFloat dt) { };
-  void update();
+  virtual void update(reFloat dt) = 0;
   
   const reVector getAABBLowerCorner() const;
   const reVector getAABBUpperCorner() const;
@@ -68,25 +71,23 @@ public:
   virtual reEnt& withDensity(reFloat mass) = 0;
   
   // collision queries
-  bool intersectsRay(const reRayQuery& query, reRayQueryResult& result);
+  bool intersectsRay(const reRayQuery& query, reRayQueryResult& result) const;
   
-  bool intersectsHyperplane(const reHyperplaneQuery& query);
+  bool intersectsHyperplane(const reHyperplaneQuery& query) const;
   bool intersectsHyperplane(const reVector& point, const reVector& dir) const;
   
   /** a pointer to arbitrary data, defined by the user */
   void* userdata;
   
-  static reUInt queriesMade;
-  
 protected:
+  /** A reference to the parent reWorld object */
+  reWorld& _world;
   /** A unique identifier for the reEnt */
   const reUInt _id;
   /** The reEnt's reShape */
   reShape* _shape;
   /** The reEnt's transformation matrix */
   reTransform _transform;
-  /** Used internally to avoid repeating queries */
-  reUInt _queryID;
   
   static reUInt globalEntID;
 };
@@ -138,18 +139,18 @@ protected:
  * @return A reference to the reEnt
  */
 
-inline reEnt::reEnt() : userdata(nullptr), _id(globalEntID++), _shape(nullptr), _transform(), _queryID(0) { }
+inline reEnt::reEnt(reWorld* world) : userdata(nullptr), _world(*world), _id(globalEntID++), _shape(nullptr), _transform() { }
 inline reEnt::~reEnt() { }
 
 /**
  * Notifies the reEnt that it should update its AABB
  */
 
-inline void reEnt::update() {
-  if (shape() != nullptr) {
-    shape()->updateAABB(_transform.m);
-  }
-}
+//inline void reEnt::update() {
+//  if (shape() != nullptr) {
+//    shape()->updateAABB(_transform.m);
+//  }
+//}
 
 inline const reVector reEnt::getAABBLowerCorner() const {
   if (shape() != nullptr) {
@@ -273,7 +274,7 @@ inline void reEnt::setPos(reFloat x, reFloat y, reFloat z) {
  */
 
 inline void reEnt::setShape(const reShape& shape) {
-  _shape = re::copyOf(shape);
+  _shape = &_world.copyOf(shape);
 }
 
 /**
@@ -288,23 +289,14 @@ inline void reEnt::setShape(const reShape& shape) {
  * @return True if the ray intersects
  */
 
-inline bool reEnt::intersectsRay(const reRayQuery& query, reRayQueryResult& result) {
-  if (_queryID == query.ID) {
-    return false; // avoid redundant queries
-  }
-  reEnt::queriesMade++;
-  _queryID = query.ID;
+inline bool reEnt::intersectsRay(const reRayQuery& query, reRayQueryResult& result) const {
   if (_shape != nullptr) {
     return _shape->intersectsRay(_transform, query, result);
   }
   return false;
 }
 
-inline bool reEnt::intersectsHyperplane(const reHyperplaneQuery& query) {
-  if (_queryID == query.ID) {
-    return false; // avoid redundant queries
-  }
-  _queryID = query.ID;
+inline bool reEnt::intersectsHyperplane(const reHyperplaneQuery& query) const {
   if (_shape != nullptr) {
     return _shape->intersectsHyperplane(_transform, query);
   } else {

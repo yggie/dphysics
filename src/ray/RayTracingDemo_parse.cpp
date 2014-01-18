@@ -233,7 +233,7 @@ void RayTracingDemo::createSceneFromFile(const char* filename, bool useOpenGL) {
         tm.v[1] = m[3][1];
         tm.v[2] = m[3][2];
         reEnt& ent = _world.newRigidBody().withShape(
-          reDistortedShape(reSphere(v[3])).withDistortion(tm)
+          reProxyShape().withShape(reSphere(v[3])).withTransform(tm)
         ).at(v[0], v[1], v[2]);
         RayObject* obj = new RayObject();
         ent.userdata = obj;
