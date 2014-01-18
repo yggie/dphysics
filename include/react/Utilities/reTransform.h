@@ -33,6 +33,9 @@ struct reTransform {
   reTransform& scale(const reVector& scale);
   reTransform& scale(reFloat x, reFloat y, reFloat z);
   
+  const reMatrix& mat() const;
+  const reVector& vec() const;
+  
   reTransform& inverted();
   const reTransform inverse() const;
   
@@ -125,6 +128,14 @@ inline reTransform& reTransform::scale(reFloat x, reFloat y, reFloat z) {
     m[i][2] *= z;
   }
   return *this;
+}
+
+inline const reMatrix& reTransform::mat() const {
+  return m;
+}
+
+inline const reVector& reTransform::vec() const {
+  return v;
 }
 
 inline reTransform& reTransform::inverted() {

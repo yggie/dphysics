@@ -172,7 +172,7 @@ reLinkedList<reEnt*> reEntList::sample(reUInt size) const {
     node = node->next;
   }
   
-  RE_ASSERT(idx == size, "Loop incomplete")
+  RE_ASSERT_MSG(idx == size, "Loop incomplete")
   
   delete indices;
   return list;

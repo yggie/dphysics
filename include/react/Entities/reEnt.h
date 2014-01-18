@@ -42,6 +42,7 @@ public:
   virtual const reVector vel() const = 0;
   virtual const reMatrix rotVel() const = 0;
   
+  virtual void step(reFloat dt) { };
   void update();
   
   const reVector getAABBLowerCorner() const;

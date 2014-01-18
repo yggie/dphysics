@@ -24,6 +24,8 @@ public:
   
   reEnt::Type type() const;
   
+  void step(reFloat dt) override;
+  
   // getters for state properties
   const reVector vel() const override;
   const reMatrix rotVel() const override;
@@ -58,6 +60,10 @@ protected:
 
 inline reEnt::Type reRigidBody::type() const {
   return RIGID;
+}
+
+inline void reRigidBody::step(reFloat dt) {
+  _transform.v += _vVel * dt;
 }
 
 inline const reVector reRigidBody::vel() const {

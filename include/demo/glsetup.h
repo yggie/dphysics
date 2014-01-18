@@ -15,7 +15,7 @@ const int LOG_BUFFER_LENGTH = 255;
 inline bool checkOpenGLError() {
   GLenum err = glGetError();
   if (err != GL_NO_ERROR) {
-    RE_LOG("OpenGL error: %s", gluErrorString(err));
+    RE_WARN("OpenGL error: %s", gluErrorString(err));
     return true;
   }
   return false;

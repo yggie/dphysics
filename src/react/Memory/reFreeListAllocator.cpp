@@ -14,7 +14,7 @@
 reFreeListAllocator::reFreeListAllocator(u32 size, void* start) : reBaseAllocator(),
 _used(0), _numAllocs(0), _size(size), _ptr(start),
 _freeBlocks((FreeBlock*)start) {
-  RE_ASSERT(size > sizeof(FreeBlock), "Allocated memory is too small!")
+  RE_ASSERT_MSG(size > sizeof(FreeBlock), "Allocated memory is too small!")
   
 #ifdef RE_ZERO_MEMORY
   memset(start, RE_ZERO_MEM_VAL, size);
@@ -29,7 +29,7 @@ reFreeListAllocator::~reFreeListAllocator() {
 }
 
 void* reFreeListAllocator::alloc(u32 size, u8 alignment) {
-  RE_ASSERT(size != 0, "Useless allocation detected")
+  RE_ASSERT(size != 0)
   
   // check free blocks
   FreeBlock* prevFreeBlock = nullptr;
@@ -81,7 +81,7 @@ void* reFreeListAllocator::alloc(u32 size, u8 alignment) {
     return (void*)alignedAddress;
   }
   
-  RE_ASSERT(false, "Couldn\'t find a free block large enough!")
+  RE_WARN("Couldn\'t find a free memory block large enough!\n")
   
   return nullptr;
 }

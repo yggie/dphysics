@@ -11,7 +11,7 @@ namespace {
         break;
         
       default:
-        RE_LOG("DARN")
+        RE_WARN("Unexpected shape type\n")
         break;
     }
     

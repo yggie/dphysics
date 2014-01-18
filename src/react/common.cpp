@@ -7,6 +7,8 @@ reAllocator* re::globalAllocator = nullptr;
 
 reUInt re::globalQueryID = 0;
 
+FILE* re::logFile = stderr;
+
 /**
  * A convenient method to create copies of shapes
  */

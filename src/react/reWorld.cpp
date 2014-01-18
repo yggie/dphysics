@@ -48,7 +48,7 @@ void reWorld::forEachEntDo(void(*func)(reEnt* ent)) {
 
 void reWorld::add(reEnt* entity) {
   if (entity == nullptr) {
-    RE_LOG("Attempted to add null entity")
+    RE_WARN("Attempted to add null entity to world\n")
     return;
   }
   
@@ -58,7 +58,9 @@ void reWorld::add(reEnt* entity) {
 
 void reWorld::step(reFloat dt) {
   // do nothing
-  dt += 1;
+//  _broadPhase->forEachEntDo([](reEnt* ent) {
+//    ent->step(dt);
+//  });
 }
 
 reEnt* reWorld::queryWithRay(const reVector& origin, const reVector& dir, reVector* intersect, reVector* normal) {

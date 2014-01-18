@@ -107,6 +107,6 @@ void PlainSphere::setup(GLuint* vao, GLuint* vbo, const Canvas& canvas) {
   glEnableVertexAttribArray(canvas.attrs().vertColor);
   
   printf("[DEMO]  Expected: %d got %d\n", nVerts, cnt);
-  RE_ASSERT(cnt == nVerts, "Number expected was wrong");
+  RE_ASSERT_MSG(cnt == nVerts, "Number expected was wrong");
 }
 

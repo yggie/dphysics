@@ -6,21 +6,23 @@
 
 reProxyAllocator::reProxyAllocator(reBaseAllocator* allocator) : reAllocator(),
 _allocator(allocator) {
-  RE_ASSERT(allocator != nullptr, "The allocator cannot be null")
+  RE_ASSERT(allocator != nullptr)
 }
 
 reProxyAllocator::~reProxyAllocator() {
-  RE_LOG("STATS  : {#%02d-%5d/%4d}", _allocator->numAllocs(), _allocator->used(), _allocator->size())
-  RE_ASSERT_WARN((_allocator->numAllocs() == 0 && _allocator->used() == 0), "Memory leak detected!")
+  RE_DEBUG("STATS  : {#%02d-%5d/%4d}", _allocator->numAllocs(), _allocator->used(), _allocator->size())
+  if (_allocator->numAllocs() == 0 && _allocator->used() == 0) {
+    RE_WARN("Memory leak detected!\n")
+  }
   
 //  show();
   
-  RE_ASSERT(_allocator != nullptr, "No allocator was used by the proxy")
+  RE_ASSERT(_allocator != nullptr)
 }
 
 void* reProxyAllocator::alloc(u32 size, u8 alignment) {
   void* tmp = _allocator->alloc(size, alignment);
-//  RE_LOG("alloc  : {#%02d-%5d}", _allocator->numAllocs(), size + alignment)
+//  RE_DEBUG("alloc  : {#%02d-%5d}", _allocator->numAllocs(), size + alignment)
   return tmp;
 }
 
@@ -29,7 +31,7 @@ void reProxyAllocator::dealloc(void* ptr) {
 //  unsigned int uu = _allocator->used();
 #endif
   _allocator->dealloc(ptr);
-//  RE_LOG("dealloc: {#%02d-%5d}", _allocator->numAllocs(), uu - _allocator->used())
+//  RE_DEBUG("dealloc: {#%02d-%5d}", _allocator->numAllocs(), uu - _allocator->used())
 }
 
 void reProxyAllocator::show() {

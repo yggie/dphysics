@@ -24,7 +24,9 @@ void reBSPTree::clear() {
   }
   if (_depth == 0) {
     for (reQueryable& q : _entities) {
-      RE_ASSERT_WARN(q.ent->userdata == nullptr, "This body has a non-null userdata pointer!")
+      if (q.ent->userdata == nullptr) {
+        RE_WARN("This body has a non-null userdata pointer!\n")
+      }
       re::alloc_delete(q.ent->shape());
       re::alloc_delete(q.ent);
     }
@@ -133,7 +135,7 @@ void reBSPTree::remove(reQueryable* q) {
 
 bool reBSPTree::contains(const reEnt* ent) const {
   if (ent == nullptr) {
-    RE_LOG("Attempted to query for null ent")
+    RE_WARN("Attempted to query using null\n")
     return false;
   }
   

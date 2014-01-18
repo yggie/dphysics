@@ -307,7 +307,7 @@ void RayTracingDemo::renderScene(GLsizei w, GLsizei h) {
       pix[1] = (GLubyte)(255.0 * reClamp(color[1], 0.0, 1.0));
       pix[2] = (GLubyte)(255.0 * reClamp(color[2], 0.0, 1.0));
       pix[3] = 0xff;
-      RE_ASSERT((IDX < 4*w*h-3 && IDX >= 0), "Buffer overflow")
+      RE_ASSERT_MSG((IDX < 4*w*h-3 && IDX >= 0), "Buffer overflow detected\n")
 //      colorPixel(&_pixels[4*(h - i - 1)*w + 4*j], shootRay(0, eye, ray));
     }
     

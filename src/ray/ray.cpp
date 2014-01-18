@@ -117,7 +117,7 @@ int main(int argc, char** argv) {
     demos[i] = nullptr;
   }
   
-  RE_LOG("SUCCESSFULLY DELETED ALL DEMOS")
+  RE_DEBUG("SUCCESSFULLY DELETED ALL DEMOS\n")
   
   return 0;
 }

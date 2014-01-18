@@ -18,64 +18,92 @@ typedef unsigned int reUInt;
 #define RE_ZERO_MEM_VAL   0
 #endif
 
-#ifdef NDEBUG
-  #include <cstdio>
-  #include <string.h>
-  
-  #define RE_FILE (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)
-  
+#include <cstdio>
+#include <string.h>
+
+namespace re {
   /**
-   * If NDEBUG is defined, all log outputs will be forwarded to this file
+   * All log outputs will be forwarded to this file
    */
-  #define RE_LOG_OUTPUT       stderr
+  
+  extern FILE* logFile;
+}
+
+#define RE_FUNC             __func__
+
+/**
+ * A convenient define to obtain short file names
+ */
+
+#define RE_FILE (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)
+
+/**
+ *  Marks features which have not yet been implemented.
+ */
+
+#define RE_NOT_IMPLEMENTED \
+  fprintf(re::logFile, \
+    "[ALERT] %s:%d: (%s)(%s %s) %s\n", RE_FILE, __LINE__, \
+    RE_FUNC, __DATE__, __TIME__, "Feature not implemented");
+
+/**
+ * Marks areas of the code which should be impossible to react.
+ */
+
+#define RE_IMPOSSIBLE \
+  fprintf(re::logFile, "[ALERT] %s:%d: Impossible program flow!\n", RE_FILE, __LINE__);
+
+/**
+ * Behaves like a printf statement, but includes additional information such
+ * as line number, file name and an info tag.
+ */
+
+#define RE_INFO(...) \
+  fprintf(re::logFile, "[INFO]  %s:%d: ", RE_FILE, __LINE__), \
+  fprintf(re::logFile, __VA_ARGS__);
+
+/**
+ * Behaves like a printf statement, but includes additional information such
+ * as line number, file name and a warning tag.
+ */
+
+#define RE_WARN(...) \
+  fprintf(re::logFile, "[WARN]  %s:%d: ", RE_FILE, __LINE__), \
+  fprintf(re::logFile, __VA_ARGS__);
+
+#ifdef NDEBUG
   #define RE_ZERO_MEMORY
-  #define __RE_FUNC__         __func__
   
   #ifndef RE_SOFT_STOP
     #define _RE_STOP_PROGRAM    __builtin_trap();
   #else
     #define _RE_STOP_PROGRAM
   #endif
+
+  #define RE_DEBUG(...) \
+    fprintf(re::logFile, "[DEBUG] %s:%d: ", RE_FILE, __LINE__), \
+    fprintf(re::logFile, __VA_ARGS__);
   
-  #define _RE_MSG(msg)                fprintf(RE_LOG_OUTPUT, "[DEBUG] %s:%d: %s", RE_FILE, __LINE__, msg)
-  
-  #define RE_NOT_IMPLEMENTED \
-    fprintf(RE_LOG_OUTPUT, \
-      "[DEBUG] %s:%d: (%s)(%s %s) %s\n", RE_FILE, __LINE__, \
-      __RE_FUNC__, __DATE__, __TIME__, "Feature not implemented");
-  
-  #define RE_IMPOSSIBLE \
-    fprintf(RE_LOG_OUTPUT, "[ALERT] %s:%d: Impossible program flow!\n", RE_FILE, __LINE__);
-  
-  #define RE_ASSERT(expr, msg) \
+  #define RE_EXPECT_MSG(expr, msg) \
   do { \
     if(!(expr)) { \
-      fprintf(RE_LOG_OUTPUT, "[FATAL] %s:%d: %s\n", RE_FILE, __LINE__, msg); \
+      RE_WARN("Expected (%s) to be true but got false! %s\n", #expr, msg) \
+    } \
+  } while(0);
+  
+  #define RE_EXPECT(expr)   RE_EXPECT_MSG(expr, "")
+  
+  #define RE_ASSERT_MSG(expr, msg) \
+  do { \
+    if(!(expr)) { \
+      fprintf(re::logFile, "[FATAL] %s:%d: Assertion in expression (%s) failed! %s\n", RE_FILE, __LINE__, #expr, msg); \
       _RE_STOP_PROGRAM \
     } \
   } while(0);
   
-  #define RE_ASSERT_WARN(expr, msg) \
-    do { \
-      if(!(expr)) { \
-        fprintf(RE_LOG_OUTPUT, "[WARN]  %s:%d: %s\n", RE_FILE, __LINE__, msg); \
-      } \
-    } while(0);
+  #define RE_ASSERT(expr)   RE_ASSERT_MSG(expr, "")
   
-  #define RE_LOG(...) \
-    _RE_MSG(""), fprintf(RE_LOG_OUTPUT, __VA_ARGS__), fprintf(RE_LOG_OUTPUT, "\n");
-    
 #else
-  /**
-   *  Marks features which have not yet been implemented. Does nothing if DEBUG
-   * is not defined
-   */
-  #define RE_NOT_IMPLEMENTED
-  /**
-   * Marks areas of the code which should be impossible to react. Does nothing
-   * if NDEBUG is not defined
-   */
-  #define RE_IMPOSSIBLE
   /**
    * Asserts a given condition, halting the program and showing a message if it
    * fails. Does nothing if NDEBUG is not defined
@@ -83,20 +111,27 @@ typedef unsigned int reUInt;
    * @param expr The assert condition
    * @param msg The message shown on failure
    */
-  #define RE_ASSERT(expr, msg)   do { (void)sizeof(expr); } while(0);
+  #define RE_ASSERT_MSG(expr, msg)
+  
+  #define RE_ASSERT(expr)
+  
   /**
-   * Asserts a given condition, showing a message if it fails. Does nothing if
-   * NDEBUG is not defined
+   * Expects a given condition to be true, displays a warning message if it
+   * fails. Does nothing if NDEBUG is not defined
    * 
-   * @param expr The assert condition
+   * @param expr The condition expected to be true
    * @param msg The message shown on failure
    */
-  #define RE_ASSERT_WARN(expr, msg)   do { (void)sizeof(expr); } while(0);
+  #define RE_EXPECT_MSG(expr, msg)
+  
+  #define RE_EXPECT
+
   /**
-   * Behaves like a prinf statement, but includes additional information such
-   * as line number and file name. Does nothing if NDEBUG is not defined
+   * Behaves like a printf statement, but includes additional information such
+   * as line number, file name and a debug tag. Does nothing if NDEBUG is not
+   * defined
    */
-  #define RE_LOG(...)
+  #define RE_DEBUG(...)
 #endif
 
 #include "react/Memory/reBaseAllocator.h"
