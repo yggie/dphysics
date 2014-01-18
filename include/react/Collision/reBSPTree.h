@@ -21,7 +21,7 @@ const reUInt RE_BSPTREE_GUESSES       = 3;
 
 class reBSPTree : public reBroadPhase {
 public:
-  reBSPTree();
+  reBSPTree(const reWorld* world, reUInt depth = 0);
   ~reBSPTree();
   
   void clear() override;
@@ -46,15 +46,17 @@ protected:
   void split();
   void merge();
   bool hasChildren() const;
+  bool isRoot() const;
   
   void optimalSplit(reVector& anchor, reVector& dir) const;
   
+  const reWorld& _world;
   reBSPTree* _child[2];
   reUInt _size;
   reVector _dir;
   reVector _anchor;
   reEntList _entities;
-  reUInt _depth;
+  const reUInt _depth;
 };
 
 inline void reBSPTree::forEachEntDo(void(*func)(reEnt* ent)) {
@@ -69,6 +71,10 @@ inline reUInt reBSPTree::size() const {
 
 inline bool reBSPTree::hasChildren() const {
   return _child[0] != nullptr;
+}
+
+inline bool reBSPTree::isRoot() const {
+  return _depth == 0;
 }
 
 #endif

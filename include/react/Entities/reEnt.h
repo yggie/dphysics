@@ -139,9 +139,6 @@ protected:
  * @return A reference to the reEnt
  */
 
-inline reEnt::reEnt(reWorld* world) : userdata(nullptr), _world(*world), _id(globalEntID++), _shape(nullptr), _transform() { }
-inline reEnt::~reEnt() { }
-
 /**
  * Notifies the reEnt that it should update its AABB
  */

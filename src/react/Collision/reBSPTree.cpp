@@ -6,7 +6,7 @@
 
 #include <cstdio>
 
-reBSPTree::reBSPTree() : _child{nullptr}, _size(0), _dir(1.0, 0.0, 0.0), _anchor(0.0, 0.0, 0.0), _entities() {
+reBSPTree::reBSPTree(const reWorld* world, reUInt depth) : _world(*world), _child{nullptr}, _size(0), _dir(1.0, 0.0, 0.0), _anchor(0.0, 0.0, 0.0), _entities(), _depth(depth) {
   // do nothing
 }
 
@@ -18,17 +18,16 @@ void reBSPTree::clear() {
   if (hasChildren()) {
     for (reUInt i = 0; i < 2; i++) {
       _child[i]->clear();
-      re::alloc_delete(_child[i]);
+      _world.allocator().alloc_delete(_child[i]);
       _child[i] = nullptr;
     }
   }
-  if (_depth == 0) {
+  
+  if (isRoot()) {
     for (reQueryable& q : _entities) {
-      if (q.ent->userdata == nullptr) {
-        RE_WARN("This body has a non-null userdata pointer!\n")
-      }
-      re::alloc_delete(q.ent->shape());
-      re::alloc_delete(q.ent);
+      RE_EXPECT(q.ent->userdata == nullptr)
+      _world.allocator().alloc_delete(q.ent);
+      _world.allocator().alloc_delete(&q);
     }
   }
   _entities.clear();
@@ -39,7 +38,7 @@ bool reBSPTree::add(reEnt* ent) {
     return false;
   }
   
-  reQueryable* q = re::alloc_new<reQueryable>(ent);
+  reQueryable* q = _world.allocator().alloc_new<reQueryable>(ent);
   if (_entities.add(q)) {
     if (hasChildren()) {
       for (reUInt i = 0; i < 2; i++) {
@@ -51,7 +50,7 @@ bool reBSPTree::add(reEnt* ent) {
     _size++;
     return true;
   } else {
-    re::alloc_delete(q);
+    _world.allocator().alloc_delete(q);
     return false;
   }
 }
@@ -67,7 +66,7 @@ bool reBSPTree::remove(reEnt* ent) {
         }
       }
       _entities.remove(&q);
-      re::alloc_delete(&q);
+      _world.allocator().alloc_delete(&q);
       _size--;
       return true;
     }
@@ -96,7 +95,7 @@ void reBSPTree::update() {
       }
     }
   } else {
-    if (_depth > 0) {
+    if (!isRoot()) {
       trim();
     }
     if (_size > RE_BSPTREE_NODE_MIN_SIZE && _depth < RE_BSPTREE_DEPTH_LIMIT) {
@@ -104,7 +103,7 @@ void reBSPTree::update() {
     }
   }
   
-  printf("[ROOT] (%3d, %3d) (%+.1f, %+.1f, %+.1f) (%+.1f, %+.1f, %+.1f)\n", _depth, _size, _dir[0], _dir[1], _dir[2], _anchor[0], _anchor[1], _anchor[2]);
+  printf("[ROOT] (%3d, %3d, %3d) (%+.1f, %+.1f, %+.1f) (%+.1f, %+.1f, %+.1f)\n", _depth, _size, _entities.size(), _dir[0], _dir[1], _dir[2], _anchor[0], _anchor[1], _anchor[2]);
 }
 
 void reBSPTree::add(reQueryable* q) {
@@ -177,7 +176,7 @@ reEntList reBSPTree::updateNode() {
   }
   
   if (!hasChildren()) {
-    printf("[NODE] (%3d, %3d) (%+.1f, %+.1f, %+.1f) (%+.1f, %+.1f, %+.1f)\n", _depth, _size, _dir[0], _dir[1], _dir[2], _anchor[0], _anchor[1], _anchor[2]);
+    printf("[NODE] (%3d, %3d, %3d) (%+.1f, %+.1f, %+.1f) (%+.1f, %+.1f, %+.1f)\n", _depth, _size, _entities.size(), _dir[0], _dir[1], _dir[2], _anchor[0], _anchor[1], _anchor[2]);
   }
   
   return list;
@@ -212,10 +211,9 @@ void reBSPTree::split() {
   
   // setup each _child node
   for (reUInt i = 0; i < 2; i++) {
-    _child[i] = re::alloc_new<reBSPTree>();
+    _child[i] = _world.allocator().alloc_new<reBSPTree>(&_world, _depth + 1);
     _child[i]->_anchor = splitAnchor;
     _child[i]->_dir = splitDir * ((i % 2 == 0) ? -1 : 1);
-    _child[i]->_depth = _depth + 1;
     
     for (reQueryable& q : _entities) {
       if (_child[i]->contains(q.ent)) {
@@ -226,7 +224,9 @@ void reBSPTree::split() {
     _child[i]->updateNode();
   }
   
-  _entities.clear();
+  if (!isRoot()) {
+    _entities.clear();
+  }
 }
 
 /**
@@ -236,7 +236,7 @@ void reBSPTree::split() {
 void reBSPTree::merge() {
   for (reUInt i = 0; i < 2; i++) {
     _entities.append(_child[i]->_entities);
-    re::alloc_delete<reBSPTree>(_child[i]);
+    _world.allocator().alloc_delete<reBSPTree>(_child[i]);
     _child[i] = nullptr;
   }
   printf("[NODE] MERGE %d\n", _depth);
@@ -244,7 +244,7 @@ void reBSPTree::merge() {
 
 reEnt* reBSPTree::queryWithRay(const reRayQuery& query, reRayQueryResult& result) const {
   
-  if (!_entities.empty()) {
+  if (!_entities.empty() && !isRoot()) {
     // this must be a leaf node, proceed to entity query
     reRayQueryResult res;
     reFloat maxDistSq = RE_INFINITY;

@@ -18,6 +18,7 @@ namespace {
     SimpleAllocator() : n(0) { }
     
     void* alloc(u32 size, u8) { n++; return malloc(size); }
+    
     void dealloc(void* p) { n--; free(p); }
     
     u32 used() const override { return 0; }
@@ -32,11 +33,19 @@ namespace {
   SimpleAllocator* tmp;
 }
 
+/**
+ * Default constructor initializes the world with the default settings
+ */
+
 reWorld::reWorld() : _broadPhase(nullptr), _allocator(nullptr), _updated(false) {
   tmp = new SimpleAllocator();
   _allocator = new reProxyAllocator(tmp);
-  _broadPhase = allocator().alloc_new<reBSPTree>();
+  _broadPhase = allocator().alloc_new<reBSPTree>(this);
 }
+
+/**
+ * Releases all resources used by the reWorld instance
+ */
 
 reWorld::~reWorld() {
   clear();
@@ -143,7 +152,6 @@ reShape& reWorld::copyOf(const reShape& shape) const {
     
     case reShape::PROXY:
       {
-        // TODO fix very bad bug with distorted shape unable to allocate shapes
         const reProxyShape& orig = (const reProxyShape&)shape;
         reProxyShape* copy = allocator().alloc_new<reProxyShape>(this);
         copy->setShape(orig.shape());

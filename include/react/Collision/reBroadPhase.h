@@ -18,10 +18,8 @@ class reEnt;
 
 class reBroadPhase {
 public:
-  /** Default constructor does nothing */
-  reBroadPhase();
   /** Destructor constructor does nothing */
-  virtual ~reBroadPhase();
+  virtual ~reBroadPhase() = 0;
 
   virtual void clear() = 0;
   virtual bool add(reEnt* ent) = 0;
@@ -32,10 +30,6 @@ public:
   
   virtual reEnt* queryWithRay(const reRayQuery& query, reRayQueryResult& result) const = 0;
 };
-
-inline reBroadPhase::reBroadPhase() {
-  // do nothing
-}
 
 inline reBroadPhase::~reBroadPhase() {
   // do nothing

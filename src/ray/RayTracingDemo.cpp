@@ -83,6 +83,7 @@ void RayTracingDemo::release() {
   _world.forEachEntDo([](reEnt* ent) {
     if (ent->userdata != nullptr) {
       delete (RayObject*)(ent->userdata);
+      ent->userdata = nullptr;
     }
   });
   _world.clear();
