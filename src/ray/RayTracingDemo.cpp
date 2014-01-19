@@ -80,12 +80,13 @@ void RayTracingDemo::restart() {
 }
 
 void RayTracingDemo::release() {
-  _world.forEachEntDo([](reEnt* ent) {
-    if (ent->userdata != nullptr) {
-      delete (RayObject*)(ent->userdata);
-      ent->userdata = nullptr;
+  for (reEnt& ent : _world.entities()) {
+    if (ent.userdata != nullptr) {
+      delete (RayObject*)(ent.userdata);
+      ent.userdata = nullptr;
     }
-  });
+  }
+  
   _world.clear();
   for_each(_lights.begin(), _lights.end(), [&](RayLightSource* light) {
     delete light;

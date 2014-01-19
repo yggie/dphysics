@@ -16,7 +16,7 @@
 
 class reRigidBody : public reSolid {
 public:
-  reRigidBody(reWorld* world);
+  reRigidBody(const reWorld* world);
   reRigidBody(const reRigidBody&) = delete;
   virtual ~reRigidBody();
   

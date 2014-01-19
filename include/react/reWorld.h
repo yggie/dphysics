@@ -7,9 +7,10 @@
 
 #include "react/common.h"
 #include "react/math.h"
-#include "react/Collision/reSpatialQueries.h"
 #include "react/Memory/reAllocator.h"
+#include "react/Collision/reSpatialQueries.h"
 
+class reEntList;
 class reBroadPhase;
 class reRigidBody;
 class reEnt;
@@ -30,12 +31,12 @@ public:
   /** Prohibit copying */
   reWorld& operator=(const reWorld&) = delete;
   
+  reEntList& entities() const;
+  
   void clear();
   
   reDistortedShape& newDistortedShape(const reShape& shape);
   reRigidBody& newRigidBody();
-  
-  void forEachEntDo(void(*func)(reEnt* ent));
   
   void add(reEnt* entity);
   

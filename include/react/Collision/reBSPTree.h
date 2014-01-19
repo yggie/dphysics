@@ -29,10 +29,12 @@ public:
   bool remove(reEnt* ent) override;
   void update() override;
   
-  void forEachEntDo(void(*func)(reEnt* ent)) override;
-  
   reUInt size() const;
+  bool hasChildren() const;
+  bool isRoot() const;
+  bool isLeaf() const;
   
+  // spatial queries
   reEnt* queryWithRay(const reRayQuery& query, reRayQueryResult& result) const override;
   
 protected:
@@ -45,28 +47,17 @@ protected:
   reEntList trim();
   void split();
   void merge();
-  bool hasChildren() const;
-  bool isRoot() const;
   
   void optimalSplit(reVector& anchor, reVector& dir) const;
   
-  const reWorld& _world;
   reBSPTree* _child[2];
-  reUInt _size;
   reVector _dir;
   reVector _anchor;
-  reEntList _entities;
   const reUInt _depth;
 };
 
-inline void reBSPTree::forEachEntDo(void(*func)(reEnt* ent)) {
-  for (reQueryable& q : _entities) {
-    func(q.ent);
-  }
-}
-
 inline reUInt reBSPTree::size() const {
-  return _size;
+  return _entities.size();
 }
 
 inline bool reBSPTree::hasChildren() const {
@@ -75,6 +66,10 @@ inline bool reBSPTree::hasChildren() const {
 
 inline bool reBSPTree::isRoot() const {
   return _depth == 0;
+}
+
+inline bool reBSPTree::isLeaf() const {
+  return !hasChildren();
 }
 
 #endif

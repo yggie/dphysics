@@ -2,7 +2,7 @@
 
 reUInt reEnt::globalEntID = 1;
 
-reEnt::reEnt(reWorld* world) : userdata(nullptr), _world(*world), _id(globalEntID++), _shape(nullptr), _transform() {
+reEnt::reEnt(const reWorld* world) : userdata(nullptr), _world(*world), _id(globalEntID++), _shape(nullptr), _transform() {
   // do nothing
 }
 

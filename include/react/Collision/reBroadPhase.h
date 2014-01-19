@@ -6,9 +6,11 @@
 #define RE_BROADPHASE_H
 
 #include "react/common.h"
+#include "react/Utilities/reEntList.h"
 #include "react/Collision/reSpatialQueries.h"
 
 class reEnt;
+class reWorld;
 
 /**
  * @ingroup collision
@@ -18,6 +20,7 @@ class reEnt;
 
 class reBroadPhase {
 public:
+  reBroadPhase(const reWorld* world);
   /** Destructor constructor does nothing */
   virtual ~reBroadPhase() = 0;
 
@@ -26,10 +29,20 @@ public:
   virtual bool remove(reEnt* ent) = 0;
   virtual void update() = 0;
   
-  virtual void forEachEntDo(void(*func)(reEnt* ent)) = 0;
-  
+  // spatial queries
   virtual reEnt* queryWithRay(const reRayQuery& query, reRayQueryResult& result) const = 0;
+  
+  reEntList& entities();
+  const reEntList& entities() const;
+  
+protected:
+  const reWorld& _world;
+  reEntList _entities;
 };
+
+inline reBroadPhase::reBroadPhase(const reWorld* world) : _world(*world), _entities(world) {
+  // do nothing
+}
 
 inline reBroadPhase::~reBroadPhase() {
   // do nothing
@@ -62,5 +75,13 @@ inline reBroadPhase::~reBroadPhase() {
  * @param ent The reEnt to remove
  * @return True if the operation was successful
  */
+
+inline reEntList& reBroadPhase::entities() {
+  return _entities;
+}
+
+inline const reEntList& reBroadPhase::entities() const {
+  return _entities;
+}
 
 #endif

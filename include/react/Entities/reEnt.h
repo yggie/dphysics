@@ -37,7 +37,7 @@ public:
   /** Disable default constructor */
   reEnt() = delete;
   /** Creates an entity from a parent reWorld object */
-  reEnt(reWorld* world);
+  reEnt(const reWorld* world);
   /** Default destructor does nothing */
   virtual ~reEnt();
   
@@ -81,7 +81,7 @@ public:
   
 protected:
   /** A reference to the parent reWorld object */
-  reWorld& _world;
+  const reWorld& _world;
   /** A unique identifier for the reEnt */
   const reUInt _id;
   /** The reEnt's reShape */
@@ -138,16 +138,6 @@ protected:
  * @param shape The new reShape
  * @return A reference to the reEnt
  */
-
-/**
- * Notifies the reEnt that it should update its AABB
- */
-
-//inline void reEnt::update() {
-//  if (shape() != nullptr) {
-//    shape()->updateAABB(_transform.m);
-//  }
-//}
 
 inline const reVector reEnt::getAABBLowerCorner() const {
   if (shape() != nullptr) {

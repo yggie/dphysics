@@ -6,7 +6,7 @@
 
 #include <cstdio>
 
-reBSPTree::reBSPTree(const reWorld* world, reUInt depth) : _world(*world), _child{nullptr}, _size(0), _dir(1.0, 0.0, 0.0), _anchor(0.0, 0.0, 0.0), _entities(&_world), _depth(depth) {
+reBSPTree::reBSPTree(const reWorld* world, reUInt depth) : reBroadPhase(world), _child{nullptr}, _dir(1.0, 0.0, 0.0), _anchor(0.0, 0.0, 0.0), _depth(depth) {
   // do nothing
 }
 
@@ -24,13 +24,15 @@ void reBSPTree::clear() {
   }
   
   if (isRoot()) {
-    for (reQueryable& q : _entities) {
+    auto end = entities().qEnd();
+    for (auto iter = entities().qBegin(); iter != end; ++iter) {
+      reQueryable& q = *iter;
       RE_EXPECT(q.ent->userdata == nullptr)
       _world.allocator().alloc_delete(q.ent);
       _world.allocator().alloc_delete(&q);
     }
   }
-  _entities.clear();
+  entities().clear();
 }
 
 bool reBSPTree::add(reEnt* ent) {
@@ -39,7 +41,7 @@ bool reBSPTree::add(reEnt* ent) {
   }
   
   reQueryable* q = _world.allocator().alloc_new<reQueryable>(ent);
-  if (_entities.add(q)) {
+  if (entities().add(q)) {
     if (hasChildren()) {
       for (reUInt i = 0; i < 2; i++) {
         if (_child[i]->contains(ent)) {
@@ -47,7 +49,6 @@ bool reBSPTree::add(reEnt* ent) {
         }
       }
     }
-    _size++;
     return true;
   } else {
     _world.allocator().alloc_delete(q);
@@ -56,7 +57,9 @@ bool reBSPTree::add(reEnt* ent) {
 }
 
 bool reBSPTree::remove(reEnt* ent) {
-  for (reQueryable& q : _entities) {
+  auto end = entities().qEnd();
+  for (auto iter = entities().qBegin(); iter != end; ++iter) {
+    reQueryable& q = *iter;
     if (q.ent->id() == ent->id()) {
       if (hasChildren()) {
         for (reUInt i = 0; i < 2; i++) {
@@ -65,9 +68,8 @@ bool reBSPTree::remove(reEnt* ent) {
           }
         }
       }
-      _entities.remove(&q);
+      entities().remove(&q);
       _world.allocator().alloc_delete(&q);
-      _size--;
       return true;
     }
   }
@@ -77,14 +79,16 @@ bool reBSPTree::remove(reEnt* ent) {
 
 void reBSPTree::update() {
   if (hasChildren()) {
-    if (_child[0]->_entities.size() + _child[1]->_entities.size() < RE_BSPTREE_NODE_MIN_SIZE) {
+    if (_child[0]->size() + _child[1]->size() < RE_BSPTREE_NODE_MIN_SIZE) {
       merge();
     } else {
       reEntList list(&_world);
       for (reUInt i = 0; i < 2; i++) {
         list.append(_child[i]->updateNode());
         
-        for (reQueryable& q : list) {
+        auto end = list.qEnd();
+        for (auto iter = list.qBegin(); iter != end; ++iter) {
+          reQueryable& q = *iter;
           const reUInt j = (i + 1) % 2;
           if (_child[j]->contains(q.ent)) {
             _child[j]->add(&q);
@@ -98,12 +102,12 @@ void reBSPTree::update() {
     if (!isRoot()) {
       trim();
     }
-    if (_size > RE_BSPTREE_NODE_MIN_SIZE && _depth < RE_BSPTREE_DEPTH_LIMIT) {
+    if (size() > RE_BSPTREE_NODE_MIN_SIZE && _depth < RE_BSPTREE_DEPTH_LIMIT) {
       split();
     }
   }
   
-  printf("[ROOT] (%3d, %3d, %3d) (%+.1f, %+.1f, %+.1f) (%+.1f, %+.1f, %+.1f)\n", _depth, _size, _entities.size(), _dir[0], _dir[1], _dir[2], _anchor[0], _anchor[1], _anchor[2]);
+  printf("[ROOT] (%3d, %3d) (%+.1f, %+.1f, %+.1f) (%+.1f, %+.1f, %+.1f)\n", _depth, size(), _dir[0], _dir[1], _dir[2], _anchor[0], _anchor[1], _anchor[2]);
 }
 
 void reBSPTree::add(reQueryable* q) {
@@ -114,8 +118,7 @@ void reBSPTree::add(reQueryable* q) {
       }
     }
   } else {
-    _entities.add(q);
-    _size++;
+    entities().add(q);
   }
 }
 
@@ -127,8 +130,7 @@ void reBSPTree::remove(reQueryable* q) {
       }
     }
   } else {
-    _entities.remove(q);
-    _size--;
+    entities().remove(q);
   }
 }
 
@@ -145,21 +147,23 @@ bool reBSPTree::contains(const reEnt* ent) const {
  * Called from the root or parent node to update its structure. If any reEnts
  * were removed, it is returned
  * 
- * @return A list of rejected _entities
+ * @return A list of rejected entities()
  */
 
 reEntList reBSPTree::updateNode() {
   reEntList list(&_world);
   
   if (hasChildren()) {
-    if (_child[0]->_entities.size() + _child[1]->_entities.size() < RE_BSPTREE_NODE_MIN_SIZE) {
+    if (_child[0]->size() + _child[1]->size() < RE_BSPTREE_NODE_MIN_SIZE) {
       merge();
       return updateNode();
     } else {
       for (reUInt i = 0; i < 2; i++) {
         list.append(_child[i]->updateNode());
         
-        for (reQueryable& q : list) {
+        auto end = list.qEnd();
+        for (auto iter = list.qBegin(); iter != end; ++iter) {
+          reQueryable& q = *iter;
           const reUInt j = (i + 1) % 2;
           if (_child[j]->contains(q.ent)) {
             _child[j]->add(&q);
@@ -170,28 +174,30 @@ reEntList reBSPTree::updateNode() {
     }
   } else {
     list.append(trim());
-    if (_size > RE_BSPTREE_NODE_MIN_SIZE && _depth < RE_BSPTREE_DEPTH_LIMIT) {
+    if (size() > RE_BSPTREE_NODE_MIN_SIZE && _depth < RE_BSPTREE_DEPTH_LIMIT) {
       split();
     }
   }
   
   if (!hasChildren()) {
-    printf("[NODE] (%3d, %3d, %3d) (%+.1f, %+.1f, %+.1f) (%+.1f, %+.1f, %+.1f)\n", _depth, _size, _entities.size(), _dir[0], _dir[1], _dir[2], _anchor[0], _anchor[1], _anchor[2]);
+    printf("[NODE] (%3d, %3d) (%+.1f, %+.1f, %+.1f) (%+.1f, %+.1f, %+.1f)\n", _depth, size(), _dir[0], _dir[1], _dir[2], _anchor[0], _anchor[1], _anchor[2]);
   }
   
   return list;
 }
 
 /**
- * Called when a node should verify if all _entities are still contained. 
- * Returns a list of rejected _entities
+ * Called when a node should verify if all entities() are still contained. 
+ * Returns a list of rejected entities()
  * 
- * @return A list of rejected _entities
+ * @return A list of rejected entities()
  */
 
 reEntList reBSPTree::trim() {
   reEntList rejected(&_world);
-  for (reQueryable& q : _entities) {
+  auto end = entities().qEnd();
+  for (auto iter = entities().qBegin(); iter != end; ++iter) {
+    reQueryable& q = *iter;
     if (!contains(q.ent)) {
       remove(&q);
       rejected.add(&q);
@@ -215,7 +221,9 @@ void reBSPTree::split() {
     _child[i]->_anchor = splitAnchor;
     _child[i]->_dir = splitDir * ((i % 2 == 0) ? -1 : 1);
     
-    for (reQueryable& q : _entities) {
+    auto end = entities().qEnd();
+    for (auto iter = entities().qBegin(); iter != end; ++iter) {
+      reQueryable& q = *iter;
       if (_child[i]->contains(q.ent)) {
         _child[i]->add(&q);
       }
@@ -225,7 +233,7 @@ void reBSPTree::split() {
   }
   
   if (!isRoot()) {
-    _entities.clear();
+    entities().clear();
   }
 }
 
@@ -235,7 +243,7 @@ void reBSPTree::split() {
 
 void reBSPTree::merge() {
   for (reUInt i = 0; i < 2; i++) {
-    _entities.append(_child[i]->_entities);
+    entities().append(_child[i]->entities());
     _world.allocator().alloc_delete<reBSPTree>(_child[i]);
     _child[i] = nullptr;
   }
@@ -244,13 +252,15 @@ void reBSPTree::merge() {
 
 reEnt* reBSPTree::queryWithRay(const reRayQuery& query, reRayQueryResult& result) const {
   
-  if (!_entities.empty() && !isRoot()) {
+  if (!entities().empty() && !isRoot()) {
     // this must be a leaf node, proceed to entity query
     reRayQueryResult res;
     reFloat maxDistSq = RE_INFINITY;
     reEnt* resultEnt = nullptr;
     
-    for (reQueryable& q : _entities) {
+    auto end = entities().qEnd();
+    for (auto iter = entities().qBegin(); iter != end; ++iter) {
+      reQueryable& q = *iter;
       if (q.queryID == query.ID) {
         continue;
       }
@@ -289,6 +299,14 @@ reEnt* reBSPTree::queryWithRay(const reRayQuery& query, reRayQueryResult& result
   }
 }
 
+/**
+ * Determines the optimal split plane for the node by sampling the contained
+ * reEnt
+ * 
+ * @param anchor This field is set to the optimal anchor point
+ * @param dir This field is set to the optimal split plane direction
+ */
+
 void reBSPTree::optimalSplit(reVector& anchor, reVector& dir) const {
   anchor.set(0.0, 0.0, 0.0);
   
@@ -301,8 +319,8 @@ void reBSPTree::optimalSplit(reVector& anchor, reVector& dir) const {
   reFloat vals[RE_BSPTREE_GUESSES] = { 0.0 };
   reUInt index = 0;
   
-  if (_size > RE_BSPTREE_SAMPLE_SIZE) {
-    reLinkedList<reEnt*> list = _entities.sample(RE_BSPTREE_SAMPLE_SIZE);
+  if (size() > RE_BSPTREE_SAMPLE_SIZE) {
+    reLinkedList<reEnt*> list = entities().sample(RE_BSPTREE_SAMPLE_SIZE);
     
     for (const reEnt* ent : list) {
       anchor += ent->center();
@@ -310,7 +328,7 @@ void reBSPTree::optimalSplit(reVector& anchor, reVector& dir) const {
     
     anchor /= RE_BSPTREE_SAMPLE_SIZE;
     
-    reLinkedList<reEnt*> list2 = _entities.sample(RE_BSPTREE_SAMPLE_SIZE);
+    reLinkedList<reEnt*> list2 = entities().sample(RE_BSPTREE_SAMPLE_SIZE);
     for (const reEnt* ent : list2) {
       for (reUInt i = 0; i < RE_BSPTREE_GUESSES; i++) {
         vals[i] += dirs[i].dot(anchor - ent->center());
@@ -324,8 +342,11 @@ void reBSPTree::optimalSplit(reVector& anchor, reVector& dir) const {
     }
   } else {
     reUInt num = 0;
-    reUInt n = reMin(RE_BSPTREE_SAMPLE_SIZE, _size);
-    for (const reQueryable& q : _entities) {
+    reUInt n = reMin(RE_BSPTREE_SAMPLE_SIZE, size());
+    
+    auto end = entities().qEnd();
+    for (auto iter = entities().qBegin(); iter != end; ++iter) {
+      const reQueryable& q = *iter;
       anchor += q.ent->center();
       if (++num >= n) {
         break;
@@ -334,7 +355,9 @@ void reBSPTree::optimalSplit(reVector& anchor, reVector& dir) const {
     anchor /= n;
     for (reUInt i = 0; i < RE_BSPTREE_GUESSES; i++) {
       num = 0;
-      for (const reQueryable& q : _entities) {
+      auto end = entities().qEnd();
+      for (auto iter = entities().qBegin(); iter != end; ++iter) {
+        const reQueryable& q = *iter;
         vals[i] += dirs[i].dot(anchor - q.ent->center());
         if (++num >= n) {
           break;

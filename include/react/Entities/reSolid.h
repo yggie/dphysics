@@ -17,7 +17,7 @@
 class reSolid : public reEnt {
 public:
   /** Default constructor does nothing */
-  reSolid(reWorld* world);
+  reSolid(const reWorld* world);
   /** Default destructor does nothing */
   virtual ~reSolid();
   
@@ -99,7 +99,7 @@ protected:
  * @param density The density in user-defined units
  */
 
-inline reSolid::reSolid(reWorld* world) : reEnt(world) { }
+inline reSolid::reSolid(const reWorld* world) : reEnt(world) { }
 inline reSolid::~reSolid() { }
 
 inline void reSolid::setShape(const reShape& shape) {

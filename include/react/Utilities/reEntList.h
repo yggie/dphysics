@@ -1,3 +1,7 @@
+/**
+ * @file
+ * Contains the definition of the reEntList utility class
+ */
 #ifndef RE_ENTLIST_H
 #define RE_ENTLIST_H
 
@@ -57,8 +61,21 @@ public:
     Node* node;
   };
   
-  Iterator begin() const;
-  Iterator end() const;
+  class reEntItor {
+  public:
+    reEntItor(Node* node);
+    bool operator!=(const reEntItor& iter) const;
+    reEnt& operator*() const;
+    const reEntItor& operator++();
+  private:
+    Node* _node;
+  };
+  
+  Iterator qBegin() const;
+  Iterator qEnd() const;
+  
+  reEntItor begin() const;
+  reEntItor end() const;
   
 private:
   void appendToNode(Node* node, reQueryable* queryable);
@@ -77,6 +94,31 @@ inline bool reEntList::empty() const {
 
 inline reUInt reEntList::size() const {
   return _size;
+}
+
+inline reEntList::reEntItor::reEntItor(reEntList::Node* node) : _node(node) {
+  // do nothing
+}
+
+inline bool reEntList::reEntItor::operator!=(const reEntList::reEntItor& iter) const {
+  return _node != iter._node;
+}
+
+inline reEnt& reEntList::reEntItor::operator*() const {
+  return *_node->q->ent;
+}
+
+inline const reEntList::reEntItor& reEntList::reEntItor::operator++() {
+  _node = _node->next;
+  return *this;
+}
+
+inline reEntList::reEntItor reEntList::begin() const {
+  return reEntList::reEntItor(_first);
+}
+
+inline reEntList::reEntItor reEntList::end() const {
+  return reEntList::reEntItor(nullptr);
 }
 
 #endif

@@ -59,6 +59,16 @@ reWorld::~reWorld() {
 }
 
 /**
+ * Returns a list of all reEnt contained in the reWorld
+ * 
+ * @return A list of reEnt
+ */
+
+reEntList& reWorld::entities() const {
+  return _broadPhase->entities();
+}
+
+/**
  * Removes all entities in the reWorld
  */
 
@@ -71,10 +81,6 @@ reRigidBody& reWorld::newRigidBody() {
   reRigidBody* body = allocator().alloc_new<reRigidBody>(this);
   add(body);
   return *body;
-}
-
-void reWorld::forEachEntDo(void(*func)(reEnt* ent)) {
-  _broadPhase->forEachEntDo(func);
 }
 
 /**

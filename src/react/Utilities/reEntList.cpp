@@ -109,8 +109,9 @@ bool reEntList::remove(reQueryable* q) {
 
 void reEntList::append(const reEntList& list) {
   if (empty() || list._first->entID() > _last->entID()) {
-    for (reQueryable& q : list) {
-      add(&q);
+    auto end = list.qEnd();
+    for (auto iter = list.qBegin(); iter != end; ++iter) {
+      add(&(*iter));
     }
     return;
   }
@@ -233,11 +234,11 @@ const reEntList::Iterator& reEntList::Iterator::operator++() {
   return *this;
 }
 
-reEntList::Iterator reEntList::begin() const {
+reEntList::Iterator reEntList::qBegin() const {
   return reEntList::Iterator(_first);
 }
 
-reEntList::Iterator reEntList::end() const {
+reEntList::Iterator reEntList::qEnd() const {
   return reEntList::Iterator(nullptr);
 }
 
