@@ -147,7 +147,6 @@ void RayTracingDemo::createSceneFromFile(const char* filename, bool useOpenGL) {
       readUInts(2, s);
       _imageWidth = s[0];
       _imageHeight = s[1];
-      printf("    %-25s%4d, %4d   (%s)\n", "SIZE", s[0], s[1], line.c_str());
       
     } else if (cmd == "maxdepth") {
       readUInts(1, &_maxDepth);
@@ -155,7 +154,6 @@ void RayTracingDemo::createSceneFromFile(const char* filename, bool useOpenGL) {
       
     } else if (cmd == "output") {
       in >> _outputFile;
-      printf("    %-6s%29s   (%s)\n", "OUTPUT", _outputFile.c_str(), line.c_str());
       
       /**
        * CAMERA RELATED COMMANDS

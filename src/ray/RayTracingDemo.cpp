@@ -19,13 +19,13 @@ namespace {
   }
   
   void statusUpdate(float percentageCompleted, long ms) {
-    printf("  %5.1f%% complete --- ", percentageCompleted);
+    printf("%11.1f%%%12d", percentageCompleted, re::queriesMade);
     if (ms < 1000) {
-      printf("%ld ms\n", ms);
+      printf("%12ld ms\n", ms);
     } else if (ms < 60 * 1000) {
-      printf("%.3f s\n", ms/1000.0);
+      printf("%12.3f s\n", ms/1000.0);
     } else if (ms < 3600 * 1000) {
-      printf("%.2f mins\n", ms / 60000.0);
+      printf("%12.2f mins\n", ms / 60000.0);
     }
   }
   
@@ -294,6 +294,13 @@ void RayTracingDemo::renderScene(GLsizei w, GLsizei h) {
   gettimeofday(&lastChecked, nullptr);
   
   const reVector eye = _inverseViewMat.mult(reVector(0,0,0), 1.0);
+  
+  _world.update();
+  
+  printf("[INFO]  Image size: %d x %d\n", _renderWidth, _renderHeight);
+  printf("%12s%12s%12s\n", "% complete", "Queries", "Time");
+  printf("---------------------------------------\n");
+  statusUpdate(0.0, 0);
 
   for (GLsizei i = 0; i < h; i++) {
     const float tany = glm::tan(fovy * (i + 0.5f - halfHeight) / halfHeight);
@@ -329,10 +336,8 @@ void RayTracingDemo::renderScene(GLsizei w, GLsizei h) {
   gettimeofday(&now, nullptr);
   statusUpdate(100.0, timeBetween(start, now));
   gettimeofday(&lastChecked, nullptr);
+  printf("---------------------------------------\n");
   
-  printf("[INFO]  Rendering of %d x %d image complete\n", _renderWidth, _renderHeight);
-  
-  printf("[INFO]  Total queries made = %d\n", re::queriesMade);
   re::queriesMade = 0;
   
   delete[] tanx;

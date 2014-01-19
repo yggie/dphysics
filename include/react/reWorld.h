@@ -41,7 +41,7 @@ public:
   void add(reEnt* entity);
   
   // time update function
-  void update(reFloat dt);
+  void update(reFloat dt = 0.0);
   
   reAllocator& allocator() const;
   reBroadPhase& broadPhase() const;
@@ -53,12 +53,8 @@ public:
   reShape& copyOf(const reShape& shape) const;
 
 protected:
-  void ensureUpdate();
-  
   reBroadPhase* _broadPhase;
   reAllocator* _allocator;
-  
-  bool _updated;
 };
 
 inline reAllocator& reWorld::allocator() const {

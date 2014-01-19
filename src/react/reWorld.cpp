@@ -37,7 +37,7 @@ namespace {
  * Default constructor initializes the world with the default settings
  */
 
-reWorld::reWorld() : _broadPhase(nullptr), _allocator(nullptr), _updated(false) {
+reWorld::reWorld() : _broadPhase(nullptr), _allocator(nullptr) {
   tmp = new SimpleAllocator();
   _allocator = new reProxyAllocator(tmp);
   _broadPhase = allocator().alloc_new<reBSPTree>(this);
@@ -74,7 +74,6 @@ reEntList& reWorld::entities() const {
 
 void reWorld::clear() {
   _broadPhase->clear();
-  _updated = true;
 }
 
 reRigidBody& reWorld::newRigidBody() {
@@ -95,7 +94,6 @@ void reWorld::add(reEnt* entity) {
     return;
   }
   
-  _updated = false;
   _broadPhase->add(entity);
 }
 
@@ -104,11 +102,10 @@ void reWorld::update(reFloat dt) {
 //  _broadPhase->forEachEntDo([](reEnt* ent) {
 //    ent->step(dt);
 //  });
+  _broadPhase->update();
 }
 
 reEnt* reWorld::queryWithRay(const reVector& origin, const reVector& dir, reVector* intersect, reVector* normal) {
-  ensureUpdate();
-  
   reRayQuery query;
   query.origin = origin;
   query.dir = dir;
@@ -127,13 +124,6 @@ reEnt* reWorld::queryWithRay(const reVector& origin, const reVector& dir, reVect
   }
   
   return nullptr;
-}
-
-void reWorld::ensureUpdate() {
-  if (!_updated) {
-    _broadPhase->update();
-    _updated = true;
-  }
 }
 
 /**
