@@ -6,11 +6,11 @@ namespace {
   reUInt* genRandomIndices(reUInt size, reUInt maxValue);
 }
 
-reEntList::reEntList() : _size(0), _first(nullptr), _last(nullptr) {
+reEntList::reEntList(const reWorld* world) : _world(*world), _size(0), _first(nullptr), _last(nullptr) {
   // do nothing
 }
 
-reEntList::reEntList(const reEntList& list) : reEntList() {
+reEntList::reEntList(const reEntList& list) : reEntList(&list._world) {
   append(list);
 }
 
@@ -26,14 +26,14 @@ reEntList& reEntList::operator=(const reEntList& list) {
 
 bool reEntList::add(reQueryable* q) {
   if (_last != nullptr && _last->entID() < q->ent->id()) {
-    _last->append(q);
+    appendToNode(_last, q);
     _last = _last->next;
     _size++;
     return true;
   }
   
   if (_first == nullptr) {
-    _first = re::alloc_new<Node>(q);
+    _first = _world.allocator().alloc_new<Node>(q);
     _last = _first;
     _size++;
     return true;
@@ -43,7 +43,7 @@ bool reEntList::add(reQueryable* q) {
   Node* node = _first;
   while (node != nullptr) {
     if (node->entID() > q->ent->id()) {
-      node->prepend(q);
+      prependToNode(node, q);
       if (node == _first) {
         _first = node->prev;
       }
@@ -57,7 +57,7 @@ bool reEntList::add(reQueryable* q) {
   
   RE_IMPOSSIBLE
   
-  _last->append(q);
+  appendToNode(_last, q);
   _last = _last->next;
   _size++;
   return true;
@@ -71,7 +71,7 @@ bool reEntList::remove(reQueryable* q) {
   }
   
   if (_first == _last && _first->entID() == q->ent->id()) {
-    re::alloc_delete(_first);
+    _world.allocator().alloc_delete(_first);
     _first = nullptr;
     _last = nullptr;
     _size--;
@@ -79,15 +79,15 @@ bool reEntList::remove(reQueryable* q) {
   } else if (_first->entID() == q->ent->id()) {
     Node* node = _first;
     _first = _first->next;
-    node->unlink();
-    re::alloc_delete(node);
+    detachNode(node);
+    _world.allocator().alloc_delete(node);
     _size--;
     return true;
   } else if (_last->entID() == q->ent->id()) {
     Node* node = _last;
     _last = _last->prev;
-    node->unlink();
-    re::alloc_delete(node);
+    detachNode(node);
+    _world.allocator().alloc_delete(node);
     _size--;
     return true;
   }
@@ -96,8 +96,8 @@ bool reEntList::remove(reQueryable* q) {
   Node* node = _first;
   while (node != nullptr) {
     if (node->entID() == q->ent->id()) {
-      node->unlink();
-      re::alloc_delete(node);
+      detachNode(node);
+      _world.allocator().alloc_delete(node);
       _size--;
       return true;
     }
@@ -121,7 +121,7 @@ void reEntList::append(const reEntList& list) {
   while (node != nullptr && thatNode != nullptr) {
     if (node->entID() > thatNode->entID()) {
       if (node->prev->entID() != thatNode->entID()) {
-        node->prepend(thatNode->q);
+        prependToNode(node, thatNode->q);
         _size++;
       } else {
         thatNode = thatNode->next;
@@ -133,7 +133,7 @@ void reEntList::append(const reEntList& list) {
   
   if (node == nullptr) {
     while (thatNode != nullptr) {
-      _last->append(thatNode->q);
+      appendToNode(_last, thatNode->q);
       _last = _last->next;
       _size++;
       thatNode = thatNode->next;
@@ -146,7 +146,7 @@ void reEntList::clear() {
   while (node != nullptr) {
     Node* tmp = node;
     node = tmp->next;
-    delete tmp;
+    _world.allocator().alloc_delete(tmp);
   }
   
   _first = nullptr;
@@ -155,7 +155,7 @@ void reEntList::clear() {
 }
 
 reLinkedList<reEnt*> reEntList::sample(reUInt size) const {
-  reLinkedList<reEnt*> list;
+  reLinkedList<reEnt*> list(&_world);
   
   reUInt* indices = genRandomIndices(size, _size);
   
@@ -187,32 +187,32 @@ reUInt reEntList::Node::entID() const {
   return q->ent->id();
 }
 
-void reEntList::Node::append(reQueryable* q) {
-  Node* node = re::alloc_new<Node>(q);
-  node->prev = this;
-  if (next != nullptr) {
-    next->prev = node;
-    node->next = next;
+void reEntList::appendToNode(Node* node, reQueryable* q) {
+  Node* newNode = _world.allocator().alloc_new<Node>(q);
+  newNode->prev = node;
+  if (node->next != nullptr) {
+    node->next->prev = newNode;
+    newNode->next = node->next;
   }
-  next = node;
+  node->next = newNode;
 }
 
-void reEntList::Node::prepend(reQueryable* q) {
-  Node* node = re::alloc_new<Node>(q);
-  node->next = this;
-  if (prev != nullptr) {
-    prev->next = node;
-    node->prev = prev;
+void reEntList::prependToNode(Node* node, reQueryable* q) {
+  Node* newNode = _world.allocator().alloc_new<Node>(q);
+  newNode->next = node;
+  if (node->prev != nullptr) {
+    node->prev->next = newNode;
+    newNode->prev = node->prev;
   }
-  prev = node;
+  node->prev = newNode;
 }
 
-void reEntList::Node::unlink() {
-  if (prev != nullptr) {
-    prev->next = next;
+void reEntList::detachNode(Node* node) {
+  if (node->prev != nullptr) {
+    node->prev->next = node->next;
   }
-  if (next != nullptr) {
-    next->prev = prev;
+  if (node->next != nullptr) {
+    node->next->prev = node->prev;
   }
 }
 

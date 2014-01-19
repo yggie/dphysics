@@ -136,39 +136,4 @@ namespace re {
   #define RE_DEBUG(...)
 #endif
 
-#include "react/Memory/reBaseAllocator.h"
-
-class reShape;
-class reEnt;
-
-namespace re {
-
-  /**
-   * Uses the global allocator to allocate memory for the object using the
-   * default constructor
-   * 
-   * @return The allocated instance
-   */
-  
-  template <class T> T* alloc_new() {
-    return new T();
-  }
-
-  /**
-   * Uses the global allocator to allocate memory for the object using a
-   * constructor with a single argument
-   * 
-   * @param arg A single argument
-   * @return The allocated instance
-   */
-  
-  template <class T, class Y> T* alloc_new(Y& arg) {
-    return new T(arg);
-  }
-  
-  template <class T> void alloc_delete(T* ptr) {
-    delete ptr;
-  }
-};
-
 #endif

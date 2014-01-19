@@ -23,7 +23,7 @@ struct reQueryable {
 
 class reEntList {
 public:
-  reEntList();
+  reEntList(const reWorld* world);
   reEntList(const reEntList& list);
   ~reEntList();
   
@@ -43,9 +43,6 @@ public:
     Node(reQueryable* queryable);
     
     reUInt entID() const;
-    void append(reQueryable* q);
-    void prepend(reQueryable* q);
-    void unlink();
     
     reQueryable* q;
     Node* next;
@@ -64,7 +61,11 @@ public:
   Iterator end() const;
   
 private:
+  void appendToNode(Node* node, reQueryable* queryable);
+  void prependToNode(Node* node, reQueryable* queryable);
+  void detachNode(Node* node);
   
+  const reWorld& _world;
   reUInt _size;
   Node* _first;
   Node* _last;

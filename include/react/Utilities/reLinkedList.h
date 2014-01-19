@@ -6,6 +6,8 @@
 #define RE_LINKEDLIST_H
 
 #include "react/common.h"
+#include "react/reWorld.h"
+#include "react/Memory/reAllocator.h"
 
 /**
  * @ingroup utilities
@@ -44,13 +46,13 @@ public:
 
 /**
  * @ingroup utilities
- * An implementation of a sorted linked list
+ * An implementation of a simple linked list
  */
 
 template <class T>
 class reLinkedList {
 public:
-  reLinkedList();
+  reLinkedList(const reWorld* world);
   reLinkedList(const reLinkedList& list);
   ~reLinkedList();
   
@@ -64,6 +66,7 @@ public:
   reIterator<T> end() const;
   
 private:
+  const reWorld& _world;
   reLinkedNode<T>* _first;
   reLinkedNode<T>* _last;
 };
@@ -94,12 +97,12 @@ inline const reLinkedNode<T>*& reLinkedNode<T>::next() const {
 }
 
 template <class T>
-reLinkedList<T>::reLinkedList() : _first(nullptr), _last(nullptr) {
+reLinkedList<T>::reLinkedList(const reWorld* world) : _world(*world), _first(nullptr), _last(nullptr) {
   // do nothing
 }
 
 template <class T>
-reLinkedList<T>::reLinkedList(const reLinkedList<T>& list) : _first(nullptr), _last(nullptr) {
+reLinkedList<T>::reLinkedList(const reLinkedList<T>& list) : _world(list._world), _first(nullptr), _last(nullptr) {
   append(list);
 }
 
@@ -110,7 +113,7 @@ reLinkedList<T>::~reLinkedList() {
 
 template <class T>
 inline bool reLinkedList<T>::add(T t) {
-  reLinkedNode<T>* node = re::alloc_new<reLinkedNode<T>>();
+  reLinkedNode<T>* node = _world.allocator().alloc_new<reLinkedNode<T>>();
   node->value() = t;
   // TODO sort values
   if (_first == nullptr) {
@@ -137,7 +140,7 @@ inline bool reLinkedList<T>::remove(T t) {
           _last = prevNode;
         }
       }
-      re::alloc_delete<reLinkedNode<T>>(node);
+      _world.allocator().alloc_delete<reLinkedNode<T>>(node);
       
       return true;
     }
@@ -165,7 +168,7 @@ inline void reLinkedList<T>::clear() {
   reLinkedNode<T>* node = _first;
   while (node != nullptr) {
     reLinkedNode<T>*tmp = node->next();
-    re::alloc_delete(node);
+    _world.allocator().alloc_delete(node);
     node = tmp;
   }
   _first = _last = nullptr;

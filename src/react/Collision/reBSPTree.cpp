@@ -6,7 +6,7 @@
 
 #include <cstdio>
 
-reBSPTree::reBSPTree(const reWorld* world, reUInt depth) : _world(*world), _child{nullptr}, _size(0), _dir(1.0, 0.0, 0.0), _anchor(0.0, 0.0, 0.0), _entities(), _depth(depth) {
+reBSPTree::reBSPTree(const reWorld* world, reUInt depth) : _world(*world), _child{nullptr}, _size(0), _dir(1.0, 0.0, 0.0), _anchor(0.0, 0.0, 0.0), _entities(&_world), _depth(depth) {
   // do nothing
 }
 
@@ -80,7 +80,7 @@ void reBSPTree::update() {
     if (_child[0]->_entities.size() + _child[1]->_entities.size() < RE_BSPTREE_NODE_MIN_SIZE) {
       merge();
     } else {
-      reEntList list;
+      reEntList list(&_world);
       for (reUInt i = 0; i < 2; i++) {
         list.append(_child[i]->updateNode());
         
@@ -149,7 +149,7 @@ bool reBSPTree::contains(const reEnt* ent) const {
  */
 
 reEntList reBSPTree::updateNode() {
-  reEntList list;
+  reEntList list(&_world);
   
   if (hasChildren()) {
     if (_child[0]->_entities.size() + _child[1]->_entities.size() < RE_BSPTREE_NODE_MIN_SIZE) {
@@ -190,7 +190,7 @@ reEntList reBSPTree::updateNode() {
  */
 
 reEntList reBSPTree::trim() {
-  reEntList rejected;
+  reEntList rejected(&_world);
   for (reQueryable& q : _entities) {
     if (!contains(q.ent)) {
       remove(&q);
