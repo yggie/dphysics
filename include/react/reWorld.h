@@ -15,10 +15,10 @@ class reBroadPhase;
 class reRigidBody;
 class reEnt;
 class reShape;
-class reDistortedShape;
+class reIntegrator;
 
 /**
- * Represents a physical world
+ * Encapsulates the entire implementation of a physics engine
  */
 
 class reWorld {
@@ -31,38 +31,55 @@ public:
   /** Prohibit copying */
   reWorld& operator=(const reWorld&) = delete;
   
-  reEntList& entities() const;
-  
   void clear();
-  
-  reDistortedShape& newDistortedShape(const reShape& shape);
-  reRigidBody& newRigidBody();
-  
   void add(reEnt* entity);
-  
-  // time update function
   void update(reFloat dt = 0.0);
   
+  // getters
+  reEntList& entities() const;
   reAllocator& allocator() const;
   reBroadPhase& broadPhase() const;
+  reIntegrator& integrator() const;
+  
+  // factory methods
+  reRigidBody& newRigidBody();
+  reShape& copyOf(const reShape& shape) const;
   
   // spatial queries
   reEnt* queryWithRay(const reVector& from, const reVector& direction, reVector* intersect = nullptr, reVector* normal = nullptr);
-  
-  // memory allocation functions
-  reShape& copyOf(const reShape& shape) const;
 
-protected:
+private:
+  /** The reBroadPhase used in this reWorld */
   reBroadPhase* _broadPhase;
+  /** The general purpose reAllocator used in this reWorld */
   reAllocator* _allocator;
+  /** The integrator used to integrate the time step for all dynamic objects */
+  reIntegrator* _integrator;
 };
+
+/**
+ * Returns the general purpose memory allocator object associated with the
+ * reWorld
+ * 
+ * @return The general purpose reAllocator object
+ */
 
 inline reAllocator& reWorld::allocator() const {
   return *_allocator;
 }
 
+/**
+ * Returns the broad phase collision detection object
+ * 
+ * @return The reBroadPhase used in the reWorld
+ */
+
 inline reBroadPhase& reWorld::broadPhase() const {
   return *_broadPhase;
+}
+
+inline reIntegrator& reWorld::integrator() const {
+  return *_integrator;
 }
 
 #endif

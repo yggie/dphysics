@@ -1,5 +1,6 @@
 #include "react/reWorld.h"
 
+#include "react/Utilities/reIntegrator.h"
 #include "react/Entities/reRigidBody.h"
 #include "react/Collision/Shapes/shapes.h"
 
@@ -37,10 +38,11 @@ namespace {
  * Default constructor initializes the world with the default settings
  */
 
-reWorld::reWorld() : _broadPhase(nullptr), _allocator(nullptr) {
+reWorld::reWorld() : _broadPhase(nullptr), _allocator(nullptr), _integrator(nullptr) {
   tmp = new SimpleAllocator();
   _allocator = new reProxyAllocator(tmp);
   _broadPhase = allocator().alloc_new<reBSPTree>(this);
+  _integrator = allocator().alloc_new<reIntegrator>();
 }
 
 /**
@@ -59,27 +61,11 @@ reWorld::~reWorld() {
 }
 
 /**
- * Returns a list of all reEnt contained in the reWorld
- * 
- * @return A list of reEnt
- */
-
-reEntList& reWorld::entities() const {
-  return _broadPhase->entities();
-}
-
-/**
  * Removes all entities in the reWorld
  */
 
 void reWorld::clear() {
   _broadPhase->clear();
-}
-
-reRigidBody& reWorld::newRigidBody() {
-  reRigidBody* body = allocator().alloc_new<reRigidBody>(this);
-  add(body);
-  return *body;
 }
 
 /**
@@ -97,6 +83,12 @@ void reWorld::add(reEnt* entity) {
   _broadPhase->add(entity);
 }
 
+/**
+ * Steps the reWorld forward in time by the step given
+ * 
+ * @param dt The time step to advance
+ */
+
 void reWorld::update(reFloat dt) {
   // do nothing
 //  _broadPhase->forEachEntDo([](reEnt* ent) {
@@ -105,25 +97,26 @@ void reWorld::update(reFloat dt) {
   _broadPhase->update();
 }
 
-reEnt* reWorld::queryWithRay(const reVector& origin, const reVector& dir, reVector* intersect, reVector* normal) {
-  reRayQuery query;
-  query.origin = origin;
-  query.dir = dir;
-  reRayQueryResult result;
-  
-  reEnt* ent = _broadPhase->queryWithRay(query, result);
-  
-  if (ent != nullptr) {
-    if (intersect != nullptr) {
-      *intersect = result.intersect;
-    }
-    if (normal != nullptr) {
-      *normal = result.normal;
-    }
-    return ent;
-  }
-  
-  return nullptr;
+/**
+ * Returns a list of all reEnt contained in the reWorld
+ * 
+ * @return A list of reEnt
+ */
+
+reEntList& reWorld::entities() const {
+  return _broadPhase->entities();
+}
+
+/**
+ * Creates a new reRigidBody and properly initializes it into the reWorld
+ * 
+ * @return The attached reRigidBody entity
+ */
+
+reRigidBody& reWorld::newRigidBody() {
+  reRigidBody* body = allocator().alloc_new<reRigidBody>(this);
+  add(body);
+  return *body;
 }
 
 /**
@@ -157,7 +150,39 @@ reShape& reWorld::copyOf(const reShape& shape) const {
   }
   
   RE_IMPOSSIBLE
-  return *allocator().alloc_new<reSphere>(1.0);
+  throw 0; // TODO proper exceptions
+}
+
+/**
+ * Performs a spatial query on the reBroadPhase with a ray defined by the input
+ * data. The intersect point and normal is written to the optional parameters.
+ * 
+ * @param origin The origin of the ray
+ * @param dir The ray direction
+ * @param intersect If present, the point of intersection is written to it
+ * @param normal If present, the intersection normal is written to it
+ * @return The entity which was found
+ */
+
+reEnt* reWorld::queryWithRay(const reVector& origin, const reVector& dir, reVector* intersect, reVector* normal) {
+  reRayQuery query;
+  query.origin = origin;
+  query.dir = dir;
+  reRayQueryResult result;
+  
+  reEnt* ent = _broadPhase->queryWithRay(query, result);
+  
+  if (ent != nullptr) {
+    if (intersect != nullptr) {
+      *intersect = result.intersect;
+    }
+    if (normal != nullptr) {
+      *normal = result.normal;
+    }
+    return ent;
+  }
+  
+  return nullptr;
 }
 
 

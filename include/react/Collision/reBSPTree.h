@@ -57,7 +57,7 @@ protected:
 };
 
 inline reUInt reBSPTree::size() const {
-  return _entities.size();
+  return entities().size();
 }
 
 inline bool reBSPTree::hasChildren() const {
