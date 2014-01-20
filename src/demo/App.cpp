@@ -227,7 +227,6 @@ void App::gPaint() {
   _cam.step();
   _canvas.setViewMat(_cam.viewMat());
   _canvas.push();
-  _canvas.rotate(angle, 0, 1, 0);
   for_each(_gfxObjs.begin(), _gfxObjs.end(), [&](GfxObj* obj) {
     obj->draw(_canvas);
   });

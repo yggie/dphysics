@@ -15,6 +15,7 @@
 struct reQuaternion {
   reQuaternion();
   reQuaternion(const reQuaternion& that);
+  reQuaternion(const reMatrix& m);
   reQuaternion(reFloat angle, const reVector& axis);
   reQuaternion(reFloat r, reFloat i, reFloat j, reFloat k);
   
@@ -43,6 +44,7 @@ struct reQuaternion {
   reQuaternion& normalized();
   void normalize();
   const reMatrix toMatrix() const;
+  void setFromMatrix(const reMatrix& m);
   
   union {
     struct {
@@ -62,7 +64,7 @@ struct reQuaternion {
   };
 };
 
-inline reQuaternion::reQuaternion() : r(1.0), i(0.0), j(0.0), k(0.0) {
+inline reQuaternion::reQuaternion() : v{ 1.0, 0.0, 0.0, 0.0 } {
   // do nothing
 }
 
@@ -70,6 +72,10 @@ inline reQuaternion::reQuaternion(const reQuaternion& that) {
   for (reUInt i = 0; i < 4; i++) {
     v[i] = that.v[i];
   }
+}
+
+inline reQuaternion::reQuaternion(const reMatrix& m) {
+  setFromMatrix(m);
 }
 
 inline reQuaternion::reQuaternion(reFloat angle, const reVector& axis) {
@@ -199,6 +205,48 @@ inline const reQuaternion reVector::operator*(const reQuaternion& q) const {
     -x * q.k + y * q.r + z * q.i,
     x * q.j - y * q.i + z * q.r
   );
+}
+
+inline const reMatrix reQuaternion::toMatrix() const {
+  const reFloat i2 = i*i;
+  const reFloat j2 = j*j;
+  const reFloat k2 = k*k;
+  
+  const reFloat ri = r*i;
+  const reFloat rj = r*j;
+  const reFloat rk = r*k;
+  
+  const reFloat ij = i*j;
+  const reFloat ik = i*k;
+  
+  const reFloat jk = j*k;
+  
+  return reMatrix(
+    1 - 2*(j2 + k2), 2*(ij + rj), 2*(ik - rj),
+    2*(ij - rk), 1 - 2*(i2 + k2), 2*(jk + ri),
+    2*(ik + rj), 2*(jk - ri), 1 - 2*(i2 + j2)
+  );
+}
+
+inline void reQuaternion::setFromMatrix(const reMatrix& m) {
+  r = 0.5 * reSqrt(1 + m[0][0] + m[1][1] + m[2][2]);
+  if (reAbs(r) < RE_FP_TOLERANCE) {
+    i = 0.5 * reSqrt(1 + m[0][0] - m[1][1] - m[2][2]);
+    // TODO confirm this
+    if (reAbs(i) < RE_FP_TOLERANCE) {
+      j = 0.5 * reSqrt(1 + m[1][1] - m[0][0] - m[2][2]);
+      k = 0.25 * (m[1][0] + m[0][1]) / j;
+      r = 0.25 * (m[0][2] - m[2][0]) / j;
+      i = 0.25 * (m[2][1] + m[1][2]) / j;
+    }
+    j = 0.25 * (m[0][1] + m[1][0]) / i;
+    k = 0.25 * (m[0][2] + m[2][0]) / i;
+    r = 0.25 * (m[2][1] - m[1][2]) / i;
+  } else {
+    i = 0.25 * (m[2][1] - m[1][2]) / r;
+    j = 0.25 * (m[0][2] - m[2][0]) / r;
+    k = 0.25 * (m[1][0] - m[0][1]) / r;
+  }
 }
 
 #endif

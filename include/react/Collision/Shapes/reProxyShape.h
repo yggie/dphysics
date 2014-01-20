@@ -50,7 +50,7 @@ public:
   
 private:
   reTransform _transform;
-  reShape* _shape;
+  reShape* const _shape;
 };
 
 inline void reProxyShape::setTransform(const reTransform& transform) {

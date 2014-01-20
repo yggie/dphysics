@@ -27,8 +27,15 @@ PlainSphere::~PlainSphere() {
 void PlainSphere::draw(Canvas& canvas) {
 //  canvas.modelMat();
   canvas.push();
+  reQuaternion q = _ent.quat();
   canvas.translate(_ent.pos()[0], _ent.pos()[1], _ent.pos()[2]);
   canvas.scale(shape().radius());
+  const reFloat ang = acos(q.r);
+  if (reAbs(ang) > RE_FP_TOLERANCE) {
+    const reFloat s = reSin(ang);
+    printf("%.2f, %.2f (%.2f, %.2f, %.2f) \n", ang, s, q.i, q.j, q.k);
+    canvas.rotate(2 * ang * 180.0 / RE_PI, q.i / s, q.j / s, q.k / s);
+  }
   canvas.applyModelView();
   glBindVertexArray(PlainSphere::_globalVAO);
   glBindBuffer(GL_ARRAY_BUFFER, PlainSphere::_globalVBO);

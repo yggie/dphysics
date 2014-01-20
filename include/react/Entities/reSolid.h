@@ -20,9 +20,21 @@ public:
   reSolid(reShape* shape);
   /** Default destructor does nothing */
   virtual ~reSolid();
+  
+  const reMatrix rot() const override;
+  const reQuaternion& quat() const override;
+  const reVector& angVel() const override;
+  
+  void setFacing(const reVector& dir, reFloat angle = 0.0) override;
+  
+protected:
+  /** The reSolid's rotation matrix */
+  reQuaternion _quat;
+  /** The reSolid's angular velocity vector */
+  reVector _angVel;
 };
 
-inline reSolid::reSolid(reShape* shape) : reEnt(shape) {
+inline reSolid::reSolid(reShape* shape) : reEnt(shape), _quat(), _angVel() {
   // do nothing
 }
 
@@ -30,22 +42,36 @@ inline reSolid::~reSolid() {
   // do nothing
 }
 
-/**
- * @fn void reSolid::setMass(reFloat mass)
- * @brief Set the reSolid's mass property. The mass and density properties are
- * not independent, therefore setting one or the other will override the
- * previous setting.
- * 
- * @param mass The mass in user-defined units
- */
+inline const reMatrix reSolid::rot() const {
+  return _quat.toMatrix();
+}
 
-/**
- * @fn void reSolid::setDensity(reFloat density)
- * @brief Set the reSolid's density property. The mass and density properties are
- * not independent, therefore setting one or the other will override the
- * previous setting.
- * 
- * @param density The density in user-defined units
- */
+inline const reQuaternion& reSolid::quat() const {
+  return _quat;
+}
+
+inline const reVector& reSolid::angVel() const {
+  return _angVel;
+}
+
+inline void reSolid::setFacing(const reVector& dir, reFloat angle) {
+  reVector dr(dir);
+  dr.normalize();
+  reVector up(0.0, 0.0, 1.0);
+  if ((dr - up).lengthSq() < RE_FP_TOLERANCE) {
+    up.set(0.0, 1.0, 0.0);
+  }
+  const reVector nx = dr.cross(up);
+  reMatrix mm(
+    nx[0], nx[1], nx[2],
+    dr[0], dr[1], dr[2],
+    up[0], up[1], up[2]
+  );
+  for (reUInt i = 0; i < 3; i++) {
+    printf(" | %.2f, %.2f, %.2f, |\n", mm[i][0], mm[i][1], mm[i][2]);
+  }
+  _quat.setFromMatrix(mm);
+  _quat *= reQuaternion(angle, dr);
+}
 
 #endif

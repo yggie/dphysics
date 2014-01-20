@@ -47,17 +47,15 @@ public:
   
   virtual void update(reIntegrator& integrator, reFloat dt) = 0;
   
-  const reVector getAABBLowerCorner() const;
-  const reVector getAABBUpperCorner() const;
-  
   // getter methods
   reShape* shape();
   const reShape* shape() const;
   const reVector& pos() const;
-  const reMatrix& rot() const;
+  virtual const reMatrix rot() const = 0;
+  virtual const reQuaternion& quat() const = 0;
   const reVector& vel() const;
-  const reVector& angVel() const;
-  const reTransform transform() const;
+  virtual const reVector& angVel() const = 0;
+  virtual const reTransform transform() const;
   const reVector center() const;
   reUInt id() const;
   virtual reFloat mass() const = 0;
@@ -67,10 +65,14 @@ public:
   // setter methods
   void setPos(const reVector& position);
   void setPos(reFloat x, reFloat y, reFloat z);
+  void setVel(const reVector& vel);
+  void setVel(reFloat x, reFloat y, reFloat z);
+  virtual void setFacing(const reVector&, reFloat) { }
   virtual void setMass(reFloat) { } // stub
   virtual void setDensity(reFloat) { } // stub
   virtual reEnt& at(const reVector& position) = 0;
   virtual reEnt& at(reFloat x, reFloat y, reFloat z) = 0;
+  virtual reEnt& facing(const reVector& dir, reFloat angle = 0.0) = 0;
   virtual reEnt& withMass(reFloat mass) = 0;
   virtual reEnt& withDensity(reFloat mass) = 0;
   
@@ -84,44 +86,25 @@ public:
   void* userdata;
   
 protected:
-  virtual void updateInertia() = 0;
   /** A unique identifier for the reEnt */
   const reUInt _id;
   /** The reEnt's reShape */
-  reShape* _shape;
-  /** The reEnt's transformation matrix */
-  reTransform _transform;
+  reShape* const _shape;
+  /** The reEnt's position vector */
+  reVector _pos;
   /** The reEnt's velocity vector */
   reVector _vel;
-  /** The reEnt's angular velocity vector */
-  reVector _angVel;
   
 private:
   static reUInt globalEntID;
 };
 
-inline reEnt::reEnt(reShape* shape) : userdata(nullptr), _id(globalEntID++), _shape(shape), _transform() {
+inline reEnt::reEnt(reShape* shape) : userdata(nullptr), _id(globalEntID++), _shape(shape), _pos(), _vel() {
   // do nothing
 }
 
 inline reEnt::~reEnt() {
   // do nothing
-}
-
-inline const reVector reEnt::getAABBLowerCorner() const {
-  if (shape() != nullptr) {
-    return center() - shape()->aabb().dimens();
-  } else {
-    return _transform.v;
-  }
-}
-
-inline const reVector reEnt::getAABBUpperCorner() const {
-  if (shape() != nullptr) {
-    return center() + shape()->aabb().dimens();
-  } else {
-    return _transform.v;
-  }
 }
 
 /**
@@ -151,17 +134,7 @@ inline const reShape* reEnt::shape() const {
  */
 
 inline const reVector& reEnt::pos() const {
-  return _transform.v;
-}
-
-/**
- * Returns the reEnt's rotation matrix
- * 
- * @return The rotation in matrix form
- */
-
-inline const reMatrix& reEnt::rot() const {
-  return _transform.m;
+  return _pos;
 }
 
 /**
@@ -175,23 +148,13 @@ inline const reVector& reEnt::vel() const {
 }
 
 /**
- * @brief Returns the reEnt's angular velocity vector
- * 
- * @return The angular velocity vector in user-defined units
- */
-
-inline const reVector& reEnt::angVel() const {
-  return _angVel;
-}
-
-/**
  * Returns the reEnt's reTransform
  * 
  * @return The transformation in matrix form
  */
 
 inline const reTransform reEnt::transform() const {
-  return _transform;
+  return reTransform(rot(), _pos);
 }
 
 /**
@@ -203,9 +166,9 @@ inline const reTransform reEnt::transform() const {
 
 inline const reVector reEnt::center() const {
   if (shape() != nullptr) {
-    return _transform.v + shape()->offset();
+    return _pos + shape()->offset();
   } else {
-    return _transform.v;
+    return _pos;
   }
 }
 
@@ -226,7 +189,7 @@ inline reUInt reEnt::id() const {
  */
 
 inline void reEnt::setPos(const reVector& position) {
-  _transform.v = position;
+  _pos = position;
 }
 
 /**
@@ -238,7 +201,29 @@ inline void reEnt::setPos(const reVector& position) {
  */
 
 inline void reEnt::setPos(reFloat x, reFloat y, reFloat z) {
-  _transform.v.set(x, y, z);
+  _pos.set(x, y, z);
+}
+
+/**
+ * Set the reEnt's velocity
+ * 
+ * @param velocity The new velocity vector
+ */
+
+inline void reEnt::setVel(const reVector& velocity) {
+  _vel = velocity;
+}
+
+/**
+ * Set the reEnt's velocity
+ * 
+ * @param x The new velocity in the x-direction
+ * @param y The new velocity in the y-direction
+ * @param z The new velocity in the z-direction
+ */
+
+inline void reEnt::setVel(reFloat x, reFloat y, reFloat z) {
+  _vel.set(x, y, z);
 }
 
 /**
@@ -251,16 +236,16 @@ inline void reEnt::setPos(reFloat x, reFloat y, reFloat z) {
 
 inline bool reEnt::intersectsRay(const reRayQuery& query, reRayQueryResult& result) const {
   if (_shape != nullptr) {
-    return _shape->intersectsRay(_transform, query, result);
+    return _shape->intersectsRay(transform(), query, result);
   }
   return false;
 }
 
 inline bool reEnt::intersectsHyperplane(const reHyperplaneQuery& query) const {
   if (_shape != nullptr) {
-    return _shape->intersectsHyperplane(_transform, query);
+    return _shape->intersectsHyperplane(transform(), query);
   } else {
-    return (_transform.v - query.point).dot(query.dir) > 0.0;
+    return (_pos - query.point).dot(query.dir) > 0.0;
   }
 }
 
@@ -269,9 +254,9 @@ inline bool reEnt::intersectsHyperplane(const reVector& point, const reVector& d
     reHyperplaneQuery query;
     query.point = point;
     query.dir = dir;
-    return _shape->intersectsHyperplane(_transform, query);
+    return _shape->intersectsHyperplane(transform(), query);
   } else {
-    return (_transform.v - point).dot(dir) > 0.0;
+    return (_pos - point).dot(dir) > 0.0;
   }
 }
 
@@ -289,6 +274,27 @@ inline bool reEnt::intersectsHyperplane(const reVector& point, const reVector& d
  * 
  * @param integrator The integration scheme
  * @param dt The time step in user defined units
+ */
+
+/**
+ * @fn const reMatrix reEnt::rot() const
+ * Returns the reEnt's rotation matrix
+ * 
+ * @return The rotation in matrix form
+ */
+
+/**
+ * @fn const reQuaternion& reEnt::quat() const
+ * Returns the reEnt's rotation represented as a quaternion
+ * 
+ * @return The rotation in quaternion form
+ */
+
+/**
+ * @fn const reVector& reEnt::angVel() const
+ * Returns the reSolid's angular velocity vector
+ * 
+ * @return The angular velocity vector in user-defined units
  */
 
 /**
@@ -331,6 +337,24 @@ inline bool reEnt::intersectsHyperplane(const reVector& point, const reVector& d
  */
 
 /**
+ * @fn void reEnt::setMass(reFloat mass)
+ * @brief Set the reEnt's mass property. The mass and density properties are
+ * not independent, therefore setting one or the other will override the
+ * previous setting.
+ * 
+ * @param mass The mass in user-defined units
+ */
+
+/**
+ * @fn void reEnt::setDensity(reFloat density)
+ * @brief Set the reEnt's density property. The mass and density properties are
+ * not independent, therefore setting one or the other will override the
+ * previous setting.
+ * 
+ * @param density The density in user-defined units
+ */
+
+/**
  * @fn reEnt& reEnt::withMass(reFloat mass)
  * Set the reEnt's mass property, this method can be chained. The mass and
  * density properties are not independent, therefore setting one or the other
@@ -358,6 +382,7 @@ inline bool reEnt::intersectsHyperplane(const reVector& point, const reVector& d
       KLASS& at(const reVector& position) override { setPos(position);return *this; } \
       KLASS& at(reFloat x, reFloat y, reFloat z) override { setPos(x, y, z);return *this; } \
       KLASS& withMass(reFloat mass) override { setMass(mass);return *this; } \
-      KLASS& withDensity(reFloat density) override { setDensity(density);return *this; }
+      KLASS& withDensity(reFloat density) override { setDensity(density);return *this; } \
+      KLASS& facing(const reVector& dir, reFloat angle = 0.0) { setFacing(dir, angle); return *this; }
 
 #endif

@@ -17,6 +17,7 @@
 struct reTransform {
   reTransform();
   reTransform(const reTransform& that);
+  reTransform(const reMatrix& matrix, const reVector& translation);
   ~reTransform();
   
   reTransform& operator*=(const reTransform& that);
@@ -53,6 +54,10 @@ inline reTransform::reTransform() : m(1.0), v(0.0, 0.0, 0.0) {
 }
 
 inline reTransform::reTransform(const reTransform& that) : m(that.m), v(that.v) {
+  // do nothing
+}
+
+inline reTransform::reTransform(const reMatrix& matrix, const reVector& translation) : m(matrix), v(translation) {
   // do nothing
 }
 

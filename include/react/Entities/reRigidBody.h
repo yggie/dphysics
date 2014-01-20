@@ -43,11 +43,11 @@ protected:
   /** The reRigidBody's inertia tensor */
   reMatrix _inertia;
   
-  void updateInertia() override;
+  void updateInertia();
 };
 
 inline reRigidBody::reRigidBody(reShape* shape) : reSolid(shape), _mass(1.0), _inertia() {
-  // do nothing
+  updateInertia();
 }
 
 inline reRigidBody::~reRigidBody() {
@@ -58,8 +58,9 @@ inline reEnt::Type reRigidBody::type() const {
   return RIGID;
 }
 
-inline void reRigidBody::update(reIntegrator&, reFloat) {
-//  RE_NOT_IMPLEMENTED
+inline void reRigidBody::update(reIntegrator& op, reFloat dt) {
+  op.integrate(_pos, _vel, dt);
+  op.integrate(_quat, _angVel, dt);
 }
 
 inline reFloat reRigidBody::mass() const {
