@@ -90,10 +90,9 @@ void reWorld::add(reEnt* entity) {
  */
 
 void reWorld::update(reFloat dt) {
-  // do nothing
-//  _broadPhase->forEachEntDo([](reEnt* ent) {
-//    ent->step(dt);
-//  });
+  for (reEnt& ent : entities()) {
+    ent.update(integrator(), dt);
+  }
   _broadPhase->update();
 }
 

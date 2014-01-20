@@ -38,6 +38,9 @@ struct reMatrix {
   reMatrix& operator=(const reMatrix& m);
   
   // arithmetic operations
+  reMatrix& operator+=(const reMatrix& m);
+  reMatrix& operator-=(const reMatrix& m);
+  reMatrix& operator*=(const reMatrix& m);
   reMatrix& operator*=(reFloat s);
   reMatrix& operator/=(reFloat s);
   const reVector operator*(const reVector& v) const;
@@ -45,7 +48,8 @@ struct reMatrix {
   const reMatrix operator/(reFloat s) const;
   
   // arithmetic operations with matrices
-  reMatrix& operator*=(const reMatrix& m);
+  const reMatrix operator+(const reMatrix& m) const;
+  const reMatrix operator-(const reMatrix& m) const;
   const reMatrix operator*(const reMatrix& m) const;
   
   /** the elements of the matrix stored as an array */
@@ -111,6 +115,7 @@ inline const reFloat* reMatrix::cptr() const {
  */
 
 inline reFloat* reMatrix::operator[](int i) {
+  RE_ASSERT(i < 3)
   return &e[3*i];
 }
 
@@ -124,6 +129,7 @@ inline reFloat* reMatrix::operator[](int i) {
  */
 
 inline const reFloat* reMatrix::operator[](int i) const {
+  RE_ASSERT(i < 3)
   return &e[3*i];
 }
 
@@ -136,6 +142,34 @@ inline const reFloat* reMatrix::operator[](int i) const {
 
 inline reMatrix& reMatrix::operator=(const reMatrix& m) {
   memcpy(ptr(), m.cptr(), 9*sizeof(reFloat));
+  return *this;
+}
+
+/**
+ * Increments the elements of the matrix with the the input matrix
+ * 
+ * @param m The input matrix
+ * @return A reference to the reMatrix
+ */
+
+inline reMatrix& reMatrix::operator+=(const reMatrix& m) {
+  for (reUInt i = 0; i < 9; i++) {
+    e[i] += m.e[i];
+  }
+  return *this;
+}
+
+/**
+ * Decrements the elements of the matrix with the the input matrix
+ * 
+ * @param m The input matrix
+ * @return A reference to the reMatrix
+ */
+
+inline reMatrix& reMatrix::operator-=(const reMatrix& m) {
+  for (reUInt i = 0; i < 9; i++) {
+    e[i] -= m.e[i];
+  }
   return *this;
 }
 
@@ -200,6 +234,28 @@ inline const reMatrix reMatrix::operator*(reFloat s) const {
 
 inline const reMatrix reMatrix::operator/(reFloat s) const {
   return reMatrix(*this) /= s;
+}
+
+/**
+ * Adds two matrices
+ * 
+ * @param m The matrix operand
+ * @return The resulting matrix
+ */
+
+inline const reMatrix reMatrix::operator+(const reMatrix& m) const {
+  return reMatrix(*this) += m;
+}
+
+/**
+ * Subtracts two matrices
+ * 
+ * @param m The matrix operand
+ * @return The resulting matrix
+ */
+
+inline const reMatrix reMatrix::operator-(const reMatrix& m) const {
+  return reMatrix(*this) -= m;
 }
 
 /**

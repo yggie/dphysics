@@ -7,6 +7,8 @@
 
 #include "react/Utilities/math_funcs.h"
 
+struct reQuaternion;
+
 /**
  * @brief Represents a single 3D vector
  */
@@ -61,6 +63,8 @@ struct reVector {
   void set(reFloat _x, reFloat _y, reFloat _z);
   void set(const reVector& a);
   void setZero();
+  
+  const reQuaternion operator*(const reQuaternion& q) const;
   
   /** allows the vector to be accessed using common element names (x, y, z) or as elements of an array */
   union {
@@ -120,6 +124,7 @@ inline reFloat& reVector::operator[](int i) {
  */
 
 inline const reFloat& reVector::operator[](int i) const {
+  RE_ASSERT(i < 3)
   return v[i];
 }
 

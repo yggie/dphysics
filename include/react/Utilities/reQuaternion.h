@@ -15,36 +15,45 @@
 struct reQuaternion {
   reQuaternion();
   reQuaternion(const reQuaternion& that);
-  reQuaternion(reFloat w, reFloat x, reFloat y, reFloat z);
+  reQuaternion(reFloat angle, const reVector& axis);
+  reQuaternion(reFloat r, reFloat i, reFloat j, reFloat k);
   
   reQuaternion& operator=(const reQuaternion& that);
+  
+  reFloat& operator[](reUInt i);
   
   reQuaternion& operator+=(const reQuaternion& that);
   reQuaternion& operator-=(const reQuaternion& that);
   reQuaternion& operator*=(const reQuaternion& that);
   reQuaternion& operator*=(const reVector& that);
   reQuaternion& operator*=(reFloat s);
+  reQuaternion& operator/=(reFloat s);
   
   const reQuaternion operator+(const reQuaternion& that) const;
   const reQuaternion operator-(const reQuaternion& that) const;
   const reQuaternion operator*(const reQuaternion& that) const;
   const reQuaternion operator*(const reVector& that) const;
   const reQuaternion operator*(reFloat s) const;
+  const reQuaternion operator/(reFloat s) const;
   
+  void fromAxisAngle(reFloat angle, reFloat x, reFloat y, reFloat z);
+  void fromAxisAngle(reFloat angle, const reVector& axis);
   reFloat length() const;
   reFloat lengthSq() const;
+  reQuaternion& normalized();
+  void normalize();
   const reMatrix toMatrix() const;
   
   union {
     struct {
       /** The real component of the quaternion */
-      reFloat w;
+      reFloat r;
       /** The first complex component */
-      reFloat x;
+      reFloat i;
       /** The second complex component */
-      reFloat y;
+      reFloat j;
       /** The third complex component */
-      reFloat z;
+      reFloat k;
     };
     struct {
       /** The quarternion as an array */
@@ -53,7 +62,7 @@ struct reQuaternion {
   };
 };
 
-inline reQuaternion::reQuaternion() : w(1.0), x(0.0), y(0.0), z(0.0) {
+inline reQuaternion::reQuaternion() : r(1.0), i(0.0), j(0.0), k(0.0) {
   // do nothing
 }
 
@@ -63,7 +72,11 @@ inline reQuaternion::reQuaternion(const reQuaternion& that) {
   }
 }
 
-inline reQuaternion::reQuaternion(reFloat w, reFloat x, reFloat y, reFloat z) : v{ w, x, y, z } {
+inline reQuaternion::reQuaternion(reFloat angle, const reVector& axis) {
+  fromAxisAngle(angle, axis);
+}
+
+inline reQuaternion::reQuaternion(reFloat r, reFloat i, reFloat j, reFloat k) : v{ r, i, j, k } {
   // do nothing
 }
 
@@ -72,6 +85,11 @@ inline reQuaternion& reQuaternion::operator=(const reQuaternion& that) {
     v[i] = that.v[i];
   }
   return *this;
+}
+
+inline reFloat& reQuaternion::operator[](reUInt i) {
+  RE_ASSERT(i < 4)
+  return v[i];
 }
 
 inline reQuaternion& reQuaternion::operator+=(const reQuaternion& that) {
@@ -90,25 +108,32 @@ inline reQuaternion& reQuaternion::operator-=(const reQuaternion& that) {
 
 inline reQuaternion& reQuaternion::operator*=(const reQuaternion& that) {
   reQuaternion tmp(*this);
-  w = tmp.w * that.w - tmp.x * that.x - tmp.y * that.y - tmp.z * that.z;
-  x = tmp.w * that.x + tmp.x * that.w + tmp.y * that.z - tmp.z * that.y;
-  y = tmp.w * that.y - tmp.x * that.z + tmp.y * that.w + tmp.z * that.x;
-  z = tmp.w * that.z + tmp.x * that.y - tmp.y * that.x + tmp.z * that.w;
+  r = tmp.r * that.r - tmp.i * that.i - tmp.j * that.j - tmp.k * that.k;
+  i = tmp.r * that.i + tmp.i * that.r + tmp.j * that.k - tmp.k * that.j;
+  j = tmp.r * that.j - tmp.i * that.k + tmp.j * that.r + tmp.k * that.i;
+  k = tmp.r * that.k + tmp.i * that.j - tmp.j * that.i + tmp.k * that.r;
   return *this;
 }
 
 inline reQuaternion& reQuaternion::operator*=(const reVector& that) {
   reQuaternion tmp(*this);
-  w = - tmp.x * that.x - tmp.y * that.y - tmp.z * that.z;
-  x = tmp.w * that.x + tmp.y * that.z - tmp.z * that.y;
-  y = tmp.w * that.y - tmp.x * that.z + tmp.z * that.x;
-  z = tmp.w * that.z + tmp.x * that.y - tmp.y * that.x;
+  r = - tmp.i * that.x - tmp.j * that.y - tmp.k * that.z;
+  i = tmp.r * that.x + tmp.j * that.z - tmp.k * that.y;
+  j = tmp.r * that.y - tmp.i * that.z + tmp.k * that.x;
+  k = tmp.r * that.z + tmp.i * that.y - tmp.j * that.x;
   return *this;
 }
 
 inline reQuaternion& reQuaternion::operator*=(reFloat s) {
   for (reUInt i = 0; i < 4; i++) {
     v[i] *= s;
+  }
+  return *this;
+}
+
+inline reQuaternion& reQuaternion::operator/=(reFloat s) {
+  for (reUInt i = 0; i < 4; i++) {
+    v[i] /= s;
   }
   return *this;
 }
@@ -133,12 +158,47 @@ inline const reQuaternion reQuaternion::operator*(reFloat s) const {
   return reQuaternion(*this) *= s;
 }
 
+inline const reQuaternion reQuaternion::operator/(reFloat s) const {
+  return reQuaternion(*this) /= s;
+}
+
+inline void reQuaternion::fromAxisAngle(reFloat angle, reFloat x, reFloat y, reFloat z) {
+  fromAxisAngle(angle, reVector(x, y, z));
+}
+
+inline void reQuaternion::fromAxisAngle(reFloat angle, const reVector& axis) {
+  r = reCos(angle / 2.0);
+  const reFloat s = reSin(angle / 2.0);
+  const reFloat L = axis.length();
+  i = axis.x * s / L;
+  j = axis.y * s / L;
+  k = axis.z * s / L;
+}
+
 inline reFloat reQuaternion::length() const {
   return reSqrt(lengthSq());
 }
 
 inline reFloat reQuaternion::lengthSq() const {
-  return w*w + x*x + y*y + z*z;
+  return r*r + i*i + j*j + k*k;
+}
+
+inline reQuaternion& reQuaternion::normalized() {
+  normalize();
+  return *this;
+}
+
+inline void reQuaternion::normalize() {
+  (*this) /= length();
+}
+
+inline const reQuaternion reVector::operator*(const reQuaternion& q) const {
+  return reQuaternion(
+    -x * q.i - y * q.j - z * q.k,
+    x * q.r + y * q.k - z * q.j,
+    -x * q.k + y * q.r + z * q.i,
+    x * q.j - y * q.i + z * q.r
+  );
 }
 
 #endif

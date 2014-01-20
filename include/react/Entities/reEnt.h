@@ -8,6 +8,7 @@
 #include "react/math.h"
 #include "react/reWorld.h"
 #include "react/Collision/reAABB.h"
+#include "react/Utilities/reIntegrator.h"
 #include "react/Collision/Shapes/reShape.h"
 #include "react/Collision/reSpatialQueries.h"
 
@@ -27,12 +28,11 @@ public:
     RIGID,
     /** A rigid body entity with infinite mass */
     STATIC,
-    /** A physical entity with no volume */
-    PARTICLE,
-    /** A massless physical entity */
+    /** A soft body entity with a deformable shape */
+    SOFT,
+    /** A massless physical entity, does not collide */
     FIELD
   };
-  
   
   /** Disable default constructor */
   reEnt() = delete;
@@ -43,24 +43,24 @@ public:
   
   // must be implemented by the subclass
   virtual Type type() const = 0;
-  virtual const reVector vel() const = 0;
-  virtual const reMatrix rotVel() const = 0;
   
-  virtual void update(reFloat dt) = 0;
+  virtual void update(reIntegrator& integrator, reFloat dt);
   
   const reVector getAABBLowerCorner() const;
   const reVector getAABBUpperCorner() const;
   
-  // getter methods which are defined inline
+  // getter methods
   reShape* shape();
   const reShape* shape() const;
-  const reVector pos() const;
-  const reMatrix rot() const;
+  const reVector& pos() const;
+  const reMatrix& rot() const;
+  const reVector& vel() const;
+  const reVector& angVel() const;
   const reTransform transform() const;
-  virtual const reVector center() const;
+  const reVector center() const;
   reUInt id() const;
   
-  // setter methods which are defined inline
+  // setter methods
   void setPos(const reVector& position);
   void setPos(reFloat x, reFloat y, reFloat z);
   virtual void setShape(const reShape& shape);
@@ -88,56 +88,26 @@ protected:
   reShape* _shape;
   /** The reEnt's transformation matrix */
   reTransform _transform;
+  /** The reEnt's velocity vector */
+  reVector _vel;
+  /** The reEnt's angular velocity vector */
+  reVector _angVel;
   
+private:
   static reUInt globalEntID;
 };
 
 /**
- * @fn Type reEnt::type() const
- * @brief Returns the reEnt's type, it is unique for each base class
+ * Moves the reEnt forward in time by the given time step using the specified
+ * integration scheme
  * 
- * @return The entity type
+ * @param integrator The integration scheme
+ * @param dt The time step in user defined units
  */
 
-/**
- * @fn const reVector reEnt::vel() const
- * @brief Returns the reEnt's current velocity
- * 
- * @return The current velocity in 3D space in user-defined units
- */
-
-/**
- * @fn const reMatrix reEnt::rotVel() const
- * @brief Returns the reEnt's rotational velocity matrix
- * 
- * @return The rotational velocity in matrix form
- */
-
-/**
- * @fn reEnt& reEnt::at(const reVector& pos)
- * Set the reEnt's position, this method can be chained
- * 
- * @param position The new position vector
- * @return A reference to the reEnt
- */
-
-/**
- * @fn reEnt& reEnt::at(reFloat x, reFloat y, reFloat z)
- * Set the reEnt's position, this method can be chained
- * 
- * @param x The new position x-coordinates
- * @param y The new position y-coordinates
- * @param z The new position z-coordinates
- * @return A reference to the reEnt
- */
-
-/**
- * @fn reEnt& reEnt::withShape(const reShape& shape)
- * Set the reEnt's reShape, this method can be chained
- * 
- * @param shape The new reShape
- * @return A reference to the reEnt
- */
+inline void reEnt::update(reIntegrator& integrator, reFloat dt) {
+  integrator.integrate(_transform.v, _vel, dt);
+}
 
 inline const reVector reEnt::getAABBLowerCorner() const {
   if (shape() != nullptr) {
@@ -183,7 +153,7 @@ inline const reShape* reEnt::shape() const {
  * @return The position in 3D space in user defined units
  */
 
-inline const reVector reEnt::pos() const {
+inline const reVector& reEnt::pos() const {
   return _transform.v;
 }
 
@@ -193,8 +163,28 @@ inline const reVector reEnt::pos() const {
  * @return The rotation in matrix form
  */
 
-inline const reMatrix reEnt::rot() const {
+inline const reMatrix& reEnt::rot() const {
   return _transform.m;
+}
+
+/**
+ * @brief Returns the reEnt's current velocity
+ * 
+ * @return The current velocity in 3D space in user-defined units
+ */
+
+inline const reVector& reEnt::vel() const {
+  return _vel;
+}
+
+/**
+ * @brief Returns the reEnt's angular velocity vector
+ * 
+ * @return The angular velocity vector in user-defined units
+ */
+
+inline const reVector& reEnt::angVel() const {
+  return _angVel;
 }
 
 /**
@@ -267,12 +257,8 @@ inline void reEnt::setShape(const reShape& shape) {
 /**
  * Returns true if the reEnt intersects the ray specified
  * 
- * @param origin The ray origin
- * @param dir The ray direction
- * @param intersect An optional argument which is filled with the intersect
- *                  point
- * @param normal An optional argument which is filled with the intersect norm
- * @param queryID Used internally to avoid redundant queries
+ * @param query The ray query struct
+ * @param result The ray query result struct
  * @return True if the ray intersects
  */
 
@@ -301,5 +287,38 @@ inline bool reEnt::intersectsHyperplane(const reVector& point, const reVector& d
     return (_transform.v - point).dot(dir) > 0.0;
   }
 }
+
+/**
+ * @fn Type reEnt::type() const
+ * @brief Returns the reEnt's type, it is unique for each base class
+ * 
+ * @return The entity type
+ */
+
+/**
+ * @fn reEnt& reEnt::at(const reVector& pos)
+ * Set the reEnt's position, this method can be chained
+ * 
+ * @param position The new position vector
+ * @return A reference to the reEnt
+ */
+
+/**
+ * @fn reEnt& reEnt::at(reFloat x, reFloat y, reFloat z)
+ * Set the reEnt's position, this method can be chained
+ * 
+ * @param x The new position x-coordinates
+ * @param y The new position y-coordinates
+ * @param z The new position z-coordinates
+ * @return A reference to the reEnt
+ */
+
+/**
+ * @fn reEnt& reEnt::withShape(const reShape& shape)
+ * Set the reEnt's reShape, this method can be chained
+ * 
+ * @param shape The new reShape
+ * @return A reference to the reEnt
+ */
 
 #endif

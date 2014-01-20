@@ -1,4 +1,7 @@
 #include "reVector.h"
+#include "reMatrix.h"
+#include "reQuaternion.h"
+#include "reIntegrator.h"
 
 int main(int argc, char** argv) {
   testing::InitGoogleTest(&argc, argv);

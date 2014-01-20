@@ -21,6 +21,8 @@ public:
   /** Default destructor does nothing */
   virtual ~reSolid();
   
+  virtual void update(reIntegrator& integrator, reFloat dt);
+  
   virtual reFloat mass() const = 0;
   virtual const reMatrix inertia() const = 0;
   virtual reFloat density() const = 0;
@@ -35,6 +37,23 @@ public:
 protected:
   virtual void updateInertia() = 0;
 };
+
+inline reSolid::reSolid(const reWorld* world) : reEnt(world) {
+  // do nothing
+}
+
+inline reSolid::~reSolid() {
+  // do nothing
+}
+
+inline void reSolid::update(reIntegrator&, reFloat) {
+  RE_NOT_IMPLEMENTED
+}
+
+inline void reSolid::setShape(const reShape& shape) {
+  reEnt::setShape(shape);
+  updateInertia();
+}
 
 /**
  * @fn reFloat reSolid::mass() const
@@ -98,13 +117,5 @@ protected:
  * 
  * @param density The density in user-defined units
  */
-
-inline reSolid::reSolid(const reWorld* world) : reEnt(world) { }
-inline reSolid::~reSolid() { }
-
-inline void reSolid::setShape(const reShape& shape) {
-  reEnt::setShape(shape);
-  updateInertia();
-}
 
 #endif

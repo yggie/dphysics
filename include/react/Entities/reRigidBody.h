@@ -24,12 +24,6 @@ public:
   
   reEnt::Type type() const;
   
-  void update(reFloat dt) override;
-  
-  // getters for state properties
-  const reVector vel() const override;
-  const reMatrix rotVel() const override;
-  
   // getters for material properties
   reFloat mass() const override;
   const reMatrix inertia() const override;
@@ -45,59 +39,50 @@ public:
   reRigidBody& withDensity(reFloat mass) override;
   
 protected:
-  /** The reRigidBody's velocity */
-  reVector _vVel;
-  /** The reRigidBody's rotational velocity matrix */
-  reMatrix _mRotVel;
-  
   /** The reRigidBody's mass */
-  reFloat _sMass;
+  reFloat _mass;
   /** The reRigidBody's inertia tensor */
-  reMatrix _mInertia;
+  reMatrix _inertia;
   
   void updateInertia();
 };
+
+inline reRigidBody::reRigidBody(const reWorld* world) : reSolid(world), _mass(1.0), _inertia() {
+  // do nothing
+}
+
+inline reRigidBody::~reRigidBody() {
+  // do nothing
+}
 
 inline reEnt::Type reRigidBody::type() const {
   return RIGID;
 }
 
-inline void reRigidBody::update(reFloat) {
-  RE_NOT_IMPLEMENTED
-}
-
-inline const reVector reRigidBody::vel() const {
-  return _vVel;
-}
-
-inline const reMatrix reRigidBody::rotVel() const {
-  return _mRotVel;
-}
-
 inline reFloat reRigidBody::mass() const {
-  return _sMass;
+  return _mass;
 }
 
 inline const reMatrix reRigidBody::inertia() const {
-  return _mInertia;
+  return _inertia;
 }
 
 inline reFloat reRigidBody::density() const {
-  return _sMass / _shape->volume();
+  return _mass / _shape->volume();
 }
 
 inline void reRigidBody::setMass(reFloat mass) {
-  _sMass = mass;
+  _mass = mass;
   updateInertia();
 }
 
 inline void reRigidBody::setDensity(reFloat density) {
-  _sMass = density / _shape->volume();
+  _mass = density / _shape->volume();
   updateInertia();
 }
 
 inline void reRigidBody::updateInertia() {
-  _mInertia = _shape->computeInertia() * _sMass;
+  _inertia = _shape->computeInertia() * _mass;
 }
 
 inline reRigidBody& reRigidBody::at(const reVector& position) {
