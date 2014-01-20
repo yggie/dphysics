@@ -6,7 +6,6 @@
 #define RE_ENT_H
 
 #include "react/math.h"
-#include "react/reWorld.h"
 #include "react/Collision/reAABB.h"
 #include "react/Utilities/reIntegrator.h"
 #include "react/Collision/Shapes/reShape.h"
@@ -28,6 +27,8 @@ public:
     RIGID,
     /** A rigid body entity with infinite mass */
     STATIC,
+    /** An entity with no volume */
+    PARTICLE,
     /** A soft body entity with a deformable shape */
     SOFT,
     /** A massless physical entity, does not collide */
@@ -37,14 +38,14 @@ public:
   /** Disable default constructor */
   reEnt() = delete;
   /** Creates an entity from a parent reWorld object */
-  reEnt(const reWorld* world);
+  reEnt(reShape* shape);
   /** Default destructor does nothing */
   virtual ~reEnt();
   
   // must be implemented by the subclass
   virtual Type type() const = 0;
   
-  virtual void update(reIntegrator& integrator, reFloat dt);
+  virtual void update(reIntegrator& integrator, reFloat dt) = 0;
   
   const reVector getAABBLowerCorner() const;
   const reVector getAABBUpperCorner() const;
@@ -59,14 +60,17 @@ public:
   const reTransform transform() const;
   const reVector center() const;
   reUInt id() const;
+  virtual reFloat mass() const = 0;
+  virtual const reMatrix& inertia() const = 0;
+  virtual reFloat density() const = 0;
   
   // setter methods
   void setPos(const reVector& position);
   void setPos(reFloat x, reFloat y, reFloat z);
-  virtual void setShape(const reShape& shape);
+  virtual void setMass(reFloat) { } // stub
+  virtual void setDensity(reFloat) { } // stub
   virtual reEnt& at(const reVector& position) = 0;
   virtual reEnt& at(reFloat x, reFloat y, reFloat z) = 0;
-  virtual reEnt& withShape(const reShape& shape) = 0;
   virtual reEnt& withMass(reFloat mass) = 0;
   virtual reEnt& withDensity(reFloat mass) = 0;
   
@@ -80,8 +84,7 @@ public:
   void* userdata;
   
 protected:
-  /** A reference to the parent reWorld object */
-  const reWorld& _world;
+  virtual void updateInertia() = 0;
   /** A unique identifier for the reEnt */
   const reUInt _id;
   /** The reEnt's reShape */
@@ -97,16 +100,12 @@ private:
   static reUInt globalEntID;
 };
 
-/**
- * Moves the reEnt forward in time by the given time step using the specified
- * integration scheme
- * 
- * @param integrator The integration scheme
- * @param dt The time step in user defined units
- */
+inline reEnt::reEnt(reShape* shape) : userdata(nullptr), _id(globalEntID++), _shape(shape), _transform() {
+  // do nothing
+}
 
-inline void reEnt::update(reIntegrator& integrator, reFloat dt) {
-  integrator.integrate(_transform.v, _vel, dt);
+inline reEnt::~reEnt() {
+  // do nothing
 }
 
 inline const reVector reEnt::getAABBLowerCorner() const {
@@ -136,9 +135,7 @@ inline reShape* reEnt::shape() {
 }
 
 /**
- * Returns the reShape of the object
- * 
- * const version
+ * Returns the reShape of the object. Enforces constant constraint
  * 
  * @return The reShape of the object
  */
@@ -245,16 +242,6 @@ inline void reEnt::setPos(reFloat x, reFloat y, reFloat z) {
 }
 
 /**
- * Set the reEnt's reShape
- * 
- * @param shape The new reShape
- */
-
-inline void reEnt::setShape(const reShape& shape) {
-  _shape = &_world.copyOf(shape);
-}
-
-/**
  * Returns true if the reEnt intersects the ray specified
  * 
  * @param query The ray query struct
@@ -296,6 +283,36 @@ inline bool reEnt::intersectsHyperplane(const reVector& point, const reVector& d
  */
 
 /**
+ * @fn void reEnt::update(reIntegrator& integrator, reFloat dt)
+ * Moves the reEnt forward in time by the given time step using the specified
+ * integration scheme
+ * 
+ * @param integrator The integration scheme
+ * @param dt The time step in user defined units
+ */
+
+/**
+ * @fn reFloat reEnt::mass() const
+ * @brief Returns the reEnt's total mass
+ * 
+ * @return The total mass in user defined units
+ */
+
+/**
+ * @fn const reMatrix reEnt::inertia() const
+ * @brief Returns the reEnt's inertia reMatrixrix
+ * 
+ * @return The inertia tensor in user-defined units
+ */
+
+/**
+ * @fn reFloat reEnt::density() const
+ * @brief Returns the reEnt's density
+ * 
+ * @return The density in user-defined units
+ */
+
+/**
  * @fn reEnt& reEnt::at(const reVector& pos)
  * Set the reEnt's position, this method can be chained
  * 
@@ -314,11 +331,33 @@ inline bool reEnt::intersectsHyperplane(const reVector& point, const reVector& d
  */
 
 /**
- * @fn reEnt& reEnt::withShape(const reShape& shape)
- * Set the reEnt's reShape, this method can be chained
+ * @fn reEnt& reEnt::withMass(reFloat mass)
+ * Set the reEnt's mass property, this method can be chained. The mass and
+ * density properties are not independent, therefore setting one or the other
+ * will override the previous setting.
  * 
- * @param shape The new reShape
- * @return A reference to the reEnt
+ * @param mass The mass in user-defined units
  */
+
+/**
+ * @fn reEnt& reEnt::withDensity(reFloat density)
+ * Set the reEnt's density property, this method can be chained. The mass and
+ * density properties are not independent, therefore setting one or the other
+ * will override the previous setting.
+ * 
+ * @param density The density in user-defined units
+ */
+
+/**
+ * @fn void reEnt::updateInertia()
+ * @brief Called internally to update the inertia tensor, either through a
+ * change in shape, mass or density properties
+ */
+
+#define RE_ENT_CHAINABLE_METHODS(KLASS) \
+      KLASS& at(const reVector& position) override { setPos(position);return *this; } \
+      KLASS& at(reFloat x, reFloat y, reFloat z) override { setPos(x, y, z);return *this; } \
+      KLASS& withMass(reFloat mass) override { setMass(mass);return *this; } \
+      KLASS& withDensity(reFloat density) override { setDensity(density);return *this; }
 
 #endif

@@ -37,12 +37,12 @@ void testDemo(reWorld& world, demo::App& app) {
 //  reRigidBody* body;
   reSphere sphere(1.0);
   
-  reRigidBody* body = &world.newRigidBody().withShape(sphere).withMass(5.0).at(0, 0, -2);
-  app.newPlainSphere(*body);
+  reRigidBody& body = world.newRigidBody(sphere).withMass(5.0).at(0, 0, -2);
+  app.newPlainSphere(body);
   
   for (int i = 0; i < 1; i++) {
-    body = &world.newRigidBody().withShape(sphere.withRadius(1)).withMass(5.0).at(2*i - 3 , 1, -5);
-    app.newPlainSphere(*body);
+    reRigidBody& body = world.newRigidBody(sphere.withRadius(1)).withMass(5.0).at(2*i - 3 , 1, -5);
+    app.newPlainSphere(body);
   }
   
   const float m = 10.0f;

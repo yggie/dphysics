@@ -16,7 +16,7 @@
 
 class reRigidBody : public reSolid {
 public:
-  reRigidBody(const reWorld* world);
+  reRigidBody(reShape* shape);
   reRigidBody(const reRigidBody&) = delete;
   virtual ~reRigidBody();
   
@@ -24,19 +24,18 @@ public:
   
   reEnt::Type type() const;
   
+  void update(reIntegrator& integrator, reFloat dt) override;
+  
   // getters for material properties
   reFloat mass() const override;
-  const reMatrix inertia() const override;
+  const reMatrix& inertia() const override;
   reFloat density() const override;
   
   // setters for material properties
   void setMass(reFloat mass) override;
   void setDensity(reFloat density) override;
-  reRigidBody& at(const reVector& position) override;
-  reRigidBody& at(reFloat x, reFloat y, reFloat z) override;
-  reRigidBody& withShape(const reShape& shape) override;
-  reRigidBody& withMass(reFloat mass) override;
-  reRigidBody& withDensity(reFloat mass) override;
+  
+  RE_ENT_CHAINABLE_METHODS(reRigidBody)
   
 protected:
   /** The reRigidBody's mass */
@@ -44,10 +43,10 @@ protected:
   /** The reRigidBody's inertia tensor */
   reMatrix _inertia;
   
-  void updateInertia();
+  void updateInertia() override;
 };
 
-inline reRigidBody::reRigidBody(const reWorld* world) : reSolid(world), _mass(1.0), _inertia() {
+inline reRigidBody::reRigidBody(reShape* shape) : reSolid(shape), _mass(1.0), _inertia() {
   // do nothing
 }
 
@@ -59,11 +58,15 @@ inline reEnt::Type reRigidBody::type() const {
   return RIGID;
 }
 
+inline void reRigidBody::update(reIntegrator&, reFloat) {
+//  RE_NOT_IMPLEMENTED
+}
+
 inline reFloat reRigidBody::mass() const {
   return _mass;
 }
 
-inline const reMatrix reRigidBody::inertia() const {
+inline const reMatrix& reRigidBody::inertia() const {
   return _inertia;
 }
 
@@ -83,31 +86,6 @@ inline void reRigidBody::setDensity(reFloat density) {
 
 inline void reRigidBody::updateInertia() {
   _inertia = _shape->computeInertia() * _mass;
-}
-
-inline reRigidBody& reRigidBody::at(const reVector& position) {
-  setPos(position);
-  return *this;
-}
-
-inline reRigidBody& reRigidBody::at(reFloat x, reFloat y, reFloat z) {
-  setPos(x, y, z);
-  return *this;
-}
-
-inline reRigidBody& reRigidBody::withShape(const reShape& shape) {
-  setShape(shape);
-  return *this;
-}
-
-inline reRigidBody& reRigidBody::withMass(reFloat mass) {
-  setMass(mass);
-  return *this;
-}
-
-inline reRigidBody& reRigidBody::withDensity(reFloat density) {
-  setDensity(density);
-  return *this;
 }
 
 #endif

@@ -52,7 +52,8 @@ reWorld::reWorld() : _broadPhase(nullptr), _allocator(nullptr), _integrator(null
 reWorld::~reWorld() {
   clear();
   
-  allocator().alloc_delete<reBSPTree>((reBSPTree*)_broadPhase);
+  allocator().alloc_delete(_broadPhase);
+  allocator().alloc_delete(_integrator);
   
   if (_allocator != nullptr) {
     delete _allocator;
@@ -112,44 +113,24 @@ reEntList& reWorld::entities() const {
  * @return The attached reRigidBody entity
  */
 
-reRigidBody& reWorld::newRigidBody() {
-  reRigidBody* body = allocator().alloc_new<reRigidBody>(this);
+reRigidBody& reWorld::newRigidBody(const reShape& shape) {
+  reRigidBody* body = allocator().alloc_new<reRigidBody>(copyOf(shape));
   add(body);
   return *body;
 }
 
 /**
- * A convenient method to create copies of shapes
+ * Creates a new reRigidBody and properly initializes it into the reWorld
+ * 
+ * @return The attached reRigidBody entity
  */
 
-reShape& reWorld::copyOf(const reShape& shape) const {
-  switch (shape.type()) {
-    case reShape::SPHERE:
-      return *allocator().alloc_new<reSphere>((const reSphere&)shape);
-    
-    case reShape::RECTANGLE:
-      RE_NOT_IMPLEMENTED
-      break;
-    
-    case reShape::COMPOUND:
-      RE_NOT_IMPLEMENTED
-      break;
-    
-    case reShape::TRIANGLE:
-      return *allocator().alloc_new<reTriangle>((const reTriangle&)shape);
-    
-    case reShape::PROXY:
-      {
-        const reProxyShape& orig = (const reProxyShape&)shape;
-        reProxyShape* copy = allocator().alloc_new<reProxyShape>(this);
-        copy->setShape(orig.shape());
-        copy->setTransform(orig.transform());
-        return *copy;
-      }
-  }
-  
-  RE_IMPOSSIBLE
-  throw 0; // TODO proper exceptions
+reRigidBody& reWorld::newRigidBody(const reShape& shape, const reTransform& transform) {
+  reShape* base = copyOf(shape);
+  reShape* newShape = allocator().alloc_new<reProxyShape>(base, &transform);
+  reRigidBody* body = allocator().alloc_new<reRigidBody>(newShape);
+  add(body);
+  return *body;
 }
 
 /**
@@ -182,6 +163,35 @@ reEnt* reWorld::queryWithRay(const reVector& origin, const reVector& dir, reVect
   }
   
   return nullptr;
+}
+
+/**
+ * A convenient method to create copies of shapes
+ */
+
+reShape* reWorld::copyOf(const reShape& shape) const {
+  switch (shape.type()) {
+    case reShape::SPHERE:
+      return allocator().alloc_new<reSphere>((const reSphere&)shape);
+    
+    case reShape::RECTANGLE:
+      RE_NOT_IMPLEMENTED
+      break;
+    
+    case reShape::COMPOUND:
+      RE_NOT_IMPLEMENTED
+      break;
+    
+    case reShape::TRIANGLE:
+      return allocator().alloc_new<reTriangle>((const reTriangle&)shape);
+    
+    case reShape::PROXY:
+      RE_IMPOSSIBLE
+      break;
+  }
+  
+  RE_IMPOSSIBLE
+  throw 0; // TODO proper exceptions
 }
 
 

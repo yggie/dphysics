@@ -1,57 +1,14 @@
 #include "react/Collision/Shapes/reProxyShape.h"
 
-#include "react/reWorld.h"
 #include "react/Entities/reEnt.h"
 #include "react/Collision/Shapes/shapes.h"
 
-namespace {
-  reShape* allocNewShape(const reShape& base) {
-    switch (base.type()) {
-      case reShape::SPHERE:
-        return new reSphere((const reSphere&)base);
-        break;
-        
-      default:
-        RE_WARN("Unexpected shape type\n")
-        break;
-    }
-    
-    return nullptr;
-  }
-}
-
-reProxyShape::reProxyShape(const reWorld* world)
-  : _world(world), _transform(), _shape(nullptr) {
+reProxyShape::reProxyShape(reShape* shape, const reTransform* transform) : _transform(*transform), _shape(shape) {
   // do nothing
 }
 
 reProxyShape::~reProxyShape() {
-  if (_shape != nullptr) {
-    if (_world == nullptr) {
-      delete _shape;
-    } else {
-      _world->allocator().alloc_delete(_shape);
-    }
-  }
-}
-
-void reProxyShape::setShape(const reShape& base) {
-  if (_world == nullptr) {
-    if (_shape != nullptr) {
-      delete _shape;
-    }
-    _shape = allocNewShape(base);
-  } else {
-    if (_shape != nullptr) {
-      _world->allocator().alloc_delete(_shape);
-    }
-    _shape = &_world->copyOf(base);
-  }
-}
-
-reProxyShape& reProxyShape::withShape(const reShape& base) {
-  setShape(base);
-  return *this;
+  // do nothing
 }
 
 bool reProxyShape::intersectsRay(const reRayQuery& query, reRayQueryResult& result) const {

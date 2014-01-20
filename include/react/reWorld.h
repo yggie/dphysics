@@ -42,13 +42,15 @@ public:
   reIntegrator& integrator() const;
   
   // factory methods
-  reRigidBody& newRigidBody();
-  reShape& copyOf(const reShape& shape) const;
+  reRigidBody& newRigidBody(const reShape& shape);
+  reRigidBody& newRigidBody(const reShape& shape, const reTransform& transform);
   
   // spatial queries
   reEnt* queryWithRay(const reVector& from, const reVector& direction, reVector* intersect = nullptr, reVector* normal = nullptr);
 
 private:
+  reShape* copyOf(const reShape& shape) const;
+  
   /** The reBroadPhase used in this reWorld */
   reBroadPhase* _broadPhase;
   /** The general purpose reAllocator used in this reWorld */

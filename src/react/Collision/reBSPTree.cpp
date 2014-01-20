@@ -3,6 +3,7 @@
 #include "react/math.h"
 #include "react/Entities/reEnt.h"
 #include "react/Memory/reAllocator.h"
+#include "react/Collision/Shapes/reProxyShape.h"
 
 #include <cstdio>
 
@@ -28,6 +29,10 @@ void reBSPTree::clear() {
     for (auto iter = entities().qBegin(); iter != end; ++iter) {
       reQueryable& q = *iter;
       RE_EXPECT(q.ent->userdata == nullptr)
+      if (q.ent->shape()->type() == reShape::PROXY) {
+        _world.allocator().alloc_delete(((reProxyShape*)q.ent->shape())->shape());
+      }
+      _world.allocator().alloc_delete(q.ent->shape());
       _world.allocator().alloc_delete(q.ent);
       _world.allocator().alloc_delete(&q);
     }

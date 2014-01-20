@@ -7,9 +7,8 @@
 
 #include "react/Collision/Shapes/reShape.h"
 
-class reWorld;
-
 /**
+ * @ingroup shapes
  * A special wrapper class around an arbitrary shape which allows the
  * user to apply additional transformations on the shape, such as scaling
  * or rotating
@@ -17,13 +16,14 @@ class reWorld;
 
 class reProxyShape : public reShape {
 public:
-  reProxyShape(const reWorld* world = nullptr);
+  reProxyShape(reShape* shape, const reTransform* transform);
   reProxyShape(const reProxyShape&) = delete;
   ~reProxyShape();
   
   reProxyShape& operator=(const reProxyShape&) = delete;
   
-  const reShape& shape() const;
+  reShape* shape();
+  const reShape* shape() const;
   void setShape(const reShape& base);
   reProxyShape& withShape(const reShape& base);
   
@@ -49,7 +49,6 @@ public:
   bool intersectsHyperplane(const reTransform& transform, const reHyperplaneQuery& query) const override;
   
 private:
-  const reWorld* _world;
   reTransform _transform;
   reShape* _shape;
 };
@@ -63,8 +62,12 @@ inline reProxyShape& reProxyShape::withTransform(const reTransform& transform) {
   return *this;
 }
 
-inline const reShape& reProxyShape::shape() const {
-  return *_shape;
+inline reShape* reProxyShape::shape() {
+  return _shape;
+}
+
+inline const reShape* reProxyShape::shape() const {
+  return _shape;
 }
 
 inline const reTransform& reProxyShape::transform() const {
