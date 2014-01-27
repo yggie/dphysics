@@ -24,6 +24,7 @@ Makefile*
 # Ignore generated executable
 /demo
 /ray
+/tests/tests
 
 # Ignore generated Makefiles
 *.d

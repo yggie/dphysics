@@ -7,6 +7,8 @@
 
 #include "math.h"
 
+using namespace re;
+
 /**
  * @ingroup utilities
  * Defines an integrator used in the time update step to advance entity states
@@ -14,7 +16,7 @@
 
 struct reIntegrator {
   virtual void integrate(reVector& p, reVector& v, reFloat dt);
-  virtual void integrate(reQuaternion& o, reVector& w, reFloat dt);
+  virtual void integrate(quat& o, reVector& w, reFloat dt);
 };
 
 /**
@@ -37,7 +39,7 @@ inline void reIntegrator::integrate(reVector& p, reVector& v, reFloat dt) {
  * @param dt The time step in user-defined units
  */
 
-inline void reIntegrator::integrate(reQuaternion& o, reVector& w, reFloat dt) {
+inline void reIntegrator::integrate(quat& o, reVector& w, reFloat dt) {
   o += (w * o) * 0.5 * dt;
 }
 

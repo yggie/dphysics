@@ -52,7 +52,7 @@ public:
   const reShape* shape() const;
   const reVector& pos() const;
   virtual const reMatrix rot() const = 0;
-  virtual const reQuaternion& quat() const = 0;
+  virtual const re::quat& quat() const = 0;
   const reVector& vel() const;
   virtual const reVector& angVel() const = 0;
   virtual const reTransform transform() const;

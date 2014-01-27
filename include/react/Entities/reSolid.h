@@ -22,14 +22,14 @@ public:
   virtual ~reSolid();
   
   const reMatrix rot() const override;
-  const reQuaternion& quat() const override;
+  const re::quat& quat() const override;
   const reVector& angVel() const override;
   
   void setFacing(const reVector& dir, reFloat angle = 0.0) override;
   
 protected:
   /** The reSolid's rotation matrix */
-  reQuaternion _quat;
+  re::quat _quat;
   /** The reSolid's angular velocity vector */
   reVector _angVel;
 };
@@ -46,7 +46,7 @@ inline const reMatrix reSolid::rot() const {
   return _quat.toMatrix();
 }
 
-inline const reQuaternion& reSolid::quat() const {
+inline const re::quat& reSolid::quat() const {
   return _quat;
 }
 
@@ -73,7 +73,7 @@ inline void reSolid::setFacing(const reVector& dir, reFloat angle) {
   _quat.setFromMatrix(mm);
   rePrint(mm);
   if (reAbs(angle) > RE_FP_TOLERANCE) {
-    _quat *= reQuaternion(angle, v);
+    _quat *= re::quat(angle, v);
   }
   rePrint(_quat.toMatrix());
 }

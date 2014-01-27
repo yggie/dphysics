@@ -1,48 +1,50 @@
 #include "helpers.h"
 
+using namespace re;
+
 TEST(QuaternionTest, Addition) {
-  reQuaternion q(0, 1, 2, 3), p(3, 2, 1, 0);
-  reQuaternion m = q + p;
+  quat q(0, 1, 2, 3), p(3, 2, 1, 0);
+  quat m = q + p;
   for (reUInt i = 0; i < 4; i++) {
     EXPECT_FLOAT_EQ(m[i], 3.0);
   }
 }
 
 TEST(QuaternionTest, AxisAngle) {
-  reQuaternion p(0.0, reVector(1, 1, 1));
+  quat p(0.0, reVector(1, 1, 1));
   
   const reFloat c = reCos(1.0);
   const reFloat s = reSin(1.0);
   
-  ASSERT_QUAT_EQ(p, reQuaternion(1.0, 0.0, 0.0, 0.0));
+  ASSERT_QUAT_EQ(p, quat(1.0, 0.0, 0.0, 0.0));
   
-  reQuaternion g(2.0, reVector(1, 0, 0));
+  quat g(2.0, reVector(1, 0, 0));
   
-  ASSERT_QUAT_EQ(g, reQuaternion(c, s, 0.0, 0.0));
+  ASSERT_QUAT_EQ(g, quat(c, s, 0.0, 0.0));
   
-  reQuaternion b(2.0, reVector(0, 1, 0));
+  quat b(2.0, reVector(0, 1, 0));
   
-  ASSERT_QUAT_EQ(b, reQuaternion(c, 0.0, s, 0.0));
+  ASSERT_QUAT_EQ(b, quat(c, 0.0, s, 0.0));
   
   for (reUInt i = 0; i < 100; i++) {
-    reQuaternion q(1e5*reRandom(), reVector::random());
+    quat q(1e5*reRandom(), reVector::random());
     ASSERT_FLOAT_EQ(q.length(), 1.0);
   }
 }
 
 TEST(QuaternionTest, QuaternionMultiplication) {
-  reQuaternion w(1, 0, 0, 0);
-  reQuaternion x(0, 1, 0, 0);
-  reQuaternion y(0, 0, 1, 0);
-  reQuaternion z(0, 0, 0, 1);
+  quat w(1, 0, 0, 0);
+  quat x(0, 1, 0, 0);
+  quat y(0, 0, 1, 0);
+  quat z(0, 0, 0, 1);
   
-  reQuaternion ww = w*w;
-  reQuaternion wx = w*x;
-  reQuaternion wy = w*y;
-  reQuaternion wz = w*z;
-  reQuaternion xx = x*x;
-  reQuaternion yy = y*y;
-  reQuaternion zz = z*z;
+  quat ww = w*w;
+  quat wx = w*x;
+  quat wy = w*y;
+  quat wz = w*z;
+  quat xx = x*x;
+  quat yy = y*y;
+  quat zz = z*z;
   
   for (reUInt i = 0; i < 4; i++) {
     EXPECT_FLOAT_EQ(ww[i], w[i]);
@@ -56,8 +58,8 @@ TEST(QuaternionTest, QuaternionMultiplication) {
 }
 
 TEST(QuaternionTest, MultiplicationByScalar) {
-  reQuaternion w(1, 2, 3, 4);
-  reQuaternion s = w * 0.5;
+  quat w(1, 2, 3, 4);
+  quat s = w * 0.5;
   
   for (reUInt i = 0; i < 4; i++) {
     ASSERT_FLOAT_EQ(s[i], 0.5*w[i]);
@@ -66,9 +68,8 @@ TEST(QuaternionTest, MultiplicationByScalar) {
 
 TEST(QuaternionTest, MatrixConversionTest) {
   for (reUInt i = 0; i < 50; i++) {
-    reQuaternion q(1e5*reRandom(), reVector::random());
-    reMatrix m = q.toMatrix();
-    q.setFromMatrix(m);
+    reMatrix m = re::axisAngle(reVector::random(), 1e5*reRandom());
+    quat q(m);
     reMatrix n = q.toMatrix();
     ASSERT_MAT_EQ(m, n);
   }

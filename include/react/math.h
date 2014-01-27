@@ -11,5 +11,6 @@
 #include "react/Utilities/reTMatrix.h"
 #include "react/Utilities/reTransform.h"
 #include "react/Utilities/reQuaternion.h"
+#include "react/Utilities/math_ops.h"
 
 #endif

@@ -8,6 +8,8 @@
 #include <exception>
 #include <cstdio>
 
+using namespace re;
+
 struct VectorMismathException : public std::exception {
   virtual const char* what() const throw() {
     return "Value mismatch";
@@ -28,7 +30,7 @@ void assertVEq(const reVector& a, const reVector& b, const char* f, reUInt l) {
   }
 }
 
-void assertQEq(const reQuaternion& q, const reQuaternion& p, const char* f, reUInt l) {
+void assertQEq(const quat& q, const quat& p, const char* f, reUInt l) {
   for (reUInt i = 0; i < 3; i++) {
     if (reAbs(q[i] - p[i]) > RE_FP_TOLERANCE) {
       printf("%s:%d: Failure\nLHS: %s\n", f, l, toString(q).c_str());

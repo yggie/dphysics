@@ -3,6 +3,8 @@
 
 #include <cstdio>
 
+using namespace re;
+
 TEST(IntegratorTest, ConstantVelocity) {
   reVector p(0.0, 0.0, 0.0);
   reVector v(5.0, 1.0, 3.0);
@@ -26,8 +28,8 @@ TEST(IntegratorTest, ConstantRotation) {
   const reVector ax(0.0, 0.0, 1.0);
   reVector w(0.0, 0.0, tr - ir);
   const reFloat dt = 1.0 / steps;
-  reQuaternion q(ir, ax);
-  reQuaternion p(tr, ax);
+  quat q(ir, ax);
+  quat p(tr, ax);
   
   reIntegrator ign;
   for (reUInt i = 0; i < steps; i++) {

@@ -27,7 +27,7 @@ PlainSphere::~PlainSphere() {
 void PlainSphere::draw(Canvas& canvas) {
 //  canvas.modelMat();
   canvas.push();
-  reQuaternion q = _ent.quat();
+  re::quat q = _ent.quat();
   canvas.translate(_ent.pos()[0], _ent.pos()[1], _ent.pos()[2]);
   canvas.scale(shape().radius());
   const reFloat ang = acos(q.r);
