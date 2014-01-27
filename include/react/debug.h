@@ -7,10 +7,27 @@
 #define RE_UTILS_H
 
 #include <cstdio>
+#include <string>
 #include "react/math.h"
 
+inline std::string toString(const reVector& v) {
+  char buffer[255];
+  sprintf(&buffer[0], "( %+6.3f, %+6.3f, %+6.3f )", v[0], v[1], v[2]);
+  return &buffer[0];
+}
+
+inline std::string toString(const reQuaternion& q) {
+  char buffer[255];
+  sprintf(&buffer[0], "{ %+6.3f, %+6.3f, %+6.3f, %+6.3f }", q[0], q[1], q[2], q[3]);
+  return &buffer[0];
+}
+
 inline void rePrint(const reVector& v) {
-  printf(" ( %+f, %+f, %+f )\n", v[0], v[1], v[2]);
+  printf("  %s\n", toString(v).c_str());
+}
+
+inline void rePrint(const reQuaternion& q) {
+  printf("  %s\n", toString(q).c_str());
 }
 
 inline void rePrint(const reMatrix& m) {

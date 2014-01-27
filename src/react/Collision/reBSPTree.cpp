@@ -112,7 +112,7 @@ void reBSPTree::update() {
     }
   }
   
-  printf("[ROOT] (%3d, %3d) (%+.1f, %+.1f, %+.1f) (%+.1f, %+.1f, %+.1f)\n", _depth, size(), _dir[0], _dir[1], _dir[2], _anchor[0], _anchor[1], _anchor[2]);
+//  printf("[ROOT] (%3d, %3d) (%+.1f, %+.1f, %+.1f) (%+.1f, %+.1f, %+.1f)\n", _depth, size(), _dir[0], _dir[1], _dir[2], _anchor[0], _anchor[1], _anchor[2]);
 }
 
 void reBSPTree::add(reQueryable* q) {
@@ -184,9 +184,9 @@ reEntList reBSPTree::updateNode() {
     }
   }
   
-  if (!hasChildren()) {
-    printf("[NODE] (%3d, %3d) (%+.1f, %+.1f, %+.1f) (%+.1f, %+.1f, %+.1f)\n", _depth, size(), _dir[0], _dir[1], _dir[2], _anchor[0], _anchor[1], _anchor[2]);
-  }
+//  if (!hasChildren()) {
+//    printf("[NODE] (%3d, %3d) (%+.1f, %+.1f, %+.1f) (%+.1f, %+.1f, %+.1f)\n", _depth, size(), _dir[0], _dir[1], _dir[2], _anchor[0], _anchor[1], _anchor[2]);
+//  }
   
   return list;
 }
@@ -253,6 +253,27 @@ void reBSPTree::merge() {
     _child[i] = nullptr;
   }
   printf("[NODE] MERGE %d\n", _depth);
+}
+
+void reBSPTree::measure(reBPMeasure& measure) const {
+  if (isRoot()) {
+    measure.entities = entities().size();
+  } else {
+    measure.children++;
+  }
+  
+  if (hasChildren()) {
+    _child[0]->measure(measure);
+    _child[1]->measure(measure);
+  } else {
+    measure.leafs++;
+    measure.references += entities().size();
+    measure.meanDepth += _depth;
+  }
+  
+  if (isRoot()) {
+    measure.meanDepth /= measure.leafs;
+  }
 }
 
 reEnt* reBSPTree::queryWithRay(const reRayQuery& query, reRayQueryResult& result) const {

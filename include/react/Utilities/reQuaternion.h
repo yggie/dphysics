@@ -22,6 +22,7 @@ struct reQuaternion {
   reQuaternion& operator=(const reQuaternion& that);
   
   reFloat& operator[](reUInt i);
+  const reFloat& operator[](reUInt i) const;
   
   reQuaternion& operator+=(const reQuaternion& that);
   reQuaternion& operator-=(const reQuaternion& that);
@@ -94,6 +95,11 @@ inline reQuaternion& reQuaternion::operator=(const reQuaternion& that) {
 }
 
 inline reFloat& reQuaternion::operator[](reUInt i) {
+  RE_ASSERT(i < 4)
+  return v[i];
+}
+
+inline const reFloat& reQuaternion::operator[](reUInt i) const {
   RE_ASSERT(i < 4)
   return v[i];
 }
@@ -222,31 +228,49 @@ inline const reMatrix reQuaternion::toMatrix() const {
   const reFloat jk = j*k;
   
   return reMatrix(
-    1 - 2*(j2 + k2), 2*(ij + rj), 2*(ik - rj),
-    2*(ij - rk), 1 - 2*(i2 + k2), 2*(jk + ri),
-    2*(ik + rj), 2*(jk - ri), 1 - 2*(i2 + j2)
+    1 - 2*(j2 + k2), 2*(ij - rk), 2*(ik + rj),
+    2*(ij + rk), 1 - 2*(i2 + k2), 2*(jk - ri),
+    2*(ik - rj), 2*(ri + jk), 1 - 2*(i2 + j2)
   );
 }
 
 inline void reQuaternion::setFromMatrix(const reMatrix& m) {
-  r = 0.5 * reSqrt(1 + m[0][0] + m[1][1] + m[2][2]);
-  if (reAbs(r) < RE_FP_TOLERANCE) {
-    i = 0.5 * reSqrt(1 + m[0][0] - m[1][1] - m[2][2]);
-    // TODO confirm this
-    if (reAbs(i) < RE_FP_TOLERANCE) {
-      j = 0.5 * reSqrt(1 + m[1][1] - m[0][0] - m[2][2]);
-      k = 0.25 * (m[1][0] + m[0][1]) / j;
-      r = 0.25 * (m[0][2] - m[2][0]) / j;
-      i = 0.25 * (m[2][1] + m[1][2]) / j;
-    }
-    j = 0.25 * (m[0][1] + m[1][0]) / i;
-    k = 0.25 * (m[0][2] + m[2][0]) / i;
-    r = 0.25 * (m[2][1] - m[1][2]) / i;
+  r = ( m[0][0] + m[1][1] + m[2][2] + 1.0f) / 4.0f;
+  i = ( m[0][0] - m[1][1] - m[2][2] + 1.0f) / 4.0f;
+  j = (-m[0][0] + m[1][1] - m[2][2] + 1.0f) / 4.0f;
+  k = (-m[0][0] - m[1][1] + m[2][2] + 1.0f) / 4.0f;
+  if (r < 0.0f) r = 0.0f;
+  if (i < 0.0f) i = 0.0f;
+  if (j < 0.0f) j = 0.0f;
+  if (k < 0.0f) k = 0.0f;
+  r = reSqrt(r);
+  i = reSqrt(i);
+  j = reSqrt(j);
+  k = reSqrt(k);
+  if(r >= i && r >= j && r >= k) {
+      r *= +1.0f;
+      i *= reSign(m[2][1] - m[1][2]);
+      j *= reSign(m[0][2] - m[2][0]);
+      k *= reSign(m[1][0] - m[0][1]);
+  } else if(i >= r && i >= j && i >= k) {
+      r *= reSign(m[2][1] - m[1][2]);
+      i *= +1.0f;
+      j *= reSign(m[1][0] + m[0][1]);
+      k *= reSign(m[0][2] + m[2][0]);
+  } else if(j >= r && j >= i && j >= k) {
+      r *= reSign(m[0][2] - m[2][0]);
+      i *= reSign(m[1][0] + m[0][1]);
+      j *= +1.0f;
+      k *= reSign(m[2][1] + m[1][2]);
+  } else if(k >= r && k >= i && k >= j) {
+      r *= reSign(m[1][0] - m[0][1]);
+      i *= reSign(m[2][0] + m[0][2]);
+      j *= reSign(m[2][1] + m[1][2]);
+      k *= +1.0f;
   } else {
-    i = 0.25 * (m[2][1] - m[1][2]) / r;
-    j = 0.25 * (m[0][2] - m[2][0]) / r;
-    k = 0.25 * (m[1][0] - m[0][1]) / r;
+      printf("coding error\n");
   }
+  normalize();
 }
 
 #endif

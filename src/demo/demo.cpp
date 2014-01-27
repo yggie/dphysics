@@ -41,7 +41,7 @@ void testDemo(reWorld& world, demo::App& app) {
   app.newPlainSphere(body);
   
   for (int i = 0; i < 5; i++) {
-    reRigidBody& body = world.newRigidBody(sphere.withRadius(1)).withMass(5.0).at(2*i - 3 , 1, -5).facing(reVector(0.0, 1.0, 0.0));
+    reRigidBody& body = world.newRigidBody(sphere.withRadius(1)).withMass(5.0).at(2*i - 3 , 1, -5).facing(reVector(0.0, -1.0, 1.0));
     app.newPlainSphere(body);
   }
   

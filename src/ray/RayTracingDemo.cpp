@@ -296,8 +296,11 @@ void RayTracingDemo::renderScene(GLsizei w, GLsizei h) {
   const reVector eye = _inverseViewMat.mult(reVector(0,0,0), 1.0);
   
   _world.update();
+  reBPMeasure m;
+  _world.broadPhase().measure(m);
+  printf("[INFO]   B-Phase: (refRatio=%.2f, child=%d, leafs=%d, meanDepth=%.1f)\n", m.references/(float)m.entities, m.children, m.leafs, m.meanDepth);
   
-  printf("[INFO]  Image size: %d x %d\n", _renderWidth, _renderHeight);
+  printf("[INFO]   Image size: %d x %d\n", _renderWidth, _renderHeight);
   printf("%12s%12s%12s\n", "% complete", "Queries", "Time");
   printf("---------------------------------------\n");
   statusUpdate(0.0, 0);

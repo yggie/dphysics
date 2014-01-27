@@ -37,6 +37,9 @@ public:
   // spatial queries
   reEnt* queryWithRay(const reRayQuery& query, reRayQueryResult& result) const override;
   
+  // measurement
+  void measure(reBPMeasure& measure) const override;
+  
 protected:
   void add(reQueryable* q);
   void remove(reQueryable* q);

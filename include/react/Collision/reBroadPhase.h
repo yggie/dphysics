@@ -11,6 +11,7 @@
 
 class reEnt;
 class reWorld;
+struct reBPMeasure;
 
 /**
  * @ingroup collision
@@ -37,12 +38,34 @@ public:
   // spatial queries
   virtual reEnt* queryWithRay(const reRayQuery& query, reRayQueryResult& result) const = 0;
   
+  // measurement functions
+  virtual void measure(reBPMeasure& measure) const = 0;
+  
 protected:
   /** The parent reWorld object */
   const reWorld& _world;
 private:
   /** The list of reEnt contained in this structure */
   reEntList _entities;
+};
+
+/**
+ * @ingroup collision
+ * Used to obtain metrics to measure the performance of the Broad Phase
+ */
+
+struct reBPMeasure {
+  reBPMeasure() : entities(0), children(0), leafs(0), references(0), meanDepth(0.0) { }
+  /** The number of entities in the structure */
+  reUInt entities;
+  /** The number of child nodes */
+  reUInt children;
+  /** The number of leaf nodes */
+  reUInt leafs;
+  /** The number of references kept in the structure */
+  reUInt references;
+  /** The mean depth for all leaf nodes */
+  reFloat meanDepth;
 };
 
 /**

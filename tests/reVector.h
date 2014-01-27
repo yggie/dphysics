@@ -1,5 +1,4 @@
-#include "react/Utilities/reVector.h"
-#include <gtest/gtest.h>
+#include "helpers.h"
 
 TEST(VectorTest, Normalize) {
   reVector vect(1.0, 1.0, 1.0);

@@ -6,6 +6,7 @@ set(react_VERSION 0.0.0)
 
 option(DEBUG "Enables assertions and logging" ON)
 option(DEMO "Run demo application" OFF)
+option(TESTS "Compile tests specs (requires gtest library)" OFF)
 
 if(DEBUG)
   add_definitions(-g -DNDEBUG)
@@ -20,4 +21,6 @@ include_directories(
 add_subdirectory(src/react)
 add_subdirectory(src/demo)
 add_subdirectory(src/ray)
-add_subdirectory(tests)
+if(TESTS)
+  add_subdirectory(tests)
+endif(TESTS)

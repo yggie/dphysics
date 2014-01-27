@@ -1,4 +1,4 @@
-#include "react/Utilities/reQuaternion.h"
+#include "helpers.h"
 
 TEST(QuaternionTest, Addition) {
   reQuaternion q(0, 1, 2, 3), p(3, 2, 1, 0);
@@ -14,24 +14,15 @@ TEST(QuaternionTest, AxisAngle) {
   const reFloat c = reCos(1.0);
   const reFloat s = reSin(1.0);
   
-  ASSERT_FLOAT_EQ(p[0], 1.0);
-  ASSERT_FLOAT_EQ(p[1], 0.0);
-  ASSERT_FLOAT_EQ(p[2], 0.0);
-  ASSERT_FLOAT_EQ(p[3], 0.0);
+  ASSERT_QUAT_EQ(p, reQuaternion(1.0, 0.0, 0.0, 0.0));
   
   reQuaternion g(2.0, reVector(1, 0, 0));
   
-  ASSERT_FLOAT_EQ(g[0], c);
-  ASSERT_FLOAT_EQ(g[1], s);
-  ASSERT_FLOAT_EQ(g[2], 0.0);
-  ASSERT_FLOAT_EQ(g[3], 0.0);
+  ASSERT_QUAT_EQ(g, reQuaternion(c, s, 0.0, 0.0));
   
   reQuaternion b(2.0, reVector(0, 1, 0));
   
-  ASSERT_FLOAT_EQ(b[0], c);
-  ASSERT_FLOAT_EQ(b[1], 0.0);
-  ASSERT_FLOAT_EQ(b[2], s);
-  ASSERT_FLOAT_EQ(b[3], 0.0);
+  ASSERT_QUAT_EQ(b, reQuaternion(c, 0.0, s, 0.0));
   
   for (reUInt i = 0; i < 100; i++) {
     reQuaternion q(1e5*reRandom(), reVector::random());
@@ -70,6 +61,16 @@ TEST(QuaternionTest, MultiplicationByScalar) {
   
   for (reUInt i = 0; i < 4; i++) {
     ASSERT_FLOAT_EQ(s[i], 0.5*w[i]);
+  }
+}
+
+TEST(QuaternionTest, MatrixConversionTest) {
+  for (reUInt i = 0; i < 50; i++) {
+    reQuaternion q(1e5*reRandom(), reVector::random());
+    reMatrix m = q.toMatrix();
+    q.setFromMatrix(m);
+    reMatrix n = q.toMatrix();
+    ASSERT_MAT_EQ(m, n);
   }
 }
 

@@ -54,24 +54,28 @@ inline const reVector& reSolid::angVel() const {
   return _angVel;
 }
 
+#include "react/debug.h"
+
 inline void reSolid::setFacing(const reVector& dir, reFloat angle) {
-  reVector dr(dir);
-  dr.normalize();
+  reVector v(dir);
+  v.normalize();
   reVector up(0.0, 0.0, 1.0);
-  if ((dr - up).lengthSq() < RE_FP_TOLERANCE) {
+  if ((v - up).lengthSq() < RE_FP_TOLERANCE) {
     up.set(0.0, 1.0, 0.0);
   }
-  const reVector nx = dr.cross(up);
+  const reVector u = up.cross(v);
+  const reVector w = v.cross(u);
   reMatrix mm(
-    nx[0], nx[1], nx[2],
-    dr[0], dr[1], dr[2],
-    up[0], up[1], up[2]
+    u[0], v[0], w[0],
+    u[1], v[1], w[1],
+    u[2], v[2], w[2]
   );
-  for (reUInt i = 0; i < 3; i++) {
-    printf(" | %.2f, %.2f, %.2f, |\n", mm[i][0], mm[i][1], mm[i][2]);
-  }
   _quat.setFromMatrix(mm);
-  _quat *= reQuaternion(angle, dr);
+  rePrint(mm);
+  if (reAbs(angle) > RE_FP_TOLERANCE) {
+    _quat *= reQuaternion(angle, v);
+  }
+  rePrint(_quat.toMatrix());
 }
 
 #endif
