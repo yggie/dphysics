@@ -24,7 +24,7 @@ public:
   
   reEnt::Type type() const;
   
-  void update(reIntegrator& integrator, reFloat dt) override;
+  void advance(reIntegrator& integrator, reFloat dt) override;
   
   // getters for material properties
   reFloat mass() const override;
@@ -58,7 +58,7 @@ inline reEnt::Type reRigidBody::type() const {
   return RIGID;
 }
 
-inline void reRigidBody::update(reIntegrator& op, reFloat dt) {
+inline void reRigidBody::advance(reIntegrator& op, reFloat dt) {
   op.integrate(_pos, _vel, dt);
   op.integrate(_quat, _angVel, dt);
   _quat = re::normalize(_quat);

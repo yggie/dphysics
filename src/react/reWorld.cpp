@@ -85,16 +85,13 @@ void reWorld::add(reEnt* entity) {
 }
 
 /**
- * Steps the reWorld forward in time by the step given
+ * Advances the reWorld forward in time by the given time step
  * 
- * @param dt The time step to advance
+ * @param dt The time step to advance in user defined units
  */
 
-void reWorld::update(reFloat dt) {
-  for (reEnt& ent : entities()) {
-    ent.update(integrator(), dt);
-  }
-  _broadPhase->update();
+void reWorld::advance(reFloat dt) {
+  _broadPhase->advance(integrator(), dt);
 }
 
 /**

@@ -115,6 +115,12 @@ void reBSPTree::update() {
 //  printf("[ROOT] (%3d, %3d) (%+.1f, %+.1f, %+.1f) (%+.1f, %+.1f, %+.1f)\n", _depth, size(), _dir[0], _dir[1], _dir[2], _anchor[0], _anchor[1], _anchor[2]);
 }
 
+void reBSPTree::advance(reIntegrator& integrator, reFloat dt) {
+  for (reEnt& e : entities()) {
+    e.advance(integrator, dt);
+  }
+}
+
 void reBSPTree::add(reQueryable* q) {
   if (hasChildren()) {
     for (reUInt i = 0; i < 2; i++) {

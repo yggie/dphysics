@@ -217,7 +217,7 @@ void App::gPaint() {
     gStartDemo();
   }
   
-  _world.update(0.1);
+  _world.advance(0.1);
   
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   

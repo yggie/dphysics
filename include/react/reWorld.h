@@ -33,7 +33,7 @@ public:
   
   void clear();
   void add(reEnt* entity);
-  void update(reFloat dt = 0.0);
+  void advance(reFloat dt);
   
   // getters
   reEntList& entities() const;

@@ -30,6 +30,7 @@ public:
   virtual bool add(reEnt* ent) = 0;
   virtual bool remove(reEnt* ent) = 0;
   virtual void update() = 0;
+  virtual void advance(reIntegrator& integrator, reFloat dt) = 0;
   
   // getters
   reEntList& entities();

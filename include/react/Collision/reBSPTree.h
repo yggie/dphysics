@@ -28,6 +28,7 @@ public:
   bool add(reEnt* ent) override;
   bool remove(reEnt* ent) override;
   void update() override;
+  void advance(reIntegrator& integrator, reFloat dt);
   
   reUInt size() const;
   bool hasChildren() const;

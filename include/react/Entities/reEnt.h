@@ -45,7 +45,7 @@ public:
   // must be implemented by the subclass
   virtual Type type() const = 0;
   
-  virtual void update(reIntegrator& integrator, reFloat dt) = 0;
+  virtual void advance(reIntegrator& integrator, reFloat dt) = 0;
   
   // getter methods
   reShape* shape();
@@ -272,7 +272,7 @@ inline bool reEnt::intersectsHyperplane(const re::vec3& point, const re::vec3& d
  */
 
 /**
- * @fn void reEnt::update(reIntegrator& integrator, reFloat dt)
+ * @fn void reEnt::advance(reIntegrator& integrator, reFloat dt)
  * Moves the reEnt forward in time by the given time step using the specified
  * integration scheme
  * 
