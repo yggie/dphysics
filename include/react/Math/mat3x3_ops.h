@@ -7,6 +7,8 @@
 
 #include "react/Math/mat3x3.h"
 
+using namespace re; // sadly, Doxygen is not smart enought
+
 namespace re {
   
   /**

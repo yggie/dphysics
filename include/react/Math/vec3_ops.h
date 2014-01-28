@@ -7,6 +7,8 @@
 
 #include "react/Math/vec3.h"
 
+using namespace re; // sadly, Doxygen is not smart enought
+
 namespace re {
   
   /**
