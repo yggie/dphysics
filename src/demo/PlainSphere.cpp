@@ -33,7 +33,6 @@ void PlainSphere::draw(Canvas& canvas) {
   const reFloat ang = acos(q.r);
   if (reAbs(ang) > RE_FP_TOLERANCE) {
     const reFloat s = reSin(ang);
-    printf("%.2f, %.2f (%.2f, %.2f, %.2f) \n", ang, s, q.i, q.j, q.k);
     canvas.rotate(2 * ang * 180.0 / RE_PI, q.i / s, q.j / s, q.k / s);
   }
   canvas.applyModelView();

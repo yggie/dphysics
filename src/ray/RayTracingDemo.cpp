@@ -103,7 +103,7 @@ void RayTracingDemo::draw() {
   
   if (_pixels != nullptr && !usingGL) {
     glDrawPixels(_renderWidth, _renderHeight, GL_RGBA, GL_UNSIGNED_BYTE, &_pixels[0]);
-    checkOpenGLError();
+    CHECK_GL_ERR;
   }
   
   glFlush();

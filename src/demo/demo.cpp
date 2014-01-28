@@ -37,11 +37,11 @@ void testDemo(reWorld& world, demo::App& app) {
 //  reRigidBody* body;
   reSphere sphere(1.0);
   
-  reRigidBody& body = world.newRigidBody(sphere).withMass(5.0).at(0, 0, -2);
+  reRigidBody& body = world.newRigidBody(sphere).withMass(5.0).at(0, 0, -2).rotatingWith(0.0, 0.00, 0.01);
   app.newPlainSphere(body);
   
   for (int i = 0; i < 5; i++) {
-    reRigidBody& body = world.newRigidBody(sphere.withRadius(1)).withMass(5.0).at(2*i - 3 , 1, -5).facing(re::vec(0.0, -1.0, 1.0));
+    reRigidBody& body = world.newRigidBody(sphere.withRadius(1)).withMass(5.0).at(2.5*i - 3 , 1, -5).facing(re::vec3(0.0, -1.0, 1.0), re::vec3(0.0, 1.0, 0.0)).rotatingWith(0.0, 0.01, 0.0).movingAt(re::vec3(0.01, 0.0, 0.0));
     app.newPlainSphere(body);
   }
   

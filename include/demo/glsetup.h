@@ -12,10 +12,12 @@
 
 const int LOG_BUFFER_LENGTH = 255;
 
-inline bool checkOpenGLError() {
+#define CHECK_GL_ERR glErr(__FILE__, __LINE__)
+
+inline bool glErr(const char* filename, int line) {
   GLenum err = glGetError();
   if (err != GL_NO_ERROR) {
-    RE_WARN("OpenGL error: %s", gluErrorString(err));
+    printf("[DEMO] %s:%d: OpenGL error ~ %s\n", filename, line, gluErrorString(err));
     return true;
   }
   return false;

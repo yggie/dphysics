@@ -50,29 +50,33 @@ public:
   // getter methods
   reShape* shape();
   const reShape* shape() const;
-  const re::vec& pos() const;
+  const re::vec3& pos() const;
   virtual const re::mat3 rot() const = 0;
   virtual const re::quat& quat() const = 0;
-  const re::vec& vel() const;
-  virtual const re::vec& angVel() const = 0;
+  const re::vec3& vel() const;
+  virtual const re::vec3& angVel() const = 0;
   virtual const reTransform transform() const;
-  const re::vec center() const;
+  const re::vec3 center() const;
   reUInt id() const;
   virtual reFloat mass() const = 0;
   virtual const re::mat3& inertia() const = 0;
   virtual reFloat density() const = 0;
   
   // setter methods
-  void setPos(const re::vec& position);
+  void setPos(const re::vec3& position);
   void setPos(reFloat x, reFloat y, reFloat z);
-  void setVel(const re::vec& vel);
+  void setVel(const re::vec3& vel);
   void setVel(reFloat x, reFloat y, reFloat z);
-  virtual void setFacing(const re::vec&, reFloat) { }
+  virtual void setAngVel(const re::vec3&) { } // stub
+  virtual void setAngVel(reFloat, reFloat, reFloat) { } // stub
+  virtual void setFacing(const re::vec3&, const re::vec3&) { } // stub
   virtual void setMass(reFloat) { } // stub
   virtual void setDensity(reFloat) { } // stub
-  virtual reEnt& at(const re::vec& position) = 0;
+  virtual reEnt& at(const re::vec3& position) = 0;
   virtual reEnt& at(reFloat x, reFloat y, reFloat z) = 0;
-  virtual reEnt& facing(const re::vec& dir, reFloat angle = 0.0) = 0;
+  virtual reEnt& facing(const re::vec3& dir, const re::vec3& up) = 0;
+  virtual reEnt& movingAt(const re::vec3& velocity) = 0;
+  virtual reEnt& rotatingWith(reFloat wx, reFloat wy, reFloat wz) = 0;
   virtual reEnt& withMass(reFloat mass) = 0;
   virtual reEnt& withDensity(reFloat mass) = 0;
   
@@ -80,7 +84,7 @@ public:
   bool intersectsRay(const reRayQuery& query, reRayQueryResult& result) const;
   
   bool intersectsHyperplane(const reHyperplaneQuery& query) const;
-  bool intersectsHyperplane(const re::vec& point, const re::vec& dir) const;
+  bool intersectsHyperplane(const re::vec3& point, const re::vec3& dir) const;
   
   /** a pointer to arbitrary data, defined by the user */
   void* userdata;
@@ -91,9 +95,9 @@ protected:
   /** The reEnt's reShape */
   reShape* const _shape;
   /** The reEnt's position vector */
-  re::vec _pos;
+  re::vec3 _pos;
   /** The reEnt's velocity vector */
-  re::vec _vel;
+  re::vec3 _vel;
   
 private:
   static reUInt globalEntID;
@@ -133,7 +137,7 @@ inline const reShape* reEnt::shape() const {
  * @return The position in 3D space in user defined units
  */
 
-inline const re::vec& reEnt::pos() const {
+inline const re::vec3& reEnt::pos() const {
   return _pos;
 }
 
@@ -143,7 +147,7 @@ inline const re::vec& reEnt::pos() const {
  * @return The current velocity in 3D space in user-defined units
  */
 
-inline const re::vec& reEnt::vel() const {
+inline const re::vec3& reEnt::vel() const {
   return _vel;
 }
 
@@ -164,7 +168,7 @@ inline const reTransform reEnt::transform() const {
  * @return The centroid of the reShape in user-defined units
  */
 
-inline const re::vec reEnt::center() const {
+inline const re::vec3 reEnt::center() const {
   if (shape() != nullptr) {
     return _pos + shape()->offset();
   } else {
@@ -188,7 +192,7 @@ inline reUInt reEnt::id() const {
  * @param position The new position vector
  */
 
-inline void reEnt::setPos(const re::vec& position) {
+inline void reEnt::setPos(const re::vec3& position) {
   _pos = position;
 }
 
@@ -210,7 +214,7 @@ inline void reEnt::setPos(reFloat x, reFloat y, reFloat z) {
  * @param velocity The new velocity vector
  */
 
-inline void reEnt::setVel(const re::vec& velocity) {
+inline void reEnt::setVel(const re::vec3& velocity) {
   _vel = velocity;
 }
 
@@ -249,7 +253,7 @@ inline bool reEnt::intersectsHyperplane(const reHyperplaneQuery& query) const {
   }
 }
 
-inline bool reEnt::intersectsHyperplane(const re::vec& point, const re::vec& dir) const {
+inline bool reEnt::intersectsHyperplane(const re::vec3& point, const re::vec3& dir) const {
   if (_shape != nullptr) {
     reHyperplaneQuery query;
     query.point = point;
@@ -291,7 +295,7 @@ inline bool reEnt::intersectsHyperplane(const re::vec& point, const re::vec& dir
  */
 
 /**
- * @fn const re::vec& reEnt::angVel() const
+ * @fn const re::vec3& reEnt::angVel() const
  * Returns the reSolid's angular velocity vector
  * 
  * @return The angular velocity vector in user-defined units
@@ -319,7 +323,7 @@ inline bool reEnt::intersectsHyperplane(const re::vec& point, const re::vec& dir
  */
 
 /**
- * @fn reEnt& reEnt::at(const re::vec& pos)
+ * @fn reEnt& reEnt::at(const re::vec3& pos)
  * Set the reEnt's position, this method can be chained
  * 
  * @param position The new position vector
@@ -379,10 +383,12 @@ inline bool reEnt::intersectsHyperplane(const re::vec& point, const re::vec& dir
  */
 
 #define RE_ENT_CHAINABLE_METHODS(KLASS) \
-      KLASS& at(const re::vec& position) override { setPos(position);return *this; } \
+      KLASS& at(const re::vec3& position) override { setPos(position);return *this; } \
       KLASS& at(reFloat x, reFloat y, reFloat z) override { setPos(x, y, z);return *this; } \
       KLASS& withMass(reFloat mass) override { setMass(mass);return *this; } \
       KLASS& withDensity(reFloat density) override { setDensity(density);return *this; } \
-      KLASS& facing(const re::vec& dir, reFloat angle = 0.0) { setFacing(dir, angle); return *this; }
+      KLASS& facing(const re::vec3& dir, const re::vec3& up) { setFacing(dir, up); return *this; } \
+      KLASS& movingAt(const re::vec3& velocity) { setVel(velocity); return *this; } \
+      KLASS& rotatingWith(reFloat wx, reFloat wy, reFloat wz) { setAngVel(wx, wy, wz); return *this; }
 
 #endif

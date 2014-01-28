@@ -497,7 +497,7 @@ void RayTracingDemo::createSceneFromFile(const char* filename, bool useOpenGL) {
     }
     glShadeModel(GL_FLAT);
     glDisable(GL_DEPTH_TEST);
-    checkOpenGLError();
+    CHECK_GL_ERR;
   } else {
     // precompute the transformed light vectors
     for (auto& light : _lights) {

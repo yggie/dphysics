@@ -16,17 +16,21 @@ TEST_F(reSolidTest, HasIdentityRotationOnInit) {
 }
 
 TEST_F(reSolidTest, SetFacingMethod) {
-  reRigidBody& body = world.newRigidBody(reSphere(1.0)).facing(re::vec(1.0, 0.0, 0.0), 1.5);
+  reRigidBody& body = world.newRigidBody(reSphere(1.0)).facing(re::vec3(1.0, 0.0, 0.0), re::vec3(0.0, 0.0, 1.0));
   
   re::mat3 r = body.rot();
-  ASSERT_VEC_EQ(r * re::vec(0, 1, 0), re::vec(1, 0, 0));
-  ASSERT_VEC_EQ(r * re::vec(0, 0, 1), re::vec(0, 0, 1));
+  ASSERT_VEC_EQ(r * re::vec3(0, 1, 0), re::vec3(1, 0, 0));
+  ASSERT_VEC_EQ(r * re::vec3(0, 0, 1), re::vec3(0, 0, 1));
   
-  re::vec yv = re::vec(0, 1, 0);
+  re::vec3 yv = re::vec3(0, 1, 0);
+  re::vec3 zv = re::vec3(0, 0, 1);
   for (reUInt i = 0; i < 50; i++) {
-    re::vec rd = re::vec::random();
-    body.facing(rd);
+    re::vec3 rd = re::normalize(re::vec3::random());
+    re::vec3 r2 = re::normalize(re::vec3::random());
+    body.facing(rd, r2);
+    
     ASSERT_VEC_EQ(body.rot() * yv, rd);
+    ASSERT_GE(reAbs(re::dot(body.rot() * zv, r2)), 0.0);
   }
 }
 

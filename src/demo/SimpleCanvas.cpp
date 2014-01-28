@@ -63,7 +63,7 @@ void SimpleCanvas::applyModelView() {
     INVALID_ATTRIBUTE_INDEX("mModelView")
   }
 
-  m = glm::inverse(m);
+  m = glm::inverse(glm::transpose(m));
   if (_uniforms.normMat != -1) {
     glUniformMatrix4fv(_uniforms.normMat, 1, GL_FALSE, &m[0][0]);
   } else {

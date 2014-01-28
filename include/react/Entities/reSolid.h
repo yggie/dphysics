@@ -25,13 +25,15 @@ public:
   const re::quat& quat() const override;
   const re::vec3& angVel() const override;
   
-  void setFacing(const re::vec3& dir, reFloat angle = 0.0) override;
+  void setAngVel(const re::vec3& angularVelocity);
+  void setAngVel(reFloat wx, reFloat wy, reFloat wz);
+  void setFacing(const re::vec3& dir, const re::vec3& up = re::vec3(0.0, 0.0, 1.0)) override;
   
 protected:
   /** The reSolid's rotation matrix */
   re::quat _quat;
   /** The reSolid's angular velocity vector */
-  re::vec _angVel;
+  re::vec3 _angVel;
 };
 
 inline reSolid::reSolid(reShape* shape) : reEnt(shape), _quat(), _angVel() {
@@ -50,34 +52,32 @@ inline const re::quat& reSolid::quat() const {
   return _quat;
 }
 
-inline const re::vec& reSolid::angVel() const {
+inline const re::vec3& reSolid::angVel() const {
   return _angVel;
 }
 
-#include "react/debug.h"
+inline void reSolid::setAngVel(const re::vec3& angVel) {
+  _angVel = angVel;
+}
 
-inline void reSolid::setFacing(const re::vec& dir, reFloat angle) {
+inline void reSolid::setAngVel(reFloat wx, reFloat wy, reFloat wz) {
+  _angVel.set(wx, wy, wz);
+}
+
+inline void reSolid::setFacing(const re::vec3& dir, const re::vec3& up) {
   re::vec3 v = re::normalize(dir);
-  re::vec3 up(0.0, 0.0, 1.0);
-  if (reAbs(re::dot(v, up) - 1.0) < RE_FP_TOLERANCE) {
-    up.set(0.0, 1.0, 0.0);
+  re::vec3 upn = re::normalize(up);
+  if (reAbs(re::dot(v, upn) - 1.0) < RE_FP_TOLERANCE) {
+    upn = re::normalize(re::vec3::random());
   }
-  const re::vec u = re::cross(v, up);
-  const re::vec w = re::cross(u, v);
+  const re::vec3 u = re::normalize(re::cross(v, upn));
+  const re::vec3 w = re::normalize(re::cross(u, v));
   re::mat3 mm(
     u[0], v[0], w[0],
     u[1], v[1], w[1],
     u[2], v[2], w[2]
   );
-  printf("%f\n\n", re::determinant(mm));
   _quat = re::toQuat(mm);
-  rePrint(mm);
-  printf("\n\n");
-  rePrint(re::toMat(_quat));
-  printf("\n\n");
-  _quat *= re::axisAngleQ(re::vec(0, 1, 0), angle);
-  rePrint(re::toMat(_quat));
-  printf("\n\n");
 }
 
 #endif

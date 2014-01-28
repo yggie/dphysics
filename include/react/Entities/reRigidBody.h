@@ -61,6 +61,7 @@ inline reEnt::Type reRigidBody::type() const {
 inline void reRigidBody::update(reIntegrator& op, reFloat dt) {
   op.integrate(_pos, _vel, dt);
   op.integrate(_quat, _angVel, dt);
+  _quat = re::normalize(_quat);
 }
 
 inline reFloat reRigidBody::mass() const {

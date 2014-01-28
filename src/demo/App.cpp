@@ -2,6 +2,8 @@
 
 #include "demo/PlainSphere.h"
 #include "demo/StaticGfx.h"
+#include "react/Utilities/reEntList.h"
+#include "react/debug.h"
 
 #include <GL/freeglut.h>
 #include <cstdio>
@@ -212,15 +214,12 @@ void App::gResizeScreen(int w, int h) {
 
 void App::gPaint() {
   if (_currentDemo != _targetDemo) {
-#ifndef USE_OLD_SYNTAX
     gStartDemo();
-#endif
   }
   
   _world.update(0.1);
   
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  static float angle = 90;
   
 #ifndef USE_OLD_SYNTAX
   _canvas.clearStack();
@@ -234,41 +233,55 @@ void App::gPaint() {
 //  printf("%f\n\n", angle);
   _canvas.pop();
 #else
-  glPushMatrix();
-  glTranslatef(0, 0, -2);
-  glRotatef(angle, 0, 1, 0);
-  
-  glBegin(GL_TRIANGLE_STRIP);//  int idx = 0;
-  const int nSides = 20;
-  const double radius = 1;
-  
-  double s[nSides+1];
-  double c[nSides+1];
-  double r[nSides+1];
-  double z[nSides+1];
-  for (int i = 0; i <= nSides; i++) {
-    double a = 2 * PI * i / (double)nSides;
-    double b = a / 2;
-    s[i] = sin(a);
-    c[i] = cos(a);
-    r[i] = radius * sin(b);
-    z[i] = radius * cos(b);
-  }
-  
-  for (int i = 0; i < nSides; i++) {
-    for (int j = 0; j < nSides; j++) {
-      for (int k = 0; k < 2; k++) {
-        const int ik = i + k;
-        const int jk = j + k;
-        const int ix = (i % 2 == 0) ? 1 : -1;
-        glVertex3f(r[jk]*s[ik], r[jk]*c[ik], z[jk]*ix);
-        glNormal3f(r[jk]*s[ik], r[jk]*c[ik], z[jk]*ix);
-        glColor4f(c[ik], s[ik], 1.0f, 0.9f);
+  for (const reEnt& e : _world.entities()) {
+    glPushMatrix();
+    glLoadIdentity();
+    re::mat3x4 t1 = e.transform();
+    float r2[4][4] = { { 0 }, { 0 }, { 0 }, { 0 } };
+    for (reUInt i = 0; i < 3; i++) {
+      for (reUInt j = 0; j < 4; j++) {
+        if (j == 3) {
+          r2[j][i] = t1.v[i];
+        } else {
+          r2[j][i] = t1.m[i][j];
+        }
       }
     }
+    r2[3][3] = 1;
+    glLoadMatrixf(&r2[0][0]);
+    
+    glBegin(GL_TRIANGLE_STRIP);//  int idx = 0;
+    const int nSides = 20;
+    const double radius = 1;
+    
+    double s[nSides+1];
+    double c[nSides+1];
+    double r[nSides+1];
+    double z[nSides+1];
+    for (int i = 0; i <= nSides; i++) {
+      double a = 2 * PI * i / (double)nSides;
+      double b = a / 2;
+      s[i] = sin(a);
+      c[i] = cos(a);
+      r[i] = radius * sin(b);
+      z[i] = radius * cos(b);
+    }
+    
+    for (int i = 0; i < nSides; i++) {
+      for (int j = 0; j < nSides; j++) {
+        for (int k = 0; k < 2; k++) {
+          const int ik = i + k;
+          const int jk = j + k;
+          const int ix = (i % 2 == 0) ? 1 : -1;
+          glVertex3f(r[jk]*s[ik], r[jk]*c[ik], z[jk]*ix);
+          glNormal3f(r[jk]*s[ik], r[jk]*c[ik], z[jk]*ix);
+          glColor4f(c[ik], s[ik], 1.0f, 0.9f);
+        }
+      }
+    }
+    glEnd();
+    glPopMatrix();
   }
-  glEnd();
-  glPopMatrix();
   
   glPushMatrix();
   glTranslatef(0, -1, 0);
@@ -289,8 +302,6 @@ void App::gPaint() {
   glEnd();
   glPopMatrix();
 #endif
-
-  angle += 0.03f;
   
   glutSwapBuffers();
   

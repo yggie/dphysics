@@ -77,6 +77,8 @@ public:
   reEntItor begin() const;
   reEntItor end() const;
   
+  reEnt* first() const { return _first->q->ent; }
+  
 private:
   void appendToNode(Node* node, reQueryable* queryable);
   void prependToNode(Node* node, reQueryable* queryable);

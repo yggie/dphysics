@@ -47,42 +47,6 @@ inline int reSign(reFloat a) {
   return (a >= -0.0f) ? 1 : -1;
 }
 
-inline bool reIsGreaterThan(const reFloat a, const reFloat b) {
-  return (a > b + RE_FP_TOLERANCE);
-}
-
-inline bool reIsGreaterThanOrEqual(const reFloat a, const reFloat b) {
-  return (a > b - RE_FP_TOLERANCE);
-}
-
-inline bool reIsGreaterThanZero(const reFloat a) {
-  return (a > RE_FP_TOLERANCE);
-}
-
-inline bool reIsGreaterThanOrEqualZero(const reFloat a) {
-  return (a > -RE_FP_TOLERANCE);
-}
-
-inline bool reIsLessThan(const reFloat a, const reFloat b) {
-  return (a < b + RE_FP_TOLERANCE);
-}
-
-inline bool reIsLessThanOrEqual(const reFloat a, const reFloat b) {
-  return (a < b - RE_FP_TOLERANCE);
-}
-
-inline bool reIsLessThanZero(const reFloat a) {
-  return (a < -RE_FP_TOLERANCE);
-}
-
-inline bool reIsLessThanOrEqualZero(const reFloat a) {
-  return (a < RE_FP_TOLERANCE);
-}
-
-inline bool reIsAlmostZero(const reFloat a) {
-  return (reAbs(a) < RE_FP_TOLERANCE);
-}
-
 inline void reConstrainAngle(double& radians) {
   if (reAbs(radians - RE_PI) > RE_PI) {
     double tmp = (radians - RE_PI)/ (2 * RE_PI);
