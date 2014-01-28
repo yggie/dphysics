@@ -28,7 +28,7 @@ public:
   
   // getters for material properties
   reFloat mass() const override;
-  const reMatrix& inertia() const override;
+  const re::mat3& inertia() const override;
   reFloat density() const override;
   
   // setters for material properties
@@ -41,7 +41,7 @@ protected:
   /** The reRigidBody's mass */
   reFloat _mass;
   /** The reRigidBody's inertia tensor */
-  reMatrix _inertia;
+  re::mat3 _inertia;
   
   void updateInertia();
 };
@@ -67,7 +67,7 @@ inline reFloat reRigidBody::mass() const {
   return _mass;
 }
 
-inline const reMatrix& reRigidBody::inertia() const {
+inline const re::mat3& reRigidBody::inertia() const {
   return _inertia;
 }
 

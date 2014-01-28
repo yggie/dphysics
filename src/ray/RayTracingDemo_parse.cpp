@@ -293,7 +293,7 @@ void RayTracingDemo::createSceneFromFile(const char* filename, bool useOpenGL) {
         glEnd();
       } else {
         glm::vec4 verts4[3];
-        reVector triVerts[3];
+        re::vec triVerts[3];
         for (int i = 0; i < 3; i++) {
           verts4[i] = m * glm::vec4(verts.at(inds[i]), 1.0f);
           triVerts[i].set(verts4[i][0], verts4[i][1], verts4[i][2]);
@@ -389,8 +389,8 @@ void RayTracingDemo::createSceneFromFile(const char* filename, bool useOpenGL) {
       } else {
         RayLightSource* light = new RayLightSource();
         _lights.push_back(light);
-        light->withColor(reVector(&a[3]))
-              .withVect(reVector(&a[0]))
+        light->withColor(re::vec(&a[3]))
+              .withVect(re::vec(&a[0]))
               .asDirectional(true);
       }
       
@@ -408,8 +408,8 @@ void RayTracingDemo::createSceneFromFile(const char* filename, bool useOpenGL) {
       } else {
         RayLightSource* light = new RayLightSource();
         _lights.push_back(light);
-        light->withColor(reVector(&a[3]))
-              .withVect(reVector(&a[0]))
+        light->withColor(re::vec(&a[3]))
+              .withVect(re::vec(&a[0]))
               .asDirectional(false);
       }
       RAY_PRINTF("    %-22s%3.1f, %3.1f, %3.1f", "SPOT LIGHT", a[3], a[4], a[5]);

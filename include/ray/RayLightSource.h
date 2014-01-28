@@ -12,20 +12,20 @@ public:
   RayLightSource();
   ~RayLightSource();
 
-  RayLightSource& withColor(const reVector& color);
-  RayLightSource& withVect(const reVector& vect);
+  RayLightSource& withColor(const re::vec& color);
+  RayLightSource& withVect(const re::vec& vect);
   RayLightSource& asDirectional(bool directional);
   
-  reVector& transformedVect();
-  const reVector& transformedVect() const;
-  const reVector& vect() const;
-  const reVector& color() const;
+  re::vec& transformedVect();
+  const re::vec& transformedVect() const;
+  const re::vec& vect() const;
+  const re::vec& color() const;
   bool isDirectional() const;
 
 private:
-  reVector _color;
-  reVector _vect;
-  reVector _transformedVect;
+  re::vec _color;
+  re::vec _vect;
+  re::vec _transformedVect;
   bool _isSpot;
 };
 
@@ -37,12 +37,12 @@ inline RayLightSource::~RayLightSource() {
   // do nothing
 }
 
-inline RayLightSource& RayLightSource::withColor(const reVector& color) {
+inline RayLightSource& RayLightSource::withColor(const re::vec& color) {
   _color = color;
   return *this;
 }
 
-inline RayLightSource& RayLightSource::withVect(const reVector& vect) {
+inline RayLightSource& RayLightSource::withVect(const re::vec& vect) {
   _vect = vect;
   return *this;
 }
@@ -52,19 +52,19 @@ inline RayLightSource& RayLightSource::asDirectional(bool directional) {
   return *this;
 }
 
-inline reVector& RayLightSource::transformedVect() {
+inline re::vec& RayLightSource::transformedVect() {
   return _transformedVect;
 }
 
-inline const reVector& RayLightSource::transformedVect() const {
+inline const re::vec& RayLightSource::transformedVect() const {
   return _transformedVect;
 }
 
-inline const reVector& RayLightSource::vect() const {
+inline const re::vec& RayLightSource::vect() const {
   return _vect;
 }
 
-inline const reVector& RayLightSource::color() const {
+inline const re::vec& RayLightSource::color() const {
   return _color;
 }
 

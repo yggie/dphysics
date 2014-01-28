@@ -26,8 +26,8 @@ public:
   void mouseEvent(int button, int state, int x, int y) override;
   
 private:
-  const reVector shootRay(unsigned int depth, const reVector& origin, const reVector& dir);
-  void colorPixel(GLubyte* rgbaPixel, const reVector& color);
+  const re::vec shootRay(unsigned int depth, const re::vec& origin, const re::vec& dir);
+  void colorPixel(GLubyte* rgbaPixel, const re::vec& color);
   void resizeImage(GLsizei w, GLsizei h);
   void renderScene(GLsizei w, GLsizei h);
   void createSceneFromFile(const char* filename, bool useOpenGL);
@@ -43,8 +43,8 @@ private:
   reTMatrix _viewMat;
   reTMatrix _inverseViewMat;
   
-  reVector _ambient;
-  reVector _attenuation;
+  re::vec _ambient;
+  re::vec _attenuation;
   
   std::vector<RayLightSource*> _lights;
   
@@ -53,14 +53,14 @@ private:
   GLsizei _renderWidth;
   GLsizei _renderHeight;
   
-  reVector _infinityColor;
+  re::vec _infinityColor;
   
   std::string _sceneFile;
   unsigned int _lightNo;
   bool usingGL;
 };
 
-inline void RayTracingDemo::colorPixel(GLubyte* rgbaPixel, const reVector& color) {
+inline void RayTracingDemo::colorPixel(GLubyte* rgbaPixel, const re::vec& color) {
   for (int i = 0; i < 3; i++) {
     const float c = (color[i] > 1.0) ? 1.0 : color[i];
     rgbaPixel[i] = (GLubyte)(254.5 * ((c < 0.0) ? 0.0 : c));

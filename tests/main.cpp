@@ -1,7 +1,7 @@
 #include "helpers.h"
-#include "reVector.h"
-#include "reMatrix.h"
-#include "reQuaternion.h"
+#include "mat3x3.h"
+#include "vec3.h"
+#include "quat.h"
 #include "reIntegrator.h"
 #include "reSolid.h"
 

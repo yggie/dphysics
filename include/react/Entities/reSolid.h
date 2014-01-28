@@ -21,17 +21,17 @@ public:
   /** Default destructor does nothing */
   virtual ~reSolid();
   
-  const reMatrix rot() const override;
+  const re::mat3 rot() const override;
   const re::quat& quat() const override;
-  const reVector& angVel() const override;
+  const re::vec3& angVel() const override;
   
-  void setFacing(const reVector& dir, reFloat angle = 0.0) override;
+  void setFacing(const re::vec3& dir, reFloat angle = 0.0) override;
   
 protected:
   /** The reSolid's rotation matrix */
   re::quat _quat;
   /** The reSolid's angular velocity vector */
-  reVector _angVel;
+  re::vec _angVel;
 };
 
 inline reSolid::reSolid(reShape* shape) : reEnt(shape), _quat(), _angVel() {
@@ -42,40 +42,42 @@ inline reSolid::~reSolid() {
   // do nothing
 }
 
-inline const reMatrix reSolid::rot() const {
-  return _quat.toMatrix();
+inline const re::mat3 reSolid::rot() const {
+  return re::toMat(_quat);
 }
 
 inline const re::quat& reSolid::quat() const {
   return _quat;
 }
 
-inline const reVector& reSolid::angVel() const {
+inline const re::vec& reSolid::angVel() const {
   return _angVel;
 }
 
 #include "react/debug.h"
 
-inline void reSolid::setFacing(const reVector& dir, reFloat angle) {
-  reVector v(dir);
-  v.normalize();
-  reVector up(0.0, 0.0, 1.0);
-  if ((v - up).lengthSq() < RE_FP_TOLERANCE) {
+inline void reSolid::setFacing(const re::vec& dir, reFloat angle) {
+  re::vec3 v = re::normalize(dir);
+  re::vec3 up(0.0, 0.0, 1.0);
+  if (reAbs(re::dot(v, up) - 1.0) < RE_FP_TOLERANCE) {
     up.set(0.0, 1.0, 0.0);
   }
-  const reVector u = up.cross(v);
-  const reVector w = v.cross(u);
-  reMatrix mm(
+  const re::vec u = re::cross(v, up);
+  const re::vec w = re::cross(u, v);
+  re::mat3 mm(
     u[0], v[0], w[0],
     u[1], v[1], w[1],
     u[2], v[2], w[2]
   );
-  _quat.setFromMatrix(mm);
+  printf("%f\n\n", re::determinant(mm));
+  _quat = re::toQuat(mm);
   rePrint(mm);
-  if (reAbs(angle) > RE_FP_TOLERANCE) {
-    _quat *= re::quat(angle, v);
-  }
-  rePrint(_quat.toMatrix());
+  printf("\n\n");
+  rePrint(re::toMat(_quat));
+  printf("\n\n");
+  _quat *= re::axisAngleQ(re::vec(0, 1, 0), angle);
+  rePrint(re::toMat(_quat));
+  printf("\n\n");
 }
 
 #endif

@@ -217,7 +217,7 @@ reEntList reBSPTree::trim() {
  */
 
 void reBSPTree::split() {
-  reVector splitAnchor, splitDir;
+  re::vec3 splitAnchor, splitDir;
   optimalSplit(splitAnchor, splitDir);
   
   // setup each _child node
@@ -308,7 +308,7 @@ reEnt* reBSPTree::queryWithRay(const reRayQuery& query, reRayQueryResult& result
     
     for (reUInt i = 0; i < 2; i++) {
       // check if the hyperplane contains the ray
-      if (query.dir.dot(_child[i]->_dir) > 0.0 || (query.origin - _child[i]->_anchor).dot(_child[i]->_dir) > 0.0) {
+      if (re::dot(query.dir, _child[i]->_dir) > 0.0 || re::dot(query.origin - _child[i]->_anchor, _child[i]->_dir) > 0.0) {
         ent[i] = _child[i]->queryWithRay(query, res[i]);
       }
     }
@@ -333,13 +333,13 @@ reEnt* reBSPTree::queryWithRay(const reRayQuery& query, reRayQueryResult& result
  * @param dir This field is set to the optimal split plane direction
  */
 
-void reBSPTree::optimalSplit(reVector& anchor, reVector& dir) const {
+void reBSPTree::optimalSplit(re::vec3& anchor, re::vec3& dir) const {
   anchor.set(0.0, 0.0, 0.0);
   
-  reVector dirs[RE_BSPTREE_GUESSES] = {
-    _dir.cross(reVector::random()),
-    _dir.cross(reVector::random()),
-    _dir.cross(reVector::random())
+  re::vec3 dirs[RE_BSPTREE_GUESSES] = {
+    re::cross(_dir, re::vec3::random()),
+    re::cross(_dir, re::vec3::random()),
+    re::cross(_dir, re::vec3::random())
   };
   
   reFloat vals[RE_BSPTREE_GUESSES] = { 0.0 };
@@ -357,7 +357,7 @@ void reBSPTree::optimalSplit(reVector& anchor, reVector& dir) const {
     reLinkedList<reEnt*> list2 = entities().sample(RE_BSPTREE_SAMPLE_SIZE);
     for (const reEnt* ent : list2) {
       for (reUInt i = 0; i < RE_BSPTREE_GUESSES; i++) {
-        vals[i] += dirs[i].dot(anchor - ent->center());
+        vals[i] += re::dot(dirs[i], anchor - ent->center());
       }
     }
     
@@ -384,7 +384,7 @@ void reBSPTree::optimalSplit(reVector& anchor, reVector& dir) const {
       auto end = entities().qEnd();
       for (auto iter = entities().qBegin(); iter != end; ++iter) {
         const reQueryable& q = *iter;
-        vals[i] += dirs[i].dot(anchor - q.ent->center());
+        vals[i] += re::dot(dirs[i], anchor - q.ent->center());
         if (++num >= n) {
           break;
         }

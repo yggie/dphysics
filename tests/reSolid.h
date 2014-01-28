@@ -11,21 +11,20 @@ protected:
 TEST_F(reSolidTest, HasIdentityRotationOnInit) {
   reRigidBody& body = world.newRigidBody(reSphere(1.0));
   
-  reMatrix r = body.rot();
-  ASSERT_MAT_EQ(r, reMatrix(1.0));
+  re::mat3 r = body.rot();
+  ASSERT_MAT_EQ(r, re::mat3(1.0));
 }
 
 TEST_F(reSolidTest, SetFacingMethod) {
-  reRigidBody& body = world.newRigidBody(reSphere(1.0)).facing(reVector(1.0, 0.0, 0.0));
+  reRigidBody& body = world.newRigidBody(reSphere(1.0)).facing(re::vec(1.0, 0.0, 0.0), 1.5);
   
-  reMatrix r = body.rot();
-  rePrint(r);
-  ASSERT_VEC_EQ(r * reVector(0, 1, 0), reVector(1, 0, 0));
-  ASSERT_VEC_EQ(r * reVector(0, 0, 1), reVector(0, 0, 1));
+  re::mat3 r = body.rot();
+  ASSERT_VEC_EQ(r * re::vec(0, 1, 0), re::vec(1, 0, 0));
+  ASSERT_VEC_EQ(r * re::vec(0, 0, 1), re::vec(0, 0, 1));
   
-  reVector yv = reVector(0, 1, 0);
+  re::vec yv = re::vec(0, 1, 0);
   for (reUInt i = 0; i < 50; i++) {
-    reVector rd = reVector::random();
+    re::vec rd = re::vec::random();
     body.facing(rd);
     ASSERT_VEC_EQ(body.rot() * yv, rd);
   }

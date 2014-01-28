@@ -38,16 +38,16 @@ public:
   // shape representation
   virtual Type type() const = 0;
   virtual reUInt numVerts() const = 0;
-  virtual const reVector vert(reUInt i) const = 0;
+  virtual const re::vec vert(reUInt i) const = 0;
   virtual reFloat shell() const;
   
   // physical metrics
   virtual reFloat volume() const = 0;
-  virtual const reMatrix computeInertia() const = 0;
-  virtual const reVector offset() const;
+  virtual const re::mat3 computeInertia() const = 0;
+  virtual const re::vec offset() const;
   
   const reAABB& aabb() const;
-  virtual void updateAABB(const reMatrix& parentRot);
+  virtual void updateAABB(const re::mat3& parentRot);
   
   // collision queries
   virtual bool intersectsRay(const reTransform& transform, const reRayQuery& query, reRayQueryResult& result) const;
@@ -69,7 +69,7 @@ protected:
  */
 
 /**
- * @fn const reVector& reShape::vert(reUInt i) const
+ * @fn const re::vec& reShape::vert(reUInt i) const
  * Returns the vertex at the specified index
  * 
  * Enforces constant constraint
@@ -93,8 +93,8 @@ protected:
  */
 
 /**
- * @fn bool reEnt::intersectsRay(const reEnt& parent, const reVector& origin,
- * const reVector& dir, reVector* intersect = nullptr, reVector* normal =
+ * @fn bool reEnt::intersectsRay(const reEnt& parent, const re::vec& origin,
+ * const re::vec& dir, re::vec* intersect = nullptr, re::vec* normal =
  * nullptr) const
  * @brief Returns true if the ray specified intersects with the shape
  * 
@@ -129,8 +129,8 @@ inline const reAABB& reShape::aabb() const {
  * @return The position of the centroid in model space
  */
 
-inline const reVector reShape::offset() const {
-  return reVector(0.0, 0.0, 0.0);
+inline const re::vec reShape::offset() const {
+  return re::vec(0.0, 0.0, 0.0);
 }
 
 #endif

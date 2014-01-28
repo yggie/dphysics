@@ -5,12 +5,12 @@
 #ifndef RE_MATH_H
 #define RE_MATH_H
 
-#include "react/Utilities/math_funcs.h"
-#include "react/Utilities/reVector.h"
-#include "react/Utilities/reMatrix.h"
+#include "react/Math/math_funcs.h"
+#include "react/Math/vec3.h"
+#include "react/Math/mat3x3.h"
 #include "react/Utilities/reTMatrix.h"
 #include "react/Utilities/reTransform.h"
-#include "react/Utilities/reQuaternion.h"
-#include "react/Utilities/math_ops.h"
+#include "react/Math/quat.h"
+#include "react/Math/math_ops.h"
 
 #endif

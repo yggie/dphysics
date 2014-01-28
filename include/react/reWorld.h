@@ -46,7 +46,7 @@ public:
   reRigidBody& newRigidBody(const reShape& shape, const reTransform& transform);
   
   // spatial queries
-  reEnt* queryWithRay(const reVector& from, const reVector& direction, reVector* intersect = nullptr, reVector* normal = nullptr);
+  reEnt* queryWithRay(const re::vec3& from, const re::vec3& direction, re::vec3* intersect = nullptr, re::vec3* normal = nullptr);
 
 private:
   reShape* copyOf(const reShape& shape) const;

@@ -144,7 +144,7 @@ reRigidBody& reWorld::newRigidBody(const reShape& shape, const reTransform& tran
  * @return The entity which was found
  */
 
-reEnt* reWorld::queryWithRay(const reVector& origin, const reVector& dir, reVector* intersect, reVector* normal) {
+reEnt* reWorld::queryWithRay(const re::vec3& origin, const re::vec3& dir, re::vec3* intersect, re::vec3* normal) {
   reRayQuery query;
   query.origin = origin;
   query.dir = dir;

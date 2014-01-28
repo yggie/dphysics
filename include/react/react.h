@@ -49,4 +49,10 @@
  * This module contains various utility classes used internally by many classes
  */
 
+/**
+ * @defgroup maths Maths
+ * This module contains the representation for mathematical constructs and
+ * operations used in the engine
+ */
+
 #endif

@@ -34,13 +34,13 @@ public:
   // shape representation
   reShape::Type type() const override;
   reUInt numVerts() const override;
-  const reVector vert(reUInt i) const override;
+  const re::vec vert(reUInt i) const override;
   reFloat shell() const override;
-  const reVector offset() const override;
+  const re::vec offset() const override;
   
   // physical metrics
   reFloat volume() const override;
-  const reMatrix computeInertia() const override;
+  const re::mat3 computeInertia() const override;
   
   bool intersectsRay(const reRayQuery& query, reRayQueryResult& result) const override;
   
@@ -86,11 +86,11 @@ inline reUInt reProxyShape::numVerts() const {
   }
 }
 
-inline const reVector reProxyShape::vert(reUInt i) const {
+inline const re::vec reProxyShape::vert(reUInt i) const {
   if (_shape != nullptr) {
     return _shape->vert(i);
   } else {
-    return reVector(0.0, 0.0, 0.0);
+    return re::vec(0.0, 0.0, 0.0);
   }
 }
 
@@ -102,7 +102,7 @@ inline reFloat reProxyShape::shell() const {
   }
 }
 
-inline const reVector reProxyShape::offset() const {
+inline const re::vec reProxyShape::offset() const {
   if (_shape != nullptr) {
     return _shape->offset() + _transform.v;
   } else {
@@ -119,9 +119,9 @@ inline reFloat reProxyShape::volume() const {
   }
 }
 
-inline const reMatrix reProxyShape::computeInertia() const {
+inline const re::mat3 reProxyShape::computeInertia() const {
 //  RE_NOT_IMPLEMENTED
-  return reMatrix(1.0);
+  return re::mat3(1.0);
 }
   
 inline bool reProxyShape::intersectsHyperplane(const reTransform& transform, const reHyperplaneQuery& query) const {

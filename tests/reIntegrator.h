@@ -6,8 +6,8 @@
 using namespace re;
 
 TEST(IntegratorTest, ConstantVelocity) {
-  reVector p(0.0, 0.0, 0.0);
-  reVector v(5.0, 1.0, 3.0);
+  vec3 p(0.0, 0.0, 0.0);
+  vec3 v(5.0, 1.0, 3.0);
   const reUInt steps = 1000;
   const reFloat dt = 1.0 / steps;
   
@@ -25,11 +25,11 @@ TEST(IntegratorTest, ConstantRotation) {
   const reUInt steps = 1000;
   const reFloat tr = 2.0;
   const reFloat ir = 1.0;
-  const reVector ax(0.0, 0.0, 1.0);
-  reVector w(0.0, 0.0, tr - ir);
+  const vec3 ax(0.0, 0.0, 1.0);
+  vec3 w(0.0, 0.0, tr - ir);
   const reFloat dt = 1.0 / steps;
-  quat q(ir, ax);
-  quat p(tr, ax);
+  quat q = re::axisAngleQ(ax, ir);
+  quat p = re::axisAngleQ(ax, tr);
   
   reIntegrator ign;
   for (reUInt i = 0; i < steps; i++) {

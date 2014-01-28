@@ -1,56 +1,57 @@
 #include "react/Collision/Shapes/reTriangle.h"
 
+using namespace re;
+
 bool reTriangle::intersectsRay(const reRayQuery& query, reRayQueryResult& result) const {
-  const reVector u = (_verts[0] - _verts[1]);
-  const reVector v = (_verts[2] - _verts[1]);
+  const re::vec3 u = (_verts[0] - _verts[1]);
+  const re::vec3 v = (_verts[2] - _verts[1]);
   
-  const reVector faceNormal = v.cross(u).normalized();
+  const re::vec3 faceNormal = normalize(cross(v, u));
   
   // parallel to plane
-  if (reIsGreaterThanOrEqualZero(faceNormal.dot(query.dir))) {
+  if (dot(faceNormal, query.dir) > RE_FP_TOLERANCE) {
     return false;
   }
   
-  const reFloat lambda = (faceNormal.dot(_verts[0]) - faceNormal.dot(query.origin)) / faceNormal.dot(query.dir);
+  const reFloat lambda = (dot(faceNormal, _verts[0]) - dot(faceNormal, query.origin)) / dot(faceNormal, query.dir);
   
   // The solution is not in the direction of the ray
-  if (reIsLessThanOrEqualZero(lambda)) {
+  if (lambda < RE_FP_TOLERANCE) {
     return false;
   }
   
   // compute ray-plane intersection
-  const reVector intersection = query.origin + query.dir*lambda;
+  const re::vec3 intersection = query.origin + query.dir*lambda;
   
   // compute parametric coordinates
-  reVector w = intersection - _verts[1];
-  if (reIsAlmostZero(w.lengthSq())) {
+  re::vec3 w = intersection - _verts[1];
+  if (lengthSq(w) < RE_FP_TOLERANCE) {
     // TODO handle the degenerate case properly
     w = intersection - _verts[0];
-    if (reIsAlmostZero(w.lengthSq())) {
+    if (lengthSq(w) < RE_FP_TOLERANCE) {
       w = intersection - _verts[2];
     }
   }
   
-  const reFloat uw = u.dot(w);
-  const reFloat uv = u.dot(v);
-  const reFloat vw = v.dot(w);
-  const reFloat uu = u.lengthSq();
-  const reFloat vv = v.lengthSq();
+  const reFloat uw = dot(u, w);
+  const reFloat uv = dot(u, v);
+  const reFloat vw = dot(v, w);
+  const reFloat uu = dot(u, u);
+  const reFloat vv = dot(v, v);
   
   const reFloat denom = uv*uv - uu*vv;
   const reFloat s = (uv*vw - vv*uw)/denom;
   const reFloat t = (uv*uw - uu*vw)/denom;
   
-  if (reIsGreaterThanOrEqualZero(s) &&
-      reIsGreaterThanOrEqualZero(t) &&
-      reIsLessThanOrEqual((s + t), 1.0)) {
+  if ( (s > RE_FP_TOLERANCE) && (t > RE_FP_TOLERANCE) &&
+      (s + t < 1.0 - RE_FP_TOLERANCE) ) {
     result.intersect = intersection;
-    if (faceNormal.dot(query.dir) > 0.0) {
+    if (dot(faceNormal, query.dir) > 0.0) {
       result.normal = -faceNormal;
     } else {
       result.normal = faceNormal;
     }
-    result.distSq = (query.origin - result.intersect).lengthSq();
+    result.distSq = lengthSq(query.origin - result.intersect);
     return true;
   }
   

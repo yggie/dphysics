@@ -23,9 +23,9 @@ public:
   reFloat radius() const;
   Type type() const override;
   reUInt numVerts() const override;
-  const reVector vert(reUInt i) const override;
+  const re::vec3 vert(reUInt i) const override;
   reFloat volume() const override;
-  const reMatrix computeInertia() const override;
+  const re::mat3 computeInertia() const override;
   
   void setRadius(reFloat radius);
   reSphere& withRadius(reFloat radius);
@@ -57,16 +57,16 @@ inline reUInt reSphere::numVerts() const {
   return 1;
 }
 
-inline const reVector reSphere::vert(reUInt) const {
-  return reVector(0.0, 0.0, 0.0);
+inline const re::vec3 reSphere::vert(reUInt) const {
+  return re::vec3(0.0, 0.0, 0.0);
 }
 
 inline reFloat reSphere::volume() const {
   return RE_PI * 4.0 * radius()*radius()*radius() / 3.0;
 }
 
-inline const reMatrix reSphere::computeInertia() const {
-  return reMatrix(2.0 * radius() * radius() / 5.0);
+inline const re::mat3 reSphere::computeInertia() const {
+  return re::mat3(2.0 * radius() * radius() / 5.0);
 }
 
 /**

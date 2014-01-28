@@ -17,28 +17,28 @@ public:
   /** Default constructor does nothing */
   reTriangle();
   reTriangle(const reTriangle& other);
-  reTriangle(const reVector& a, const reVector& b, const reVector& c);
+  reTriangle(const re::vec& a, const re::vec& b, const re::vec& c);
   /** Destructor does nothing */
   ~reTriangle();
   
-  reTriangle& withVertex(reUInt i, const reVector& vert);
+  reTriangle& withVertex(reUInt i, const re::vec& vert);
   
   // shape representation
   reShape::Type type() const override;
   reUInt numVerts() const override;
-  const reVector vert(reUInt i) const override;
-  const reVector offset() const override;
+  const re::vec vert(reUInt i) const override;
+  const re::vec offset() const override;
   
   // physical metrics
   reFloat volume() const override;
-  const reMatrix computeInertia() const;
+  const re::mat3 computeInertia() const;
   
-  const reVector faceNorm() const;
+  const re::vec faceNorm() const;
   
   bool intersectsRay(const reRayQuery& query, reRayQueryResult& result) const override;
   
 private:
-  reVector _verts[3];
+  re::vec _verts[3];
 };
 
 inline reTriangle::reTriangle() : _verts() {
@@ -65,7 +65,7 @@ inline reTriangle::reTriangle(const reTriangle& other) : _verts() {
  * @param c The third vertex
  */
 
-inline reTriangle::reTriangle(const reVector& a, const reVector& b, const reVector& c) {
+inline reTriangle::reTriangle(const re::vec& a, const re::vec& b, const re::vec& c) {
   _verts[0] = a;
   _verts[1] = b;
   _verts[2] = c;
@@ -79,11 +79,11 @@ inline reUInt reTriangle::numVerts() const {
   return 3;
 }
 
-inline const reVector reTriangle::vert(reUInt i) const {
+inline const re::vec reTriangle::vert(reUInt i) const {
   return _verts[i];
 }
 
-inline const reVector reTriangle::offset() const {
+inline const re::vec reTriangle::offset() const {
   return (_verts[0] + _verts[1] + _verts[2]) / 3.0;
 }
 
@@ -95,7 +95,7 @@ inline const reVector reTriangle::offset() const {
  * @return A reference to the reTriangle
  */
 
-inline reTriangle& reTriangle::withVertex(reUInt i, const reVector& vert) {
+inline reTriangle& reTriangle::withVertex(reUInt i, const re::vec& vert) {
   _verts[i] = vert;
   return *this;
 }
@@ -120,13 +120,13 @@ inline reFloat reTriangle::volume() const {
   return 0.0;
 }
 
-inline const reMatrix reTriangle::computeInertia() const {
+inline const re::mat3 reTriangle::computeInertia() const {
 //  RE_NOT_IMPLEMENTED
-  return reMatrix(1.0f);
+  return re::mat3(1.0f);
 }
 
-inline const reVector reTriangle::faceNorm() const {
-  return (_verts[0] - _verts[1]).cross(_verts[2] - _verts[1]).normalized();
+inline const re::vec reTriangle::faceNorm() const {
+  return re::normalize(re::cross(_verts[0] - _verts[1], _verts[2] - _verts[1]));
 }
 
 #endif

@@ -51,11 +51,11 @@ protected:
   void split();
   void merge();
   
-  void optimalSplit(reVector& anchor, reVector& dir) const;
+  void optimalSplit(re::vec3& anchor, re::vec3& dir) const;
   
   reBSPTree* _child[2];
-  reVector _dir;
-  reVector _anchor;
+  re::vec3 _dir;
+  re::vec3 _anchor;
   const reUInt _depth;
 };
 

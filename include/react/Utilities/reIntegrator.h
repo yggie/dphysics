@@ -15,8 +15,8 @@ using namespace re;
  */
 
 struct reIntegrator {
-  virtual void integrate(reVector& p, reVector& v, reFloat dt);
-  virtual void integrate(quat& o, reVector& w, reFloat dt);
+  virtual void integrate(vec3& p, vec3& v, reFloat dt);
+  virtual void integrate(quat& o, vec3& w, reFloat dt);
 };
 
 /**
@@ -27,7 +27,7 @@ struct reIntegrator {
  * @param dt The time step in user-defined units
  */
 
-inline void reIntegrator::integrate(reVector& p, reVector& v, reFloat dt) {
+inline void reIntegrator::integrate(vec3& p, vec3& v, reFloat dt) {
   p += v*dt;
 }
 
@@ -39,7 +39,7 @@ inline void reIntegrator::integrate(reVector& p, reVector& v, reFloat dt) {
  * @param dt The time step in user-defined units
  */
 
-inline void reIntegrator::integrate(quat& o, reVector& w, reFloat dt) {
+inline void reIntegrator::integrate(quat& o, vec3& w, reFloat dt) {
   o += (w * o) * 0.5 * dt;
 }
 

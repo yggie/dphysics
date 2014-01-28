@@ -35,15 +35,15 @@ protected:
 struct reRayQuery : reSpatialQuery {
   reRayQuery() : reSpatialQuery(), origin(), dir() { }
   /** The ray origin */
-  reVector origin;
+  re::vec origin;
   /** The ray direction */
-  reVector dir;
+  re::vec dir;
 };
 
 struct reRayQueryResult {
   reRayQueryResult() : intersect(), normal(), distSq(RE_INFINITY) { }
-  reVector intersect;
-  reVector normal;
+  re::vec intersect;
+  re::vec normal;
   reFloat distSq;
 };
 
@@ -53,8 +53,8 @@ struct reRayQueryResult {
 
 struct reHyperplaneQuery : reSpatialQuery {
   reHyperplaneQuery() : reSpatialQuery(), point(), dir() { }
-  reVector point;
-  reVector dir;
+  re::vec point;
+  re::vec dir;
 };
 
 #endif

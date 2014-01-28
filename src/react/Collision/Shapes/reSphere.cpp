@@ -16,9 +16,9 @@ reSphere::~reSphere() {
 
 bool reSphere::intersectsRay(const reRayQuery& query, reRayQueryResult& result) const {
   // solve for the points of intersection
-  const reFloat a = query.dir.lengthSq();
-  const reFloat b = 2 * query.origin.dot(query.dir);
-  const reFloat c = query.origin.lengthSq() - radius() * radius();
+  const reFloat a = re::lengthSq(query.dir);
+  const reFloat b = 2 * re::dot(query.origin, query.dir);
+  const reFloat c = re::lengthSq(query.origin) - radius() * radius();
   const reFloat discriminant = b*b - 4*a*c;
   
   if (discriminant < RE_FP_TOLERANCE) {
@@ -34,8 +34,8 @@ bool reSphere::intersectsRay(const reRayQuery& query, reRayQueryResult& result) 
   }
   
   result.intersect = query.origin + query.dir * solA;
-  result.normal = (query.origin + query.dir * solA).normalized();
-  result.distSq = (result.intersect - query.origin).lengthSq();
+  result.normal = re::normalize(query.origin + query.dir * solA);
+  result.distSq = re::lengthSq(result.intersect - query.origin);
   
   return true;
 }
