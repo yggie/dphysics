@@ -116,9 +116,12 @@ void reBSPTree::update() {
 }
 
 void reBSPTree::advance(reIntegrator& integrator, reFloat dt) {
+  // advance each entity forward in time
   for (reEnt& e : entities()) {
     e.advance(integrator, dt);
   }
+  // ensure queries will be up-to-date
+  update();
 }
 
 void reBSPTree::add(reQueryable* q) {

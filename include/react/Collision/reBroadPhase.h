@@ -139,6 +139,15 @@ inline const reEntList& reBroadPhase::entities() const {
  */
 
 /**
+ * @fn void reBroadPhase::advance(reIntegrator& integrator, reFloat dt)
+ * Advances the entities forward in time and also resolves all collisions
+ * in the process
+ * 
+ * @param integrator The desired integrator to use
+ * @param dt The time step to advance, in user-defined units
+ */
+
+/**
  * @fn reEnt* reBroadPhase::queryWithRay(const reRayQuery& query,
  * reRayQueryResult& result) const;
  * Performs a spatial query into the structure using a ray

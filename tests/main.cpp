@@ -4,6 +4,7 @@
 #include "quat.h"
 #include "reIntegrator.h"
 #include "reSolid.h"
+#include "reBSPTree.h"
 
 int main(int argc, char** argv) {
   testing::InitGoogleTest(&argc, argv);
