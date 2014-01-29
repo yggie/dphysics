@@ -9,8 +9,6 @@
 #include "react/Collision/reAABB.h"
 #include "react/Utilities/reEntList.h"
 
-const reUInt RE_BSPTREE_NODE_MIN_SIZE = 10;
-const reUInt RE_BSPTREE_DEPTH_LIMIT   = 5;
 const reUInt RE_BSPTREE_SAMPLE_SIZE   = 8;
 const reUInt RE_BSPTREE_GUESSES       = 3;
 
@@ -28,7 +26,10 @@ public:
   bool add(reEnt* ent) override;
   bool remove(reEnt* ent) override;
   void update() override;
-  void advance(reIntegrator& integrator, reFloat dt);
+  void advance(reIntegrator& integrator, reFloat dt) override;
+  
+  reBSPTree& child(reUInt i) const { return *_child[i]; }
+  reUInt depth() const { return _depth; }
   
   reUInt size() const;
   bool hasChildren() const;

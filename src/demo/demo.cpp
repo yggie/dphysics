@@ -45,6 +45,8 @@ void testDemo(reWorld& world, demo::App& app) {
     app.newPlainSphere(body);
   }
   
+  printf("[DEBUG] reIntegrator: %ld:%ld, reTreeBalanceStrategy: %ld:%ld\n", sizeof(reIntegrator), alignof(reIntegrator), sizeof(reTreeBalanceStrategy), alignof(reTreeBalanceStrategy));
+  
   const float m = 10.0f;
   const float pos[] = {
     m, -1, m,

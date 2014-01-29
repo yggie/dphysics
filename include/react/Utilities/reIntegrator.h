@@ -15,8 +15,8 @@ using namespace re;
  */
 
 struct reIntegrator {
-  virtual void integrate(vec3& p, vec3& v, reFloat dt);
-  virtual void integrate(quat& o, vec3& w, reFloat dt);
+  void integrate(vec3& p, vec3& v, reFloat dt);
+  void integrate(quat& o, vec3& w, reFloat dt);
 };
 
 /**

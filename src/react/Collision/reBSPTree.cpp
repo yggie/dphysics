@@ -3,6 +3,8 @@
 #include "react/math.h"
 #include "react/Entities/reEnt.h"
 #include "react/Memory/reAllocator.h"
+#include "react/Collision/reCollisionGraph.h"
+#include "react/Collision/reTreeBalanceStrategy.h"
 #include "react/Collision/Shapes/reProxyShape.h"
 
 #include <cstdio>
@@ -25,8 +27,8 @@ void reBSPTree::clear() {
   }
   
   if (isRoot()) {
-    auto end = entities().qEnd();
-    for (auto iter = entities().qBegin(); iter != end; ++iter) {
+    auto end = _entities.qEnd();
+    for (auto iter = _entities.qBegin(); iter != end; ++iter) {
       reQueryable& q = *iter;
       RE_EXPECT(q.ent->userdata == nullptr)
       if (q.ent->shape()->type() == reShape::PROXY) {
@@ -37,7 +39,7 @@ void reBSPTree::clear() {
       _world.allocator().alloc_delete(&q);
     }
   }
-  entities().clear();
+  _entities.clear();
 }
 
 bool reBSPTree::add(reEnt* ent) {
@@ -46,7 +48,7 @@ bool reBSPTree::add(reEnt* ent) {
   }
   
   reQueryable* q = _world.allocator().alloc_new<reQueryable>(ent);
-  if (entities().add(q)) {
+  if (_entities.add(q)) {
     if (hasChildren()) {
       for (reUInt i = 0; i < 2; i++) {
         if (_child[i]->contains(ent)) {
@@ -62,8 +64,8 @@ bool reBSPTree::add(reEnt* ent) {
 }
 
 bool reBSPTree::remove(reEnt* ent) {
-  auto end = entities().qEnd();
-  for (auto iter = entities().qBegin(); iter != end; ++iter) {
+  auto end = _entities.qEnd();
+  for (auto iter = _entities.qBegin(); iter != end; ++iter) {
     reQueryable& q = *iter;
     if (q.ent->id() == ent->id()) {
       if (hasChildren()) {
@@ -73,7 +75,7 @@ bool reBSPTree::remove(reEnt* ent) {
           }
         }
       }
-      entities().remove(&q);
+      _entities.remove(&q);
       _world.allocator().alloc_delete(&q);
       return true;
     }
@@ -84,7 +86,7 @@ bool reBSPTree::remove(reEnt* ent) {
 
 void reBSPTree::update() {
   if (hasChildren()) {
-    if (_child[0]->size() + _child[1]->size() < RE_BSPTREE_NODE_MIN_SIZE) {
+    if (_strategy.shouldMerge(*this)) {
       merge();
     } else {
       reEntList list(&_world);
@@ -107,7 +109,7 @@ void reBSPTree::update() {
     if (!isRoot()) {
       trim();
     }
-    if (size() > RE_BSPTREE_NODE_MIN_SIZE && _depth < RE_BSPTREE_DEPTH_LIMIT) {
+    if (_strategy.shouldSplit(*this)) {
       split();
     }
   }
@@ -117,11 +119,15 @@ void reBSPTree::update() {
 
 void reBSPTree::advance(reIntegrator& integrator, reFloat dt) {
   // advance each entity forward in time
-  for (reEnt& e : entities()) {
+  for (reEnt& e : _entities) {
     e.advance(integrator, dt);
   }
   // ensure queries will be up-to-date
   update();
+//  for (reBSPTree& leaf : leafs()) {
+//    leaf.updateCollisions(_collisions);
+//  }
+  _collisions.solve();
 }
 
 void reBSPTree::add(reQueryable* q) {
@@ -132,7 +138,7 @@ void reBSPTree::add(reQueryable* q) {
       }
     }
   } else {
-    entities().add(q);
+    _entities.add(q);
   }
 }
 
@@ -144,7 +150,7 @@ void reBSPTree::remove(reQueryable* q) {
       }
     }
   } else {
-    entities().remove(q);
+    _entities.remove(q);
   }
 }
 
@@ -161,14 +167,14 @@ bool reBSPTree::contains(const reEnt* ent) const {
  * Called from the root or parent node to update its structure. If any reEnts
  * were removed, it is returned
  * 
- * @return A list of rejected entities()
+ * @return A list of rejected _entities
  */
 
 reEntList reBSPTree::updateNode() {
   reEntList list(&_world);
   
   if (hasChildren()) {
-    if (_child[0]->size() + _child[1]->size() < RE_BSPTREE_NODE_MIN_SIZE) {
+    if (_strategy.shouldMerge(*this)) {
       merge();
       return updateNode();
     } else {
@@ -188,7 +194,7 @@ reEntList reBSPTree::updateNode() {
     }
   } else {
     list.append(trim());
-    if (size() > RE_BSPTREE_NODE_MIN_SIZE && _depth < RE_BSPTREE_DEPTH_LIMIT) {
+    if (_strategy.shouldSplit(*this)) {
       split();
     }
   }
@@ -201,16 +207,16 @@ reEntList reBSPTree::updateNode() {
 }
 
 /**
- * Called when a node should verify if all entities() are still contained. 
- * Returns a list of rejected entities()
+ * Called when a node should verify if all _entities are still contained. 
+ * Returns a list of rejected _entities
  * 
- * @return A list of rejected entities()
+ * @return A list of rejected _entities
  */
 
 reEntList reBSPTree::trim() {
   reEntList rejected(&_world);
-  auto end = entities().qEnd();
-  for (auto iter = entities().qBegin(); iter != end; ++iter) {
+  auto end = _entities.qEnd();
+  for (auto iter = _entities.qBegin(); iter != end; ++iter) {
     reQueryable& q = *iter;
     if (!contains(q.ent)) {
       remove(&q);
@@ -235,8 +241,8 @@ void reBSPTree::split() {
     _child[i]->_anchor = splitAnchor;
     _child[i]->_dir = splitDir * ((i % 2 == 0) ? -1 : 1);
     
-    auto end = entities().qEnd();
-    for (auto iter = entities().qBegin(); iter != end; ++iter) {
+    auto end = _entities.qEnd();
+    for (auto iter = _entities.qBegin(); iter != end; ++iter) {
       reQueryable& q = *iter;
       if (_child[i]->contains(q.ent)) {
         _child[i]->add(&q);
@@ -247,7 +253,7 @@ void reBSPTree::split() {
   }
   
   if (!isRoot()) {
-    entities().clear();
+    _entities.clear();
   }
 }
 
@@ -257,7 +263,7 @@ void reBSPTree::split() {
 
 void reBSPTree::merge() {
   for (reUInt i = 0; i < 2; i++) {
-    entities().append(_child[i]->entities());
+    _entities.append(_child[i]->_entities);
     _world.allocator().alloc_delete<reBSPTree>(_child[i]);
     _child[i] = nullptr;
   }
@@ -266,7 +272,7 @@ void reBSPTree::merge() {
 
 void reBSPTree::measure(reBPMeasure& measure) const {
   if (isRoot()) {
-    measure.entities = entities().size();
+    measure.entities = _entities.size();
   } else {
     measure.children++;
   }
@@ -276,7 +282,7 @@ void reBSPTree::measure(reBPMeasure& measure) const {
     _child[1]->measure(measure);
   } else {
     measure.leafs++;
-    measure.references += entities().size();
+    measure.references += _entities.size();
     measure.meanDepth += _depth;
   }
   
@@ -287,14 +293,14 @@ void reBSPTree::measure(reBPMeasure& measure) const {
 
 reEnt* reBSPTree::queryWithRay(const reRayQuery& query, reRayQueryResult& result) const {
   
-  if (!entities().empty() && !isRoot()) {
+  if (!_entities.empty() && !isRoot()) {
     // this must be a leaf node, proceed to entity query
     reRayQueryResult res;
     reFloat maxDistSq = RE_INFINITY;
     reEnt* resultEnt = nullptr;
     
-    auto end = entities().qEnd();
-    for (auto iter = entities().qBegin(); iter != end; ++iter) {
+    auto end = _entities.qEnd();
+    for (auto iter = _entities.qBegin(); iter != end; ++iter) {
       reQueryable& q = *iter;
       if (q.queryID == query.ID) {
         continue;
@@ -355,7 +361,7 @@ void reBSPTree::optimalSplit(re::vec3& anchor, re::vec3& dir) const {
   reUInt index = 0;
   
   if (size() > RE_BSPTREE_SAMPLE_SIZE) {
-    reLinkedList<reEnt*> list = entities().sample(RE_BSPTREE_SAMPLE_SIZE);
+    reLinkedList<reEnt*> list = _entities.sample(RE_BSPTREE_SAMPLE_SIZE);
     
     for (const reEnt* ent : list) {
       anchor += ent->center();
@@ -363,7 +369,7 @@ void reBSPTree::optimalSplit(re::vec3& anchor, re::vec3& dir) const {
     
     anchor /= RE_BSPTREE_SAMPLE_SIZE;
     
-    reLinkedList<reEnt*> list2 = entities().sample(RE_BSPTREE_SAMPLE_SIZE);
+    reLinkedList<reEnt*> list2 = _entities.sample(RE_BSPTREE_SAMPLE_SIZE);
     for (const reEnt* ent : list2) {
       for (reUInt i = 0; i < RE_BSPTREE_GUESSES; i++) {
         vals[i] += re::dot(dirs[i], anchor - ent->center());
@@ -379,8 +385,8 @@ void reBSPTree::optimalSplit(re::vec3& anchor, re::vec3& dir) const {
     reUInt num = 0;
     reUInt n = reMin(RE_BSPTREE_SAMPLE_SIZE, size());
     
-    auto end = entities().qEnd();
-    for (auto iter = entities().qBegin(); iter != end; ++iter) {
+    auto end = _entities.qEnd();
+    for (auto iter = _entities.qBegin(); iter != end; ++iter) {
       const reQueryable& q = *iter;
       anchor += q.ent->center();
       if (++num >= n) {
@@ -390,8 +396,8 @@ void reBSPTree::optimalSplit(re::vec3& anchor, re::vec3& dir) const {
     anchor /= n;
     for (reUInt i = 0; i < RE_BSPTREE_GUESSES; i++) {
       num = 0;
-      auto end = entities().qEnd();
-      for (auto iter = entities().qBegin(); iter != end; ++iter) {
+      auto end = _entities.qEnd();
+      for (auto iter = _entities.qBegin(); iter != end; ++iter) {
         const reQueryable& q = *iter;
         vals[i] += re::dot(dirs[i], anchor - q.ent->center());
         if (++num >= n) {

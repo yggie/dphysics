@@ -8,6 +8,8 @@
 #include "react/common.h"
 #include "react/Utilities/reEntList.h"
 #include "react/Collision/reSpatialQueries.h"
+#include "react/Collision/reCollisionGraph.h"
+#include "react/Collision/reTreeBalanceStrategy.h"
 
 class reEnt;
 class reWorld;
@@ -45,9 +47,12 @@ public:
 protected:
   /** The parent reWorld object */
   const reWorld& _world;
-private:
-  /** The list of reEnt contained in this structure */
+  /** The list of entities contained in this structure */
   reEntList _entities;
+  /** The structure maintaining collision interactions between entities */
+  reCollisionGraph _collisions;
+  /** The strategy used to balance the tree */
+  reTreeBalanceStrategy _strategy;
 };
 
 /**
@@ -75,7 +80,7 @@ struct reBPMeasure {
  * @param world The parent reWorld
  */
 
-inline reBroadPhase::reBroadPhase(const reWorld* world) : _world(*world), _entities(world) {
+inline reBroadPhase::reBroadPhase(const reWorld* world) : _world(*world), _entities(world), _collisions(world), _strategy() {
   // do nothing
 }
 
