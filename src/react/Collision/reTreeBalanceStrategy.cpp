@@ -7,14 +7,37 @@ namespace {
   const reUInt SAMPLES = 8;
 }
 
+/**
+ * Tests if the parent node should merge the child nodes
+ * 
+ * @param node The parent node
+ * @return True if the condition for merging child nodes are met
+ */
+
 bool reTreeBalanceStrategy::shouldMerge(const reBSPTreeNode& node) {
-  if (!node.hasChildren()) return false;
+  if (!node.hasChildren() || node.child(0).hasChildren() || node.child(1).hasChildren()) return false;
   return node.child(0).size() + node.child(1).size() < 10;
 }
+
+/**
+ * Tests if the current node should split
+ * 
+ * @param node The current node
+ */
 
 bool reTreeBalanceStrategy::shouldSplit(const reBSPTreeNode& node) {
   return node.size() > 10 && node.depth < 5;
 }
+
+/**
+ * Determines the optimal split plane for the node by sampling the contained
+ * entities
+ * 
+ * @param parentDir The parent split direction
+ * @param entities A list of entities contained in the parent
+ * @param anchor This field is set to the optimal anchor point
+ * @param dir This field is set to the optimal split plane direction
+ */
 
 void reTreeBalanceStrategy::computeSplitPlane(const re::vec3& parentDir, const reEntList& entities, re::vec3& anchor, re::vec3& dir) {
   anchor.set(0.0, 0.0, 0.0);

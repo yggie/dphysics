@@ -31,6 +31,7 @@ public:
   void remove(reQueryable* q);
   bool contains(const reEnt* ent) const;
   reEntList rebalanceNode(reTreeBalanceStrategy& strategy);
+  void updateCollisions(reCollisionGraph& collisions) const;
   
   // spatial queries
   reEnt* queryWithRay(const reRayQuery& query, reRayQueryResult& result) const;
@@ -49,8 +50,6 @@ protected:
   reEntList trim();
   void split(reTreeBalanceStrategy& strategy);
   void merge();
-  
-  void optimalSplit(re::vec3& anchor, re::vec3& dir) const;
   
   /** The parent reWorld object */
   const reWorld& _world;

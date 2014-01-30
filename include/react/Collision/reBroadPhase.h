@@ -105,8 +105,10 @@ inline reBroadPhase::~reBroadPhase() {
  */
 
 /**
- * @fn void reBroadPhase::update()
+ * @fn void reBroadPhase::rebalance(reTreeBalanceStrategy& strategy)
  * Notifies the broad phase that the entities positions have changed
+ * 
+ * @param strategy The strategy used to rebalance the tree
  */
 
 /**

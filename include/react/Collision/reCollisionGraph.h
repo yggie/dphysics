@@ -16,6 +16,8 @@ public:
   ~reCollisionGraph();
   
   void solve();
+  void check(const reEnt& entA, const reEnt& entB);
+  void advance(reFloat dt);
   
 private:
   const reWorld& _world;
@@ -28,7 +30,15 @@ inline reCollisionGraph::~reCollisionGraph() {
 }
 
 inline void reCollisionGraph::solve() {
-  // do something
+  // TODO something smart
+}
+
+inline void reCollisionGraph::check(const reEnt&, const reEnt&) {
+  // TODO something smart
+}
+
+inline void reCollisionGraph::advance(reFloat) {
+  // TODO something smart
 }
 
 #endif
