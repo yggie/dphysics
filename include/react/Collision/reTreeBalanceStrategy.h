@@ -5,14 +5,14 @@
 #ifndef RE_TREE_BALANCE_STRATEGY
 #define RE_TREE_BALANCE_STRATEGY
 
-class reBSPTree;
+class reBSPTreeNode;
 
 class reTreeBalanceStrategy {
 public:
   reTreeBalanceStrategy();
   
-  bool shouldMerge(const reBSPTree& node);
-  bool shouldSplit(const reBSPTree& node);
+  bool shouldMerge(const reBSPTreeNode& node);
+  bool shouldSplit(const reBSPTreeNode& node);
 };
 
 inline reTreeBalanceStrategy::reTreeBalanceStrategy() {

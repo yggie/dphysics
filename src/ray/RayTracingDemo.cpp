@@ -294,7 +294,7 @@ void RayTracingDemo::renderScene(GLsizei w, GLsizei h) {
   
   const re::vec eye = _inverseViewMat.mult(re::vec(0,0,0), 1.0);
   
-  _world.broadPhase().update();
+  _world.broadPhase().rebalance();
   reBPMeasure m;
   _world.broadPhase().measure(m);
   printf("[INFO]   B-Phase: (refRatio=%.2f, child=%d, leafs=%d, meanDepth=%.1f)\n", m.references/(float)m.entities, m.children, m.leafs, m.meanDepth);

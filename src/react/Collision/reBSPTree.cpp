@@ -9,15 +9,16 @@
 
 #include <cstdio>
 
-reBSPTree::reBSPTree(const reWorld* world, reUInt depth) : reBroadPhase(world), _child{nullptr}, _dir(1.0, 0.0, 0.0), _anchor(0.0, 0.0, 0.0), _depth(depth) {
+reBSPTreeNode::reBSPTreeNode(const reWorld* world, reUInt depth, re::vec3 dir, re::vec3 anchor) : dir(dir), anchor(anchor), depth(depth), _world(*world), _entities(world), _child{nullptr} {
   // do nothing
 }
 
-reBSPTree::~reBSPTree() {
+reBSPTreeNode::~reBSPTreeNode() {
   clear();
 }
 
-void reBSPTree::clear() {
+void reBSPTreeNode::clear() {
+  // clear children
   if (hasChildren()) {
     for (reUInt i = 0; i < 2; i++) {
       _child[i]->clear();
@@ -26,6 +27,7 @@ void reBSPTree::clear() {
     }
   }
   
+  // clear all entities
   if (isRoot()) {
     auto end = _entities.qEnd();
     for (auto iter = _entities.qBegin(); iter != end; ++iter) {
@@ -42,256 +44,16 @@ void reBSPTree::clear() {
   _entities.clear();
 }
 
-bool reBSPTree::add(reEnt* ent) {
-  if (ent == nullptr) {
-    return false;
-  }
-  
-  reQueryable* q = _world.allocator().alloc_new<reQueryable>(ent);
-  if (_entities.add(q)) {
-    if (hasChildren()) {
-      for (reUInt i = 0; i < 2; i++) {
-        if (_child[i]->contains(ent)) {
-          _child[i]->add(q);
-        }
-      }
-    }
-    return true;
-  } else {
-    _world.allocator().alloc_delete(q);
-    return false;
-  }
-}
-
-bool reBSPTree::remove(reEnt* ent) {
-  auto end = _entities.qEnd();
-  for (auto iter = _entities.qBegin(); iter != end; ++iter) {
-    reQueryable& q = *iter;
-    if (q.ent->id() == ent->id()) {
-      if (hasChildren()) {
-        for (reUInt i = 0; i < 2; i++) {
-          if (_child[i]->contains(ent)) {
-            _child[i]->remove(&q);
-          }
-        }
-      }
-      _entities.remove(&q);
-      _world.allocator().alloc_delete(&q);
-      return true;
-    }
-  }
-  
-  return false;
-}
-
-void reBSPTree::update() {
-  if (hasChildren()) {
-    if (_strategy.shouldMerge(*this)) {
-      merge();
-    } else {
-      reEntList list(&_world);
-      for (reUInt i = 0; i < 2; i++) {
-        list.append(_child[i]->updateNode());
-        
-        auto end = list.qEnd();
-        for (auto iter = list.qBegin(); iter != end; ++iter) {
-          reQueryable& q = *iter;
-          const reUInt j = (i + 1) % 2;
-          if (_child[j]->contains(q.ent)) {
-            _child[j]->add(&q);
-          }
-        }
-        
-        list.clear();
-      }
-    }
-  } else {
-    if (!isRoot()) {
-      trim();
-    }
-    if (_strategy.shouldSplit(*this)) {
-      split();
-    }
-  }
-  
-//  printf("[ROOT] (%3d, %3d) (%+.1f, %+.1f, %+.1f) (%+.1f, %+.1f, %+.1f)\n", _depth, size(), _dir[0], _dir[1], _dir[2], _anchor[0], _anchor[1], _anchor[2]);
-}
-
-void reBSPTree::advance(reIntegrator& integrator, reFloat dt) {
-  // advance each entity forward in time
-  for (reEnt& e : _entities) {
-    e.advance(integrator, dt);
-  }
-  // ensure queries will be up-to-date
-  update();
-//  for (reBSPTree& leaf : leafs()) {
-//    leaf.updateCollisions(_collisions);
-//  }
-  _collisions.solve();
-}
-
-void reBSPTree::add(reQueryable* q) {
-  if (hasChildren()) {
-    for (reUInt i = 0; i < 2; i++) {
-      if (_child[i]->contains(q->ent)) {
-        _child[i]->add(q);
-      }
-    }
-  } else {
-    _entities.add(q);
-  }
-}
-
-void reBSPTree::remove(reQueryable* q) {
-  if (hasChildren()) {
-    for (reUInt i = 0; i < 2; i++) {
-      if (_child[i]->contains(q->ent)) {
-        _child[i]->remove(q);
-      }
-    }
-  } else {
-    _entities.remove(q);
-  }
-}
-
-bool reBSPTree::contains(const reEnt* ent) const {
+bool reBSPTreeNode::contains(const reEnt* ent) const {
   if (ent == nullptr) {
     RE_WARN("Attempted to query using null\n")
     return false;
   }
   
-  return ent->intersectsHyperplane(_anchor, _dir);
+  return ent->intersectsHyperplane(anchor, dir);
 }
 
-/**
- * Called from the root or parent node to update its structure. If any reEnts
- * were removed, it is returned
- * 
- * @return A list of rejected _entities
- */
-
-reEntList reBSPTree::updateNode() {
-  reEntList list(&_world);
-  
-  if (hasChildren()) {
-    if (_strategy.shouldMerge(*this)) {
-      merge();
-      return updateNode();
-    } else {
-      for (reUInt i = 0; i < 2; i++) {
-        list.append(_child[i]->updateNode());
-        
-        auto end = list.qEnd();
-        for (auto iter = list.qBegin(); iter != end; ++iter) {
-          reQueryable& q = *iter;
-          const reUInt j = (i + 1) % 2;
-          if (_child[j]->contains(q.ent)) {
-            _child[j]->add(&q);
-            list.remove(&q);
-          }
-        }
-      }
-    }
-  } else {
-    list.append(trim());
-    if (_strategy.shouldSplit(*this)) {
-      split();
-    }
-  }
-  
-//  if (!hasChildren()) {
-//    printf("[NODE] (%3d, %3d) (%+.1f, %+.1f, %+.1f) (%+.1f, %+.1f, %+.1f)\n", _depth, size(), _dir[0], _dir[1], _dir[2], _anchor[0], _anchor[1], _anchor[2]);
-//  }
-  
-  return list;
-}
-
-/**
- * Called when a node should verify if all _entities are still contained. 
- * Returns a list of rejected _entities
- * 
- * @return A list of rejected _entities
- */
-
-reEntList reBSPTree::trim() {
-  reEntList rejected(&_world);
-  auto end = _entities.qEnd();
-  for (auto iter = _entities.qBegin(); iter != end; ++iter) {
-    reQueryable& q = *iter;
-    if (!contains(q.ent)) {
-      remove(&q);
-      rejected.add(&q);
-    }
-  }
-  
-  return rejected;
-}
-
-/**
- * Called when the tree requires branching out
- */
-
-void reBSPTree::split() {
-  re::vec3 splitAnchor, splitDir;
-  optimalSplit(splitAnchor, splitDir);
-  
-  // setup each _child node
-  for (reUInt i = 0; i < 2; i++) {
-    _child[i] = _world.allocator().alloc_new<reBSPTree>(&_world, _depth + 1);
-    _child[i]->_anchor = splitAnchor;
-    _child[i]->_dir = splitDir * ((i % 2 == 0) ? -1 : 1);
-    
-    auto end = _entities.qEnd();
-    for (auto iter = _entities.qBegin(); iter != end; ++iter) {
-      reQueryable& q = *iter;
-      if (_child[i]->contains(q.ent)) {
-        _child[i]->add(&q);
-      }
-    }
-    
-    _child[i]->updateNode();
-  }
-  
-  if (!isRoot()) {
-    _entities.clear();
-  }
-}
-
-/**
- * Called when the _child nodes are to be merged with the parent
- */
-
-void reBSPTree::merge() {
-  for (reUInt i = 0; i < 2; i++) {
-    _entities.append(_child[i]->_entities);
-    _world.allocator().alloc_delete<reBSPTree>(_child[i]);
-    _child[i] = nullptr;
-  }
-  printf("[NODE] MERGE %d\n", _depth);
-}
-
-void reBSPTree::measure(reBPMeasure& measure) const {
-  if (isRoot()) {
-    measure.entities = _entities.size();
-  } else {
-    measure.children++;
-  }
-  
-  if (hasChildren()) {
-    _child[0]->measure(measure);
-    _child[1]->measure(measure);
-  } else {
-    measure.leafs++;
-    measure.references += _entities.size();
-    measure.meanDepth += _depth;
-  }
-  
-  if (isRoot()) {
-    measure.meanDepth /= measure.leafs;
-  }
-}
-
-reEnt* reBSPTree::queryWithRay(const reRayQuery& query, reRayQueryResult& result) const {
+reEnt* reBSPTreeNode::queryWithRay(const reRayQuery& query, reRayQueryResult& result) const {
   
   if (!_entities.empty() && !isRoot()) {
     // this must be a leaf node, proceed to entity query
@@ -323,7 +85,7 @@ reEnt* reBSPTree::queryWithRay(const reRayQuery& query, reRayQueryResult& result
     
     for (reUInt i = 0; i < 2; i++) {
       // check if the hyperplane contains the ray
-      if (re::dot(query.dir, _child[i]->_dir) > 0.0 || re::dot(query.origin - _child[i]->_anchor, _child[i]->_dir) > 0.0) {
+      if (re::dot(query.dir, _child[i]->dir) > 0.0 || re::dot(query.origin - _child[i]->anchor, _child[i]->dir) > 0.0) {
         ent[i] = _child[i]->queryWithRay(query, res[i]);
       }
     }
@@ -340,6 +102,174 @@ reEnt* reBSPTree::queryWithRay(const reRayQuery& query, reRayQueryResult& result
   }
 }
 
+void reBSPTreeNode::measure(reBPMeasure& m) const {
+  if (isRoot()) {
+    m.entities = _entities.size();
+  } else {
+    m.children++;
+  }
+  
+  if (hasChildren()) {
+    _child[0]->measure(m);
+    _child[1]->measure(m);
+  } else {
+    m.leafs++;
+    m.references += _entities.size();
+    m.meanDepth += depth;
+  }
+  
+  if (isRoot()) {
+    m.meanDepth /= m.leafs;
+  }
+}
+
+/**
+ * Adds the queryable object to the structure
+ * 
+ * @param q The queryable object to add
+ */
+
+void reBSPTreeNode::add(reQueryable* q) {
+  if (hasChildren()) {
+    for (reUInt i = 0; i < 2; i++) {
+      if (_child[i]->contains(q->ent)) {
+        _child[i]->add(q);
+      }
+    }
+  } else {
+    _entities.add(q);
+  }
+}
+
+/**
+ * Removes the queryable object from the node
+ * 
+ * @param q The queryable object to remove
+ */
+
+void reBSPTreeNode::remove(reQueryable* q) {
+  if (hasChildren()) {
+    for (reUInt i = 0; i < 2; i++) {
+      if (_child[i]->contains(q->ent)) {
+        _child[i]->remove(q);
+      }
+    }
+  } else {
+    _entities.remove(q);
+  }
+}
+
+/**
+ * Called from the root or parent node to update its structure. If any reEnts
+ * were removed, it is returned
+ * 
+ * @return A list of rejected _entities
+ */
+
+reEntList reBSPTreeNode::rebalanceNode(reTreeBalanceStrategy& strategy) {
+  reEntList list(&_world);
+  
+  // updates the child nodes
+  if (hasChildren()) {
+    if (strategy.shouldMerge(*this)) {
+      merge();
+      return rebalanceNode(strategy);
+    } else {
+      for (reUInt i = 0; i < 2; i++) {
+        list.append(_child[i]->rebalanceNode(strategy));
+        
+        // moves entities between children if necessary
+        auto end = list.qEnd();
+        for (auto iter = list.qBegin(); iter != end; ++iter) {
+          reQueryable& q = *iter;
+          const reUInt j = (i + 1) % 2;
+          if (_child[j]->contains(q.ent)) {
+            _child[j]->add(&q);
+            list.remove(&q);
+          }
+        }
+      }
+    }
+  } else {
+    // checks if entities are still contained
+    list.append(trim());
+    // split tree if necessary
+    if (strategy.shouldSplit(*this)) {
+      split(strategy);
+    }
+  }
+  
+  // returns a list of rejected entities
+  return list;
+}
+
+/**
+ * Checks if all entities are still contained and returns a list of rejected
+ * entities.
+ * 
+ * @return A list of rejected entities
+ */
+
+reEntList reBSPTreeNode::trim() {
+  reEntList rejected(&_world);
+  auto end = _entities.qEnd();
+  for (auto iter = _entities.qBegin(); iter != end; ++iter) {
+    reQueryable& q = *iter;
+    if (!contains(q.ent)) {
+      remove(&q);
+      rejected.add(&q);
+    }
+  }
+  
+  return rejected;
+}
+
+/**
+ * Called when the tree requires branching out
+ */
+
+void reBSPTreeNode::split(reTreeBalanceStrategy& strategy) {
+  re::vec3 splitAnchor, splitDir(dir);
+  optimalSplit(splitAnchor, splitDir);
+  
+  // setup each _child node
+  for (reUInt i = 0; i < 2; i++) {
+    _child[i] = _world.allocator().alloc_new<reBSPTreeNode>(
+      &_world,
+      depth + 1,
+      splitDir * ((i % 2 == 0) ? -1 : 1),
+      splitAnchor
+    );
+    
+    auto end = _entities.qEnd();
+    for (auto iter = _entities.qBegin(); iter != end; ++iter) {
+      reQueryable& q = *iter;
+      if (_child[i]->contains(q.ent)) {
+        _child[i]->add(&q);
+      }
+    }
+    
+    _child[i]->rebalanceNode(strategy);
+  }
+  
+  if (!isRoot()) {
+    _entities.clear();
+  }
+}
+
+/**
+ * Called when the _child nodes are to be merged with the parent
+ */
+
+void reBSPTreeNode::merge() {
+  for (reUInt i = 0; i < 2; i++) {
+    _entities.append(_child[i]->_entities);
+    _world.allocator().alloc_delete(_child[i]);
+    _child[i] = nullptr;
+  }
+  printf("[NODE] MERGE %d\n", depth);
+}
+
 /**
  * Determines the optimal split plane for the node by sampling the contained
  * reEnt
@@ -348,13 +278,13 @@ reEnt* reBSPTree::queryWithRay(const reRayQuery& query, reRayQueryResult& result
  * @param dir This field is set to the optimal split plane direction
  */
 
-void reBSPTree::optimalSplit(re::vec3& anchor, re::vec3& dir) const {
+void reBSPTreeNode::optimalSplit(re::vec3& anchor, re::vec3& dir) const {
   anchor.set(0.0, 0.0, 0.0);
   
   re::vec3 dirs[RE_BSPTREE_GUESSES] = {
-    re::cross(_dir, re::vec3::random()),
-    re::cross(_dir, re::vec3::random()),
-    re::cross(_dir, re::vec3::random())
+    re::cross(dir, re::vec3::random()),
+    re::cross(dir, re::vec3::random()),
+    re::cross(dir, re::vec3::random())
   };
   
   reFloat vals[RE_BSPTREE_GUESSES] = { 0.0 };
@@ -411,5 +341,100 @@ void reBSPTree::optimalSplit(re::vec3& anchor, re::vec3& dir) const {
   }
   
   dir = dirs[index];
+}
+
+reBSPTree::reBSPTree(const reWorld* world) : reBroadPhase(), reBSPTreeNode(world, 0, re::vec3(1.0, 0.0, 0.0), re::vec3(0.0, 0.0, 0.0)), _collisions(world), _strategy() {
+  // do nothing
+}
+
+reBSPTree::~reBSPTree() {
+  clear();
+}
+
+bool reBSPTree::add(reEnt* ent) {
+  if (ent == nullptr) {
+    return false;
+  }
+  
+  reQueryable* q = _world.allocator().alloc_new<reQueryable>(ent);
+  if (_entities.add(q)) {
+    if (hasChildren()) {
+      for (reUInt i = 0; i < 2; i++) {
+        if (_child[i]->contains(ent)) {
+          _child[i]->add(q);
+        }
+      }
+    }
+    return true;
+  } else {
+    _world.allocator().alloc_delete(q);
+    return false;
+  }
+}
+
+bool reBSPTree::remove(reEnt* ent) {
+  auto end = _entities.qEnd();
+  for (auto iter = _entities.qBegin(); iter != end; ++iter) {
+    reQueryable& q = *iter;
+    if (q.ent->id() == ent->id()) {
+      if (hasChildren()) {
+        for (reUInt i = 0; i < 2; i++) {
+          if (_child[i]->contains(ent)) {
+            _child[i]->remove(&q);
+          }
+        }
+      }
+      _entities.remove(&q);
+      _world.allocator().alloc_delete(&q);
+      return true;
+    }
+  }
+  
+  return false;
+}
+
+void reBSPTree::rebalance(reTreeBalanceStrategy* strategy) {
+  if (strategy == nullptr) {
+    strategy = &_strategy;
+  }
+  
+  if (hasChildren()) {
+    if (strategy->shouldMerge(*this)) {
+      merge();
+    } else {
+      reEntList list(&_world);
+      for (reUInt i = 0; i < 2; i++) {
+        list.append(_child[i]->rebalanceNode(*strategy));
+        
+        auto end = list.qEnd();
+        for (auto iter = list.qBegin(); iter != end; ++iter) {
+          reQueryable& q = *iter;
+          const reUInt j = (i + 1) % 2;
+          if (_child[j]->contains(q.ent)) {
+            _child[j]->add(&q);
+          }
+        }
+        
+        list.clear();
+      }
+    }
+  } else {
+    if (strategy->shouldSplit(*this)) {
+      split(*strategy);
+    }
+  }
+}
+
+void reBSPTree::advance(reIntegrator& integrator, reFloat dt) {
+  // advance each entity forward in time
+  for (reEnt& e : _entities) {
+    e.advance(integrator, dt);
+  }
+  // ensure queries will be up-to-date
+  rebalance();
+//  for (reBSPTree& leaf : leafs()) {
+//    leaf.updateCollisions(_collisions);
+//  }
+  _collisions.solve();
 }
 

@@ -24,35 +24,23 @@ struct reBPMeasure;
 
 class reBroadPhase {
 public:
-  reBroadPhase(const reWorld* world);
+  reBroadPhase();
   /** Destructor constructor does nothing */
   virtual ~reBroadPhase() = 0;
 
   virtual void clear() = 0;
   virtual bool add(reEnt* ent) = 0;
   virtual bool remove(reEnt* ent) = 0;
-  virtual void update() = 0;
+  virtual void rebalance(reTreeBalanceStrategy* strategy = nullptr) = 0;
   virtual void advance(reIntegrator& integrator, reFloat dt) = 0;
   
-  // getters
-  reEntList& entities();
-  const reEntList& entities() const;
+  virtual reEntList& entities() = 0;
   
   // spatial queries
   virtual reEnt* queryWithRay(const reRayQuery& query, reRayQueryResult& result) const = 0;
   
   // measurement functions
-  virtual void measure(reBPMeasure& measure) const = 0;
-  
-protected:
-  /** The parent reWorld object */
-  const reWorld& _world;
-  /** The list of entities contained in this structure */
-  reEntList _entities;
-  /** The structure maintaining collision interactions between entities */
-  reCollisionGraph _collisions;
-  /** The strategy used to balance the tree */
-  reTreeBalanceStrategy _strategy;
+  virtual void measure(reBPMeasure& m) const = 0;
 };
 
 /**
@@ -80,34 +68,12 @@ struct reBPMeasure {
  * @param world The parent reWorld
  */
 
-inline reBroadPhase::reBroadPhase(const reWorld* world) : _world(*world), _entities(world), _collisions(world), _strategy() {
+inline reBroadPhase::reBroadPhase() {
   // do nothing
 }
 
 inline reBroadPhase::~reBroadPhase() {
   // do nothing
-}
-
-/**
- * Returns the list of entities
- * 
- * @return The reEntList containing all the entities in the reBroadPhase
- */
-
-inline reEntList& reBroadPhase::entities() {
-  return _entities;
-}
-
-/**
- * Returns the list of entities.
- * 
- * Enforces the constant constraint
- * 
- * @return The reEntList containing all the entities in the reBroadPhase
- */
-
-inline const reEntList& reBroadPhase::entities() const {
-  return _entities;
 }
 
 /**
