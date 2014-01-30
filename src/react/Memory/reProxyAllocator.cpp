@@ -10,10 +10,7 @@ _allocator(allocator) {
 }
 
 reProxyAllocator::~reProxyAllocator() {
-  RE_DEBUG("LIFETIME: remaining(%d)\n", _allocator->numAllocs())
-  if (_allocator->numAllocs() != 0 || _allocator->used() != 0) {
-    RE_WARN("Memory leak detected!\n")
-  }
+  RE_EXPECT(_allocator->numAllocs() == 0 && _allocator->used() == 0);
   
 //  show();
   

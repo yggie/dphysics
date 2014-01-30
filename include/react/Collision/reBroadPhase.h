@@ -7,8 +7,8 @@
 
 #include "react/common.h"
 #include "react/Utilities/reEntList.h"
+#include "react/Collision/reContactGraph.h"
 #include "react/Collision/reSpatialQueries.h"
-#include "react/Collision/reCollisionGraph.h"
 #include "react/Collision/reTreeBalanceStrategy.h"
 
 class reEnt;
@@ -40,7 +40,7 @@ public:
   virtual reEnt* queryWithRay(const reRayQuery& query, reRayQueryResult& result) const = 0;
   
   // measurement functions
-  virtual void measure(reBPMeasure& m) const = 0;
+  virtual reBPMeasure measure() const = 0;
 };
 
 /**
@@ -128,6 +128,13 @@ inline reBroadPhase::~reBroadPhase() {
  * @param query The ray query structure
  * @param result The ray query result structure
  * @return The reEnt which was found
+ */
+
+/**
+ * @fn reBPMeasure reBroadPhase::measure()
+ * Stores usage data related to the structures and returns it
+ * 
+ * @return The measure object containing usage data
  */
 
 #endif

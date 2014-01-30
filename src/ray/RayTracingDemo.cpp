@@ -68,6 +68,9 @@ void RayTracingDemo::init() {
 	glPixelTransferi(GL_ALPHA_SCALE, 1);
 	glPixelTransferi(GL_ALPHA_BIAS, 0);
 	glShadeModel(GL_FLAT);
+	
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  glFlush();
   
   restart();
 }
@@ -295,8 +298,7 @@ void RayTracingDemo::renderScene(GLsizei w, GLsizei h) {
   const re::vec eye = _inverseViewMat.mult(re::vec(0,0,0), 1.0);
   
   _world.broadPhase().rebalance();
-  reBPMeasure m;
-  _world.broadPhase().measure(m);
+  reBPMeasure m = _world.broadPhase().measure();
   printf("[INFO]   B-Phase: (refRatio=%.2f, child=%d, leafs=%d, meanDepth=%.1f)\n", m.references/(float)m.entities, m.children, m.leafs, m.meanDepth);
   
   printf("[INFO]   Image size: %d x %d\n", _renderWidth, _renderHeight);

@@ -3,7 +3,7 @@
 #include "react/math.h"
 #include "react/Entities/reEnt.h"
 #include "react/Memory/reAllocator.h"
-#include "react/Collision/reCollisionGraph.h"
+#include "react/Collision/reContactGraph.h"
 #include "react/Collision/reTreeBalanceStrategy.h"
 #include "react/Collision/Shapes/reProxyShape.h"
 
@@ -102,25 +102,10 @@ reEnt* reBSPTreeNode::queryWithRay(const reRayQuery& query, reRayQueryResult& re
   }
 }
 
-void reBSPTreeNode::measure(reBPMeasure& m) const {
-  if (isRoot()) {
-    m.entities = _entities.size();
-  } else {
-    m.children++;
-  }
-  
-  if (hasChildren()) {
-    _child[0]->measure(m);
-    _child[1]->measure(m);
-  } else {
-    m.leafs++;
-    m.references += _entities.size();
-    m.meanDepth += depth;
-  }
-  
-  if (isRoot()) {
-    m.meanDepth /= m.leafs;
-  }
+reBPMeasure reBSPTreeNode::measure() const {
+  reBPMeasure m;
+  measureRecursive(m);
+  return m;
 }
 
 /**
@@ -210,7 +195,7 @@ reEntList reBSPTreeNode::rebalanceNode(reTreeBalanceStrategy& strategy) {
  * @param collisions The collision collection object
  */
 
-void reBSPTreeNode::updateCollisions(reCollisionGraph& collisions) const {
+void reBSPTreeNode::updateCollisions(reContactGraph& collisions) const {
   if (hasChildren()) {
     // propagate call to children
     _child[0]->updateCollisions(collisions);
@@ -295,6 +280,33 @@ void reBSPTreeNode::merge() {
     _child[i] = nullptr;
   }
   printf("[NODE] MERGE %d\n", depth);
+}
+
+/**
+ * Passes the measure object through the structure recursively
+ * 
+ * @param The measure object, in which the data will be written on
+ */
+
+void reBSPTreeNode::measureRecursive(reBPMeasure& m) const {
+  if (isRoot()) {
+    m.entities = _entities.size();
+  } else {
+    m.children++;
+  }
+  
+  if (hasChildren()) {
+    _child[0]->measureRecursive(m);
+    _child[1]->measureRecursive(m);
+  } else {
+    m.leafs++;
+    m.references += _entities.size();
+    m.meanDepth += depth;
+  }
+  
+  if (isRoot()) {
+    m.meanDepth /= m.leafs;
+  }
 }
 
 reBSPTree::reBSPTree(const reWorld* world) : reBroadPhase(), reBSPTreeNode(world, 0, re::vec3(1.0, 0.0, 0.0), re::vec3(0.0, 0.0, 0.0)), _collisions(world), _strategy() {
@@ -391,6 +403,6 @@ void reBSPTree::advance(reIntegrator& integrator, reFloat dt) {
   // solves the collisions
   _collisions.solve();
   // advances the collision collection in time
-  _collisions.advance(dt);
+  _collisions.advance();
 }
 

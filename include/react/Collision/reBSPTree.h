@@ -31,13 +31,13 @@ public:
   void remove(reQueryable* q);
   bool contains(const reEnt* ent) const;
   reEntList rebalanceNode(reTreeBalanceStrategy& strategy);
-  void updateCollisions(reCollisionGraph& collisions) const;
+  void updateCollisions(reContactGraph& collisions) const;
   
   // spatial queries
   reEnt* queryWithRay(const reRayQuery& query, reRayQueryResult& result) const;
   
   // measurement
-  void measure(reBPMeasure& measure) const;
+  reBPMeasure measure() const;
   
   /** The split direction of the node */
   const re::vec3 dir;
@@ -50,6 +50,8 @@ protected:
   reEntList trim();
   void split(reTreeBalanceStrategy& strategy);
   void merge();
+  
+  void measureRecursive(reBPMeasure& m) const;
   
   /** The parent reWorld object */
   const reWorld& _world;
@@ -82,11 +84,11 @@ public:
   reEnt* queryWithRay(const reRayQuery& query, reRayQueryResult& result) const override { return reBSPTreeNode::queryWithRay(query, result); }
   
   // measurement
-  void measure(reBPMeasure& m) const override { reBSPTreeNode::measure(m); }
+  reBPMeasure measure() const override { return reBSPTreeNode::measure(); }
   
 protected:
   /** The structure maintaining collision interactions between entities */
-  reCollisionGraph _collisions;
+  reContactGraph _collisions;
   /** The strategy used to balance the tree */
   reTreeBalanceStrategy _strategy;
 };

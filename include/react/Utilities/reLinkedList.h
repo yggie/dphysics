@@ -26,7 +26,7 @@ public:
   
 private:
   T _value;
-  reLinkedNode* _next;
+  reLinkedNode<T>* _next;
 };
 
 /**
