@@ -230,7 +230,8 @@ reEntList reBSPTreeNode::trim() {
 
 void reBSPTreeNode::split(reTreeBalanceStrategy& strategy) {
   re::vec3 splitAnchor, splitDir(dir);
-  optimalSplit(splitAnchor, splitDir);
+  strategy.computeSplitPlane(dir, _entities, splitAnchor, splitDir);
+//  optimalSplit(splitAnchor, splitDir);
   
   // setup each _child node
   for (reUInt i = 0; i < 2; i++) {
@@ -279,68 +280,6 @@ void reBSPTreeNode::merge() {
  */
 
 void reBSPTreeNode::optimalSplit(re::vec3& anchor, re::vec3& dir) const {
-  anchor.set(0.0, 0.0, 0.0);
-  
-  re::vec3 dirs[RE_BSPTREE_GUESSES] = {
-    re::cross(dir, re::vec3::random()),
-    re::cross(dir, re::vec3::random()),
-    re::cross(dir, re::vec3::random())
-  };
-  
-  reFloat vals[RE_BSPTREE_GUESSES] = { 0.0 };
-  reUInt index = 0;
-  
-  if (size() > RE_BSPTREE_SAMPLE_SIZE) {
-    reLinkedList<reEnt*> list = _entities.sample(RE_BSPTREE_SAMPLE_SIZE);
-    
-    for (const reEnt* ent : list) {
-      anchor += ent->center();
-    }
-    
-    anchor /= RE_BSPTREE_SAMPLE_SIZE;
-    
-    reLinkedList<reEnt*> list2 = _entities.sample(RE_BSPTREE_SAMPLE_SIZE);
-    for (const reEnt* ent : list2) {
-      for (reUInt i = 0; i < RE_BSPTREE_GUESSES; i++) {
-        vals[i] += re::dot(dirs[i], anchor - ent->center());
-      }
-    }
-    
-    for (reUInt i = 1; i < RE_BSPTREE_GUESSES; i++) {
-      if (reAbs(vals[i]) < reAbs(vals[index])) {
-        index = i;
-      }
-    }
-  } else {
-    reUInt num = 0;
-    reUInt n = reMin(RE_BSPTREE_SAMPLE_SIZE, size());
-    
-    auto end = _entities.qEnd();
-    for (auto iter = _entities.qBegin(); iter != end; ++iter) {
-      const reQueryable& q = *iter;
-      anchor += q.ent->center();
-      if (++num >= n) {
-        break;
-      }
-    }
-    anchor /= n;
-    for (reUInt i = 0; i < RE_BSPTREE_GUESSES; i++) {
-      num = 0;
-      auto end = _entities.qEnd();
-      for (auto iter = _entities.qBegin(); iter != end; ++iter) {
-        const reQueryable& q = *iter;
-        vals[i] += re::dot(dirs[i], anchor - q.ent->center());
-        if (++num >= n) {
-          break;
-        }
-      }
-      if (i > 0 && reAbs(vals[i]) < reAbs(vals[index])) {
-        index = i;
-      }
-    }
-  }
-  
-  dir = dirs[index];
 }
 
 reBSPTree::reBSPTree(const reWorld* world) : reBroadPhase(), reBSPTreeNode(world, 0, re::vec3(1.0, 0.0, 0.0), re::vec3(0.0, 0.0, 0.0)), _collisions(world), _strategy() {

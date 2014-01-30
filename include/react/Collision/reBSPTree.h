@@ -9,9 +9,6 @@
 #include "react/Collision/reAABB.h"
 #include "react/Utilities/reEntList.h"
 
-const reUInt RE_BSPTREE_SAMPLE_SIZE   = 8;
-const reUInt RE_BSPTREE_GUESSES       = 3;
-
 /**
  * @ingroup collision
  * Represents a node in the BSP tree
