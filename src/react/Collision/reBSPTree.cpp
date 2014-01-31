@@ -3,8 +3,6 @@
 #include "react/math.h"
 #include "react/Entities/reEnt.h"
 #include "react/Memory/reAllocator.h"
-#include "react/Collision/reContactGraph.h"
-#include "react/Collision/reTreeBalanceStrategy.h"
 #include "react/Collision/Shapes/reProxyShape.h"
 
 #include <cstdio>
@@ -195,11 +193,11 @@ reEntList reBSPTreeNode::rebalanceNode(reTreeBalanceStrategy& strategy) {
  * @param collisions The collision collection object
  */
 
-void reBSPTreeNode::updateCollisions(reContactGraph& collisions) const {
+void reBSPTreeNode::updateContacts(reContactGraph& collisions) const {
   if (hasChildren()) {
     // propagate call to children
-    _child[0]->updateCollisions(collisions);
-    _child[1]->updateCollisions(collisions);
+    _child[0]->updateContacts(collisions);
+    _child[1]->updateContacts(collisions);
   } else {
     auto end = _entities.end();
     // loop over all entities
@@ -309,7 +307,7 @@ void reBSPTreeNode::measureRecursive(reBPMeasure& m) const {
   }
 }
 
-reBSPTree::reBSPTree(const reWorld* world) : reBroadPhase(), reBSPTreeNode(world, 0, re::vec3(1.0, 0.0, 0.0), re::vec3(0.0, 0.0, 0.0)), _collisions(world), _strategy() {
+reBSPTree::reBSPTree(const reWorld* world) : reBroadPhase(), reBSPTreeNode(world, 0, re::vec3(1.0, 0.0, 0.0), re::vec3(0.0, 0.0, 0.0)), _contacts(world), _strategy() {
   // do nothing
 }
 
@@ -398,11 +396,15 @@ void reBSPTree::advance(reIntegrator& integrator, reFloat dt) {
   }
   // ensure queries will be up-to-date
   rebalance();
-  // updates the collision objects in the collection
-  updateCollisions(_collisions);
-  // solves the collisions
-  _collisions.solve();
-  // advances the collision collection in time
-  _collisions.advance();
+  // updates the contacts
+  updateContacts(_contacts);
+  // solves for the contact forces
+  _contacts.solve();
+  // advances the contact collection
+  _contacts.advance();
+}
+
+void reBSPTree::addInteraction(reInteraction* action, reEnt& A, reEnt& B) {
+  _contacts.addInteraction(action, A, B);
 }
 

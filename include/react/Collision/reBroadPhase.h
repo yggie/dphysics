@@ -7,7 +7,8 @@
 
 #include "react/common.h"
 #include "react/Utilities/reEntList.h"
-#include "react/Collision/reContactGraph.h"
+#include "react/Dynamics/reInteraction.h"
+#include "react/Dynamics/reContactGraph.h"
 #include "react/Collision/reSpatialQueries.h"
 #include "react/Collision/reTreeBalanceStrategy.h"
 
@@ -33,6 +34,8 @@ public:
   virtual bool remove(reEnt* ent) = 0;
   virtual void rebalance(reTreeBalanceStrategy* strategy = nullptr) = 0;
   virtual void advance(reIntegrator& integrator, reFloat dt) = 0;
+  
+  virtual void addInteraction(reInteraction* action, reEnt& A, reEnt& B) = 0;
   
   virtual reEntList& entities() = 0;
   

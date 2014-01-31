@@ -7,14 +7,15 @@
 
 #include "react/Entities/reEnt.h"
 #include "react/Utilities/reLinkedList.h"
+#include "react/Dynamics/reInteraction.h"
 
 /**
- * @ingroup collision
+ * @ingroup dynamics
  * Represents the contact interaction between two entities
  */
 
 struct reContactEdge {
-  reContactEdge(reEnt* a, reEnt* b);
+  reContactEdge(const reWorld* world, reEnt* a, reEnt* b);
   
   void check();
   
@@ -23,11 +24,12 @@ struct reContactEdge {
   bool contact;
   re::vec3 contactPoint;
   re::vec3 contactNormal;
-  reInt age;
+  reUInt timeLimit;
+  reLinkedList<reInteraction*> interactions;
 };
 
 /**
- * @ingroup collision
+ * @ingroup dynamics
  * A graph representation of all collisions in a moment in time
  */
 
@@ -40,13 +42,11 @@ public:
   void check(reEnt& entA, reEnt& entB);
   void advance();
   
+  void addInteraction(reInteraction* action, reEnt& A, reEnt& B);
+  
 private:
   const reWorld& _world;
   reLinkedList<reContactEdge*> _edges;
 };
-
-inline reContactEdge::reContactEdge(reEnt* a, reEnt* b) : A(*a), B(*b), age(10) {
-  check();
-}
 
 #endif

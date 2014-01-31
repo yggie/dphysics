@@ -5,14 +5,16 @@ file(GLOB react_SOURCE_FILES
   "Collision/Shapes/*.cpp"
   "Entities/*.cpp"
   "Utilities/*.cpp"
+  "Dynamics/*.cpp"
 )
 
 file(GLOB react_HEADER_FILES
   "${react_SOURCE_DIR}/include/react/*.h"
-  "${react_SOURCE_DIR}/include/react/Memory/*.h"
   "${react_SOURCE_DIR}/include/react/Collision/*.h"
   "${react_SOURCE_DIR}/include/react/Collision/Shapes/*.h"
+  "${react_SOURCE_DIR}/include/react/Dynamics/*.h"
   "${react_SOURCE_DIR}/include/react/Entities/*.h"
+  "${react_SOURCE_DIR}/include/react/Memory/*.h"
   "${react_SOURCE_DIR}/include/react/Utilities/*.h"
 )
 

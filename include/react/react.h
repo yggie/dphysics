@@ -39,6 +39,12 @@
  */
 
 /**
+ * @defgroup dynamics Dynamics
+ * This module defines the methods used to simulate and resolve interactions in
+ * the physical simulation
+ */
+
+/**
  * @defgroup collision Collision
  * This module defines the various classes used to speed up collision queries.
  * Successful queries are passed on to the Shapes module

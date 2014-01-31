@@ -31,7 +31,7 @@ public:
   void remove(reQueryable* q);
   bool contains(const reEnt* ent) const;
   reEntList rebalanceNode(reTreeBalanceStrategy& strategy);
-  void updateCollisions(reContactGraph& collisions) const;
+  void updateContacts(reContactGraph& collisions) const;
   
   // spatial queries
   reEnt* queryWithRay(const reRayQuery& query, reRayQueryResult& result) const;
@@ -78,6 +78,8 @@ public:
   void rebalance(reTreeBalanceStrategy* strategy = nullptr) override;
   void advance(reIntegrator& integrator, reFloat dt) override;
   
+  void addInteraction(reInteraction* action, reEnt& A, reEnt& B) override;
+  
   reEntList& entities() override;
   
   // spatial queries
@@ -88,7 +90,7 @@ public:
   
 protected:
   /** The structure maintaining collision interactions between entities */
-  reContactGraph _collisions;
+  reContactGraph _contacts;
   /** The strategy used to balance the tree */
   reTreeBalanceStrategy _strategy;
 };

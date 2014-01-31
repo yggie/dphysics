@@ -37,6 +37,7 @@ public:
   template <class T> T* alloc_new();
   template <class X, class Y> X* alloc_new(Y arg);
   template <class X, class Y, class Z> X* alloc_new(Y arg1, Z arg2);
+  template <class X, class Y, class Z, class W> X* alloc_new(Y arg1, Z arg2, W arg3);
   template <class A, class B, class C, class D, class E> A* alloc_new(B arg1, C arg2, D arg3, E arg4);
   template <class T> void alloc_delete(T* ptr);
   
@@ -96,6 +97,10 @@ template <class X, class Y> inline X* reAllocator::alloc_new(Y arg) {
 
 template <class X, class Y, class Z> inline X* reAllocator::alloc_new(Y arg1, Z arg2) {
   return new (alloc(sizeof(X), __alignof(X))) X(arg1, arg2);
+}
+
+template <class X, class Y, class Z, class W> inline X* reAllocator::alloc_new(Y arg1, Z arg2, W arg3) {
+  return new (alloc(sizeof(X), __alignof(X))) X(arg1, arg2, arg3);
 }
 
 template <class A, class B, class C, class D, class E> inline A* reAllocator::alloc_new(B arg1, C arg2, D arg3, E arg4) {

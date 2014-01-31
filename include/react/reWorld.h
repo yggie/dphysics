@@ -16,6 +16,7 @@ class reRigidBody;
 class reEnt;
 class reShape;
 class reIntegrator;
+class reGravAction;
 
 /**
  * Encapsulates the entire implementation of a physics engine
@@ -44,6 +45,7 @@ public:
   // factory methods
   reRigidBody& newRigidBody(const reShape& shape);
   reRigidBody& newRigidBody(const reShape& shape, const reTransform& transform);
+  reGravAction& newGravityInteraction(reEnt& A, reEnt& B);
   
   // spatial queries
   reEnt* queryWithRay(const re::vec3& from, const re::vec3& direction, re::vec3* intersect = nullptr, re::vec3* normal = nullptr);

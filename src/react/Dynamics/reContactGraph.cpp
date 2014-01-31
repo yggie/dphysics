@@ -1,8 +1,19 @@
-#include "react/Collision/reContactGraph.h"
+#include "react/Dynamics/reContactGraph.h"
 
 #include "react/Collision/Shapes/shapes.h"
 
+namespace {
+  const reUInt LIMIT = 10;
+}
+
+reContactEdge::reContactEdge(const reWorld* _world, reEnt* a, reEnt* b) : A(*a), B(*b), contact(false), contactPoint(), contactNormal(), timeLimit(0), interactions(_world) {
+  check();
+}
+
 void reContactEdge::check() {
+  if (timeLimit++ == 0) {
+    timeLimit = LIMIT;
+  }
   // TODO TEMPORARY
   const reSphere& sA = (const reSphere&)(*A.shape());
   const reSphere& sB = (const reSphere&)(*B.shape());
@@ -31,6 +42,9 @@ reContactGraph::reContactGraph(const reWorld* world) : _world(*world), _edges(wo
 
 reContactGraph::~reContactGraph() {
   for (reContactEdge* edge : _edges) {
+    for (reInteraction* action : edge->interactions) {
+      _world.allocator().alloc_delete(action);
+    }
     _world.allocator().alloc_delete(edge);
   }
   _edges.clear();
@@ -74,6 +88,9 @@ void reContactGraph::solve() {
 //      A.applyRotImpulse(impulse * rAxN);
 //      B.applyRotImpulse(impulse * inerB);
     }
+    for (reInteraction* action : edge->interactions) {
+      action->solve(edge->A, edge->B);
+    }
   }
 }
 
@@ -93,13 +110,12 @@ void reContactGraph::check(reEnt& A, reEnt& B) {
   for (reContactEdge* edge : _edges) {
     if (edge->A.id() == A.id() && edge->B.id() == B.id()) {
       edge->check();
-      edge->age++;
       return;
     }
   }
   
   // the edge does not exist, create a new one
-  reContactEdge* edge = _world.allocator().alloc_new<reContactEdge>(&A, &B);
+  reContactEdge* edge = _world.allocator().alloc_new<reContactEdge>(&_world, &A, &B);
   _edges.add(edge);
 }
 
@@ -112,7 +128,8 @@ void reContactGraph::advance() {
   reLinkedList<reContactEdge*> toRemove(&_world);
   // checks for rejected edges
   for (reContactEdge* edge : _edges) {
-    if (--edge->age <= 0) {
+    if (edge->timeLimit != 0) edge->timeLimit--;
+    if (edge->timeLimit == 0 && edge->interactions.empty()) {
       toRemove.add(edge);
     }
   }
@@ -122,5 +139,25 @@ void reContactGraph::advance() {
     _edges.remove(edge);
     _world.allocator().alloc_delete(edge);
   }
+}
+
+void reContactGraph::addInteraction(reInteraction* action, reEnt& A, reEnt& B) {
+  if (A.id() > B.id()) {
+    addInteraction(action, B, A);
+    return;
+  }
+  
+  for (reContactEdge* edge : _edges) {
+    if (edge->A.id() == A.id() && edge->B.id() == B.id()) {
+      edge->interactions.add(action);
+      return;
+    }
+  }
+  
+  // the edge does not exist, create a new one
+  reContactEdge* edge = _world.allocator().alloc_new<reContactEdge>(&_world, &A, &B);
+  edge->timeLimit = 0;
+  edge->interactions.add(action);
+  _edges.add(edge);
 }
 
