@@ -1,6 +1,6 @@
 /**
  * @file
- * Contains the definition of the reContactGraph class
+ * Contains the definition of the reContactEdge and reContactGraph classes
  */
 #ifndef RE_COLLISION_GRAPH_H
 #define RE_COLLISION_GRAPH_H
@@ -14,10 +14,15 @@
  */
 
 struct reContactEdge {
-  reContactEdge(const reEnt* a, const reEnt* b) : A(a), B(b), age(10) { }
+  reContactEdge(reEnt* a, reEnt* b);
   
-  const reEnt* const A;
-  const reEnt* const B;
+  void check();
+  
+  reEnt& A;
+  reEnt& B;
+  bool contact;
+  re::vec3 contactPoint;
+  re::vec3 contactNormal;
   reInt age;
 };
 
@@ -32,12 +37,16 @@ public:
   ~reContactGraph();
   
   void solve();
-  void check(const reEnt& entA, const reEnt& entB);
+  void check(reEnt& entA, reEnt& entB);
   void advance();
   
 private:
   const reWorld& _world;
   reLinkedList<reContactEdge*> _edges;
 };
+
+inline reContactEdge::reContactEdge(reEnt* a, reEnt* b) : A(*a), B(*b), age(10) {
+  check();
+}
 
 #endif

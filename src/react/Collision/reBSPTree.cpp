@@ -204,9 +204,9 @@ void reBSPTreeNode::updateCollisions(reContactGraph& collisions) const {
     auto end = _entities.end();
     // loop over all entities
     for (auto it = _entities.begin(); it != end; ++it) {
-      const reEnt& ie = *it;
-      for (auto jt = ++it; jt != end; ++jt) {
-        const reEnt& je = *jt;
+      reEnt& ie = *it;
+      for (auto jt = it + 1; jt != end; ++jt) {
+        reEnt& je = *jt;
         // checks the interactions between these entities
         collisions.check(ie, je);
       }

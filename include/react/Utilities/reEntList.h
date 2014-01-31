@@ -66,6 +66,7 @@ public:
     reEntItor(Node* node);
     bool operator!=(const reEntItor& iter) const;
     reEnt& operator*() const;
+    reEntItor operator+(reUInt i) const;
     const reEntItor& operator++();
   private:
     Node* _node;
@@ -108,6 +109,17 @@ inline bool reEntList::reEntItor::operator!=(const reEntList::reEntItor& iter) c
 
 inline reEnt& reEntList::reEntItor::operator*() const {
   return *_node->q->ent;
+}
+
+inline reEntList::reEntItor reEntList::reEntItor::operator+(reUInt i) const {
+  Node* n = _node;
+  for (reUInt j = 0; j < i; j++) {
+    n = n->next;
+    if (n == nullptr) {
+      return reEntList::reEntItor(n);
+    }
+  }
+  return reEntList::reEntItor(n);
 }
 
 inline const reEntList::reEntItor& reEntList::reEntItor::operator++() {

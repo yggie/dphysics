@@ -41,6 +41,7 @@ inline void reIntegrator::integrate(vec3& p, vec3& v, reFloat dt) {
 
 inline void reIntegrator::integrate(quat& o, vec3& w, reFloat dt) {
   o += (w * o) * 0.5 * dt;
+  o = re::normalize(o);
 }
 
 #endif
