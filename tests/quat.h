@@ -2,6 +2,12 @@
 
 using namespace re;
 
+TEST(QuaternionTest, HasNoRotationOnInit) {
+  quat q;
+  
+  ASSERT_QUAT_EQ(q, quat(1.0, 0.0, 0.0, 0.0));
+}
+
 TEST(QuaternionTest, AdditionAndSubtraction) {
   for (reUInt i = 0; i < NUM_REPEATS; i++) {
     const quat q = quat::random();

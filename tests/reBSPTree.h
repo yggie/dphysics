@@ -1,29 +1,23 @@
 #include "helpers.h"
 
 #include "react/reWorld.h"
-#include "react/Collision/reBroadPhase.h"
+#include "react/Collision/reBSPTree.h"
 
-struct BSPTreeTest : public testing::Test {
-  protected:
-    reWorld world;
+struct reBSPTreeTest : public testing::Test {
+  reBSPTreeTest() : world(), tree((reBSPTree&)world.broadPhase()) { }
+protected:
+  reWorld world;
+  reBSPTree& tree;
 };
 
-TEST_F(BSPTreeTest, AddClearActions) {
-  reRigidBody& r = world.build().RigidBody(reSphere(1.0));
-  ASSERT_EQ(world.entities().size(), 1) << "can create new entities";
+TEST_F(reBSPTreeTest, Creation) {
+  ASSERT_EQ(tree.entities().size(), 0) <<
+    "should be initialized with no entities";
   
-  world.add(r);
-  ASSERT_EQ(world.entities().size(), 1) << "add() should reject repeated entities";
+  ASSERT_FALSE(tree.hasChildren()) <<
+    "should not have any children when there are no entities";
   
-  reSphere* sp = world.allocator().alloc_new<reSphere>(1.0);
-  reRigidBody* r2 = world.allocator().alloc_new<reRigidBody>(sp);
-  world.add(*r2);
-  ASSERT_EQ(world.entities().size(), 2) << "add() should accept new entities";
-  
-  world.destroy(*r2);
-  ASSERT_EQ(world.entities().size(), 1) << "remove() should remove the specified entity";
-  
-  world.clear();
-  ASSERT_EQ(world.entities().size(), 0) << "clear() should remove all entities";
+  ASSERT_EQ(tree.depth, 0) <<
+    "root node should be at depth 0";
 }
 

@@ -2,6 +2,12 @@
 
 using namespace re;
 
+TEST(MatrixTest, IsIdentityOnInit) {
+  mat3x3 m;
+  
+  ASSERT_MAT_EQ(m, mat3x3(1.0));
+}
+
 TEST(MatrixTest, Identity) {
   mat3x3 eye(1.0);
   // multiplication with the identity matrix should leave the matrix unchanged

@@ -1,5 +1,11 @@
 #include "helpers.h"
 
+TEST(VectorTest, IsZeroOnInit) {
+  re::vec3 v;
+  
+  ASSERT_VEC_EQ(v, re::vec3(0.0, 0.0, 0.0));
+}
+
 TEST(VectorTest, Normalize) {
   for (reUInt i = 0; i < NUM_REPEATS; i++) {
     EXPECT_FLOAT_EQ(re::length(re::normalize(re::vec3::random())), 1.0);

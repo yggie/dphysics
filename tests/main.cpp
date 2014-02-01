@@ -1,8 +1,8 @@
 #include "helpers.h"
 
 // math module unit tests
-#include "mat3x3.h"
 #include "vec3.h"
+#include "mat3x3.h"
 #include "quat.h"
 #include "reIntegrator.h"
 
@@ -11,10 +11,13 @@
 #include "reProxyShape.h"
 
 // entity module unit tests
-#include "reSolid.h"
+#include "reRigidBody.h"
 
 // collision module tests
 #include "reBSPTree.h"
+
+// integration tests
+#include "defaultWorld.h"
 
 int main(int argc, char** argv) {
   testing::InitGoogleTest(&argc, argv);
