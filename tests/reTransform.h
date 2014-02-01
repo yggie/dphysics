@@ -75,3 +75,12 @@ TEST(reTransformTest, Concatenation) {
   }
 }
 
+TEST(reTransformTest, Inverse) {
+  for (reUInt i = 0; i < NUM_REPEATS; i++) {
+    reTransform transform = reTransform().translate(re::vec3::rand(50.0)).scale(re::vec3::rand(13.0)).rotate(re::randf(-1e5, 1e5), re::vec3::rand());
+    
+    ASSERT_TRUE(re::similar(re::inverse(transform) * transform, IDEN_MAT3x4)) <<
+      "multiplication with inverse should return the identity matrix";
+  }
+}
+
