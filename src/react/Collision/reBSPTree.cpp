@@ -395,7 +395,7 @@ void reBSPTree::advance(reIntegrator& integrator, reFloat dt) {
   _contacts.advance();
 }
 
-void reBSPTree::addInteraction(reInteraction* action, reEnt& A, reEnt& B) {
+void reBSPTree::addInteraction(reInteraction& action, reEnt& A, reEnt& B) {
   _contacts.addInteraction(action, A, B);
 }
 

@@ -141,7 +141,7 @@ void reContactGraph::advance() {
   }
 }
 
-void reContactGraph::addInteraction(reInteraction* action, reEnt& A, reEnt& B) {
+void reContactGraph::addInteraction(reInteraction& action, reEnt& A, reEnt& B) {
   if (A.id() > B.id()) {
     addInteraction(action, B, A);
     return;
@@ -149,7 +149,7 @@ void reContactGraph::addInteraction(reInteraction* action, reEnt& A, reEnt& B) {
   
   for (reContactEdge* edge : _edges) {
     if (edge->A.id() == A.id() && edge->B.id() == B.id()) {
-      edge->interactions.add(action);
+      edge->interactions.add(&action);
       return;
     }
   }
@@ -157,7 +157,7 @@ void reContactGraph::addInteraction(reInteraction* action, reEnt& A, reEnt& B) {
   // the edge does not exist, create a new one
   reContactEdge* edge = _allocator.alloc_new<reContactEdge>(_allocator, A, B);
   edge->timeLimit = 0;
-  edge->interactions.add(action);
+  edge->interactions.add(&action);
   _edges.add(edge);
 }
 

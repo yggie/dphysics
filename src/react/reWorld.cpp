@@ -12,8 +12,6 @@
 #include "react/Memory/reFreeListAllocator.h"
 #include "react/Memory/reProxyAllocator.h"
 
-#include <algorithm>
-
 // strictly for debugging
 namespace {
   struct SimpleAllocator : public reBaseAllocator {
@@ -129,7 +127,7 @@ reRigidBody& reWorld::newRigidBody(const reShape& shape, const reTransform& tran
 
 reGravAction& reWorld::newGravityInteraction(reEnt& A, reEnt& B) {
   reGravAction* action = allocator().alloc_new<reGravAction>();
-  broadPhase().addInteraction(action, A, B);
+  broadPhase().addInteraction(*action, A, B);
   return *action;
 }
 

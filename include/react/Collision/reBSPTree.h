@@ -78,7 +78,7 @@ public:
   void rebalance(reTreeBalanceStrategy* strategy = nullptr) override;
   void advance(reIntegrator& integrator, reFloat dt) override;
   
-  void addInteraction(reInteraction* action, reEnt& A, reEnt& B) override;
+  void addInteraction(reInteraction& action, reEnt& A, reEnt& B) override;
   
   reEntList& entities() override;
   

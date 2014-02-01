@@ -42,7 +42,7 @@ public:
   void check(reEnt& entA, reEnt& entB);
   void advance();
   
-  void addInteraction(reInteraction* action, reEnt& A, reEnt& B);
+  void addInteraction(reInteraction& action, reEnt& A, reEnt& B);
   
 private:
   reAllocator& _allocator;

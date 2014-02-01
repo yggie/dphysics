@@ -36,7 +36,7 @@ public:
   virtual void rebalance(reTreeBalanceStrategy* strategy = nullptr) = 0;
   virtual void advance(reIntegrator& integrator, reFloat dt) = 0;
   
-  virtual void addInteraction(reInteraction* action, reEnt& A, reEnt& B) = 0;
+  virtual void addInteraction(reInteraction& action, reEnt& A, reEnt& B) = 0;
   
   virtual reEntList& entities() = 0;
   
