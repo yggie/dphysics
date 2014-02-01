@@ -30,6 +30,11 @@ public:
   void setRadius(reFloat radius);
   reSphere& withRadius(reFloat radius);
   
+  // utility methods
+  const re::vec3 randomPoint() const override;
+  
+  // collision queries
+  bool containsPoint(const re::vec3& point) const override;
   bool intersectsRay(const reRayQuery& query, reRayQueryResult& result) const override;
 };
 

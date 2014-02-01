@@ -16,7 +16,8 @@
 
 class reProxyShape : public reShape {
 public:
-  reProxyShape(reShape* shape, const reTransform* transform);
+  reProxyShape(reShape* shape);
+  reProxyShape(reShape* shape, const reTransform& transform);
   reProxyShape(const reProxyShape&) = delete;
   ~reProxyShape();
   
@@ -42,9 +43,13 @@ public:
   reFloat volume() const override;
   const re::mat3 computeInertia() const override;
   
-  bool intersectsRay(const reRayQuery& query, reRayQueryResult& result) const override;
+  // utility methods
+  const re::vec3 randomPoint() const override;
   
-  bool intersectsRay(const reTransform& transform, const reRayQuery& query, reRayQueryResult& result) const override;
+  // collision queries
+  bool containsPoint(const re::vec3& point) const override;
+  
+  bool intersectsRay(const reRayQuery& query, reRayQueryResult& result) const override;
   
   bool intersectsHyperplane(const reTransform& transform, const reHyperplaneQuery& query) const override;
   
@@ -123,7 +128,11 @@ inline const re::mat3 reProxyShape::computeInertia() const {
 //  RE_NOT_IMPLEMENTED
   return re::mat3(1.0);
 }
-  
+
+inline const re::vec3 reProxyShape::randomPoint() const {
+  return _transform.multPoint(_shape->randomPoint());
+}
+
 inline bool reProxyShape::intersectsHyperplane(const reTransform& transform, const reHyperplaneQuery& query) const {
   return reShape::intersectsHyperplane(transform * _transform, query);
 }

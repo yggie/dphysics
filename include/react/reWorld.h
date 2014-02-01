@@ -33,7 +33,7 @@ public:
   reWorld& operator=(const reWorld&) = delete;
   
   void clear();
-  void add(reEnt* entity);
+  void add(reEnt& entity);
   void advance(reFloat dt);
   
   // getters

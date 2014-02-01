@@ -199,4 +199,6 @@ namespace re {
 
 typedef re::mat3x4 reTransform;
 
+#include "react/Math/mat3x4_ops.h"
+
 #endif

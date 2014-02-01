@@ -79,7 +79,7 @@ void reTreeBalanceStrategy::computeSplitPlane(const re::vec3& parentDir, const r
     auto end = entities.qEnd();
     for (auto iter = entities.qBegin(); iter != end; ++iter) {
       const reQueryable& q = *iter;
-      anchor += q.ent->center();
+      anchor += q.ent.center();
       if (++num >= n) {
         break;
       }
@@ -90,7 +90,7 @@ void reTreeBalanceStrategy::computeSplitPlane(const re::vec3& parentDir, const r
       auto end = entities.qEnd();
       for (auto iter = entities.qBegin(); iter != end; ++iter) {
         const reQueryable& q = *iter;
-        vals[i] += re::dot(dirs[i], anchor - q.ent->center());
+        vals[i] += re::dot(dirs[i], anchor - q.ent.center());
         if (++num >= n) {
           break;
         }

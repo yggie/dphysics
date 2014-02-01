@@ -7,7 +7,7 @@
 
 #include <cstdio>
 
-reBSPTreeNode::reBSPTreeNode(const reWorld* world, reUInt depth, re::vec3 dir, re::vec3 anchor) : dir(dir), anchor(anchor), depth(depth), _world(*world), _entities(world), _child{nullptr} {
+reBSPTreeNode::reBSPTreeNode(reAllocator& allocator, reUInt depth, re::vec3 dir, re::vec3 anchor) : dir(dir), anchor(anchor), depth(depth), _allocator(allocator), _entities(allocator), _child{nullptr} {
   // do nothing
 }
 
@@ -20,7 +20,7 @@ void reBSPTreeNode::clear() {
   if (hasChildren()) {
     for (reUInt i = 0; i < 2; i++) {
       _child[i]->clear();
-      _world.allocator().alloc_delete(_child[i]);
+      _allocator.alloc_delete(_child[i]);
       _child[i] = nullptr;
     }
   }
@@ -30,25 +30,20 @@ void reBSPTreeNode::clear() {
     auto end = _entities.qEnd();
     for (auto iter = _entities.qBegin(); iter != end; ++iter) {
       reQueryable& q = *iter;
-      RE_EXPECT(q.ent->userdata == nullptr)
-      if (q.ent->shape()->type() == reShape::PROXY) {
-        _world.allocator().alloc_delete(((reProxyShape*)q.ent->shape())->shape());
+      RE_EXPECT(q.ent.userdata == nullptr)
+      if (q.ent.shape()->type() == reShape::PROXY) {
+        _allocator.alloc_delete(((reProxyShape*)q.ent.shape())->shape());
       }
-      _world.allocator().alloc_delete(q.ent->shape());
-      _world.allocator().alloc_delete(q.ent);
-      _world.allocator().alloc_delete(&q);
+      _allocator.alloc_delete(q.ent.shape());
+      _allocator.alloc_delete(&q.ent);
+      _allocator.alloc_delete(&q);
     }
   }
   _entities.clear();
 }
 
-bool reBSPTreeNode::contains(const reEnt* ent) const {
-  if (ent == nullptr) {
-    RE_WARN("Attempted to query using null\n")
-    return false;
-  }
-  
-  return ent->intersectsHyperplane(anchor, dir);
+bool reBSPTreeNode::contains(const reEnt& ent) const {
+  return ent.intersectsHyperplane(anchor, dir);
 }
 
 reEnt* reBSPTreeNode::queryWithRay(const reRayQuery& query, reRayQueryResult& result) const {
@@ -67,9 +62,9 @@ reEnt* reBSPTreeNode::queryWithRay(const reRayQuery& query, reRayQueryResult& re
       }
       re::queriesMade++;
       q.queryID = query.ID;
-      if (q.ent->intersectsRay(query, res)) {
+      if (q.ent.intersectsRay(query, res)) {
         if (res.distSq < maxDistSq) {
-          resultEnt = q.ent;
+          resultEnt = &q.ent;
           maxDistSq = res.distSq;
           result = res;
         }
@@ -112,10 +107,10 @@ reBPMeasure reBSPTreeNode::measure() const {
  * @param q The queryable object to add
  */
 
-void reBSPTreeNode::add(reQueryable* q) {
+void reBSPTreeNode::add(reQueryable& q) {
   if (hasChildren()) {
     for (reUInt i = 0; i < 2; i++) {
-      if (_child[i]->contains(q->ent)) {
+      if (_child[i]->contains(q.ent)) {
         _child[i]->add(q);
       }
     }
@@ -130,10 +125,10 @@ void reBSPTreeNode::add(reQueryable* q) {
  * @param q The queryable object to remove
  */
 
-void reBSPTreeNode::remove(reQueryable* q) {
+void reBSPTreeNode::remove(reQueryable& q) {
   if (hasChildren()) {
     for (reUInt i = 0; i < 2; i++) {
-      if (_child[i]->contains(q->ent)) {
+      if (_child[i]->contains(q.ent)) {
         _child[i]->remove(q);
       }
     }
@@ -150,7 +145,7 @@ void reBSPTreeNode::remove(reQueryable* q) {
  */
 
 reEntList reBSPTreeNode::rebalanceNode(reTreeBalanceStrategy& strategy) {
-  reEntList list(&_world);
+  reEntList list(_allocator);
   
   // updates the child nodes
   if (hasChildren()) {
@@ -167,8 +162,8 @@ reEntList reBSPTreeNode::rebalanceNode(reTreeBalanceStrategy& strategy) {
           reQueryable& q = *iter;
           const reUInt j = (i + 1) % 2;
           if (_child[j]->contains(q.ent)) {
-            _child[j]->add(&q);
-            list.remove(&q);
+            _child[j]->add(q);
+            list.remove(q);
           }
         }
       }
@@ -220,13 +215,13 @@ void reBSPTreeNode::updateContacts(reContactGraph& collisions) const {
  */
 
 reEntList reBSPTreeNode::trim() {
-  reEntList rejected(&_world);
+  reEntList rejected(_allocator);
   auto end = _entities.qEnd();
   for (auto iter = _entities.qBegin(); iter != end; ++iter) {
     reQueryable& q = *iter;
     if (!contains(q.ent)) {
-      remove(&q);
-      rejected.add(&q);
+      remove(q);
+      rejected.add(q);
     }
   }
   
@@ -244,8 +239,8 @@ void reBSPTreeNode::split(reTreeBalanceStrategy& strategy) {
   
   // setup each _child node
   for (reUInt i = 0; i < 2; i++) {
-    _child[i] = _world.allocator().alloc_new<reBSPTreeNode>(
-      &_world,
+    _child[i] = _allocator.alloc_new<reBSPTreeNode>(
+      _allocator,
       depth + 1,
       splitDir * ((i % 2 == 0) ? -1 : 1),
       splitAnchor
@@ -255,7 +250,7 @@ void reBSPTreeNode::split(reTreeBalanceStrategy& strategy) {
     for (auto iter = _entities.qBegin(); iter != end; ++iter) {
       reQueryable& q = *iter;
       if (_child[i]->contains(q.ent)) {
-        _child[i]->add(&q);
+        _child[i]->add(q);
       }
     }
     
@@ -274,7 +269,7 @@ void reBSPTreeNode::split(reTreeBalanceStrategy& strategy) {
 void reBSPTreeNode::merge() {
   for (reUInt i = 0; i < 2; i++) {
     _entities.append(_child[i]->_entities);
-    _world.allocator().alloc_delete(_child[i]);
+    _allocator.alloc_delete(_child[i]);
     _child[i] = nullptr;
   }
   printf("[NODE] MERGE %d\n", depth);
@@ -307,7 +302,7 @@ void reBSPTreeNode::measureRecursive(reBPMeasure& m) const {
   }
 }
 
-reBSPTree::reBSPTree(const reWorld* world) : reBroadPhase(), reBSPTreeNode(world, 0, re::vec3(1.0, 0.0, 0.0), re::vec3(0.0, 0.0, 0.0)), _contacts(world), _strategy() {
+reBSPTree::reBSPTree(reAllocator& allocator) : reBroadPhase(), reBSPTreeNode(allocator, 0, re::vec3(1.0, 0.0, 0.0), re::vec3(0.0, 0.0, 0.0)), _contacts(allocator), _strategy() {
   // do nothing
 }
 
@@ -315,41 +310,37 @@ reBSPTree::~reBSPTree() {
   clear();
 }
 
-bool reBSPTree::add(reEnt* ent) {
-  if (ent == nullptr) {
-    return false;
-  }
-  
-  reQueryable* q = _world.allocator().alloc_new<reQueryable>(ent);
-  if (_entities.add(q)) {
+bool reBSPTree::add(reEnt& ent) {
+  reQueryable* q = _allocator.alloc_new<reQueryable>(ent);
+  if (_entities.add(*q)) {
     if (hasChildren()) {
       for (reUInt i = 0; i < 2; i++) {
         if (_child[i]->contains(ent)) {
-          _child[i]->add(q);
+          _child[i]->add(*q);
         }
       }
     }
     return true;
   } else {
-    _world.allocator().alloc_delete(q);
+    _allocator.alloc_delete(q);
     return false;
   }
 }
 
-bool reBSPTree::remove(reEnt* ent) {
+bool reBSPTree::remove(reEnt& ent) {
   auto end = _entities.qEnd();
   for (auto iter = _entities.qBegin(); iter != end; ++iter) {
     reQueryable& q = *iter;
-    if (q.ent->id() == ent->id()) {
+    if (q.ent.id() == ent.id()) {
       if (hasChildren()) {
         for (reUInt i = 0; i < 2; i++) {
           if (_child[i]->contains(ent)) {
-            _child[i]->remove(&q);
+            _child[i]->remove(q);
           }
         }
       }
-      _entities.remove(&q);
-      _world.allocator().alloc_delete(&q);
+      _entities.remove(q);
+      _allocator.alloc_delete(&q);
       return true;
     }
   }
@@ -366,7 +357,7 @@ void reBSPTree::rebalance(reTreeBalanceStrategy* strategy) {
     if (strategy->shouldMerge(*this)) {
       merge();
     } else {
-      reEntList list(&_world);
+      reEntList list(_allocator);
       for (reUInt i = 0; i < 2; i++) {
         list.append(_child[i]->rebalanceNode(*strategy));
         
@@ -375,7 +366,7 @@ void reBSPTree::rebalance(reTreeBalanceStrategy* strategy) {
           reQueryable& q = *iter;
           const reUInt j = (i + 1) % 2;
           if (_child[j]->contains(q.ent)) {
-            _child[j]->add(&q);
+            _child[j]->add(q);
           }
         }
         

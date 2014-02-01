@@ -6,7 +6,7 @@ namespace {
   const reUInt LIMIT = 10;
 }
 
-reContactEdge::reContactEdge(const reWorld* _world, reEnt* a, reEnt* b) : A(*a), B(*b), contact(false), contactPoint(), contactNormal(), timeLimit(0), interactions(_world) {
+reContactEdge::reContactEdge(reAllocator& allocator, reEnt& a, reEnt& b) : A(a), B(b), contact(false), contactPoint(), contactNormal(), timeLimit(0), interactions(allocator) {
   check();
 }
 
@@ -32,7 +32,7 @@ void reContactEdge::check() {
  * Creates a new contact graph
  */
 
-reContactGraph::reContactGraph(const reWorld* world) : _world(*world), _edges(world) {
+reContactGraph::reContactGraph(reAllocator& allocator) : _allocator(allocator), _edges(allocator) {
   // do nothing
 }
 
@@ -43,9 +43,9 @@ reContactGraph::reContactGraph(const reWorld* world) : _world(*world), _edges(wo
 reContactGraph::~reContactGraph() {
   for (reContactEdge* edge : _edges) {
     for (reInteraction* action : edge->interactions) {
-      _world.allocator().alloc_delete(action);
+      _allocator.alloc_delete(action);
     }
-    _world.allocator().alloc_delete(edge);
+    _allocator.alloc_delete(edge);
   }
   _edges.clear();
 }
@@ -115,7 +115,7 @@ void reContactGraph::check(reEnt& A, reEnt& B) {
   }
   
   // the edge does not exist, create a new one
-  reContactEdge* edge = _world.allocator().alloc_new<reContactEdge>(&_world, &A, &B);
+  reContactEdge* edge = _allocator.alloc_new<reContactEdge>(_allocator, A, B);
   _edges.add(edge);
 }
 
@@ -125,7 +125,7 @@ void reContactGraph::check(reEnt& A, reEnt& B) {
  */
 
 void reContactGraph::advance() {
-  reLinkedList<reContactEdge*> toRemove(&_world);
+  reLinkedList<reContactEdge*> toRemove(_allocator);
   // checks for rejected edges
   for (reContactEdge* edge : _edges) {
     if (edge->timeLimit != 0) edge->timeLimit--;
@@ -137,7 +137,7 @@ void reContactGraph::advance() {
   // removes all rejected edges
   for (reContactEdge* edge : toRemove) {
     _edges.remove(edge);
-    _world.allocator().alloc_delete(edge);
+    _allocator.alloc_delete(edge);
   }
 }
 
@@ -155,7 +155,7 @@ void reContactGraph::addInteraction(reInteraction* action, reEnt& A, reEnt& B) {
   }
   
   // the edge does not exist, create a new one
-  reContactEdge* edge = _world.allocator().alloc_new<reContactEdge>(&_world, &A, &B);
+  reContactEdge* edge = _allocator.alloc_new<reContactEdge>(_allocator, A, B);
   edge->timeLimit = 0;
   edge->interactions.add(action);
   _edges.add(edge);

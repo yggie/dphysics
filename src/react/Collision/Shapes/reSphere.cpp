@@ -14,6 +14,14 @@ reSphere::~reSphere() {
   // do nothing
 }
 
+const re::vec3 reSphere::randomPoint() const {
+  return re::normalize(re::vec3::random()) * reRandom() * radius();
+}
+
+bool reSphere::containsPoint(const re::vec3& point) const {
+  return lengthSq(point) < radius()*radius();
+}
+
 bool reSphere::intersectsRay(const reRayQuery& query, reRayQueryResult& result) const {
   // solve for the points of intersection
   const reFloat a = re::lengthSq(query.dir);

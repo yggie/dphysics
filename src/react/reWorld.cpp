@@ -43,7 +43,7 @@ namespace {
 reWorld::reWorld() : _broadPhase(nullptr), _allocator(nullptr), _integrator(nullptr) {
   tmp = new SimpleAllocator();
   _allocator = new reProxyAllocator(tmp);
-  _broadPhase = allocator().alloc_new<reBSPTree>(this);
+  _broadPhase = allocator().alloc_new<reBSPTree>(allocator());
   _integrator = allocator().alloc_new<reIntegrator>();
 }
 
@@ -77,12 +77,7 @@ void reWorld::clear() {
  * @param entity The entity to attach
  */
 
-void reWorld::add(reEnt* entity) {
-  if (entity == nullptr) {
-    RE_WARN("Attempted to add null entity to world\n")
-    return;
-  }
-  
+void reWorld::add(reEnt& entity) {
   _broadPhase->add(entity);
 }
 
@@ -114,7 +109,7 @@ reEntList& reWorld::entities() const {
 
 reRigidBody& reWorld::newRigidBody(const reShape& shape) {
   reRigidBody* body = allocator().alloc_new<reRigidBody>(copyOf(shape));
-  add(body);
+  add(*body);
   return *body;
 }
 
@@ -126,9 +121,9 @@ reRigidBody& reWorld::newRigidBody(const reShape& shape) {
 
 reRigidBody& reWorld::newRigidBody(const reShape& shape, const reTransform& transform) {
   reShape* base = copyOf(shape);
-  reShape* newShape = allocator().alloc_new<reProxyShape>(base, &transform);
+  reShape* newShape = allocator().alloc_new<reProxyShape>(base, transform);
   reRigidBody* body = allocator().alloc_new<reRigidBody>(newShape);
-  add(body);
+  add(*body);
   return *body;
 }
 

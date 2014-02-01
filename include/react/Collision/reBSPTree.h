@@ -16,7 +16,7 @@
 
 class reBSPTreeNode {
 public:
-  reBSPTreeNode(const reWorld* world, reUInt depth, re::vec3 dir, re::vec3 anchor);
+  reBSPTreeNode(reAllocator& allocator, reUInt depth, re::vec3 dir, re::vec3 anchor);
   ~reBSPTreeNode();
   
   void clear();
@@ -27,9 +27,9 @@ public:
   bool isRoot() const;
   bool isLeaf() const;
   
-  void add(reQueryable* q);
-  void remove(reQueryable* q);
-  bool contains(const reEnt* ent) const;
+  void add(reQueryable& q);
+  void remove(reQueryable& q);
+  bool contains(const reEnt& ent) const;
   reEntList rebalanceNode(reTreeBalanceStrategy& strategy);
   void updateContacts(reContactGraph& collisions) const;
   
@@ -53,8 +53,8 @@ protected:
   
   void measureRecursive(reBPMeasure& m) const;
   
-  /** The parent reWorld object */
-  const reWorld& _world;
+  /** The allocator object used for allocating memory */
+  reAllocator& _allocator;
   /** The list of entities contained in this structure */
   reEntList _entities;
   /** The direct descendents of this node */
@@ -69,12 +69,12 @@ protected:
 
 class reBSPTree : public reBroadPhase, public reBSPTreeNode {
 public:
-  reBSPTree(const reWorld* world);
+  reBSPTree(reAllocator& allocator);
   ~reBSPTree();
   
   void clear() override { reBSPTreeNode::clear(); }
-  bool add(reEnt* ent) override;
-  bool remove(reEnt* ent) override;
+  bool add(reEnt& ent) override;
+  bool remove(reEnt& ent) override;
   void rebalance(reTreeBalanceStrategy* strategy = nullptr) override;
   void advance(reIntegrator& integrator, reFloat dt) override;
   

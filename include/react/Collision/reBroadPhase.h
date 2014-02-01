@@ -25,13 +25,14 @@ struct reBPMeasure;
 
 class reBroadPhase {
 public:
+  /** Default constructor does nothing */
   reBroadPhase();
   /** Destructor constructor does nothing */
   virtual ~reBroadPhase() = 0;
 
   virtual void clear() = 0;
-  virtual bool add(reEnt* ent) = 0;
-  virtual bool remove(reEnt* ent) = 0;
+  virtual bool add(reEnt& ent) = 0;
+  virtual bool remove(reEnt& ent) = 0;
   virtual void rebalance(reTreeBalanceStrategy* strategy = nullptr) = 0;
   virtual void advance(reIntegrator& integrator, reFloat dt) = 0;
   
@@ -64,12 +65,6 @@ struct reBPMeasure {
   /** The mean depth for all leaf nodes */
   reFloat meanDepth;
 };
-
-/**
- * Initializes the reBroadPhase with the given parent world
- * 
- * @param world The parent reWorld
- */
 
 inline reBroadPhase::reBroadPhase() {
   // do nothing

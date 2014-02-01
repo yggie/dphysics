@@ -23,6 +23,7 @@ struct ValueMatchException : public std::exception {
 } val_match;
 
 const reUInt NUM_REPEATS = 50;
+const reUInt NUM_SAMPLES = 1e4;
 
 #define ASSERT_VEC_EQ(a, b) assertEq(a, b, __FILE__, __LINE__, #a, #b)
 #define ASSERT_QUAT_EQ(q, p) assertEq(q, p, __FILE__, __LINE__, #q, #p)

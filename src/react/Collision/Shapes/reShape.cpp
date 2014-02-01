@@ -19,6 +19,10 @@ void reShape::updateAABB(const re::mat3& parentRotation) {
   }
 }
 
+bool reShape::containsPoint(const reTransform& transform, const re::vec3& point) const {
+  return containsPoint(transform.multPoint(point));
+}
+
 bool reShape::intersectsRay(const reTransform& transform, const reRayQuery& query, reRayQueryResult& result) const {
   const reTransform inv = transform.inverse();
   reRayQuery newQuery;

@@ -2,6 +2,24 @@
 
 using namespace re;
 
+const re::vec3 reTriangle::randomPoint() const {
+  const re::vec3 u = (_verts[0] - _verts[1]);
+  const re::vec3 v = (_verts[2] - _verts[1]);
+  
+  reFloat s = reRandom();
+  reFloat t = reRandom();
+  while (s + t > 1.0 || s < 0.0 || t < 0.0) {
+    s = reRandom();
+    t = reRandom();
+  }
+  
+  return u*s + v*t;
+}
+
+bool reTriangle::containsPoint(const re::vec3& point) const {
+  return reAbs(re::dot(faceNorm(), point - _verts[0])) < RE_FP_TOLERANCE;
+}
+
 bool reTriangle::intersectsRay(const reRayQuery& query, reRayQueryResult& result) const {
   const re::vec3 u = (_verts[0] - _verts[1]);
   const re::vec3 v = (_verts[2] - _verts[1]);

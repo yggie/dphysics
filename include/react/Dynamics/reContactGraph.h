@@ -15,7 +15,7 @@
  */
 
 struct reContactEdge {
-  reContactEdge(const reWorld* world, reEnt* a, reEnt* b);
+  reContactEdge(reAllocator& allocator, reEnt& a, reEnt& b);
   
   void check();
   
@@ -35,7 +35,7 @@ struct reContactEdge {
 
 class reContactGraph {
 public:
-  reContactGraph(const reWorld* world);
+  reContactGraph(reAllocator& allocator);
   ~reContactGraph();
   
   void solve();
@@ -45,7 +45,7 @@ public:
   void addInteraction(reInteraction* action, reEnt& A, reEnt& B);
   
 private:
-  const reWorld& _world;
+  reAllocator& _allocator;
   reLinkedList<reContactEdge*> _edges;
 };
 

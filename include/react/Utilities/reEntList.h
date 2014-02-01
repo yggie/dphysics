@@ -14,9 +14,9 @@
  */
 
 struct reQueryable {
-  reQueryable(reEnt* entity) : queryID(0), ent(entity) { }
+  reQueryable(reEnt& entity) : queryID(0), ent(entity) { }
   reUInt queryID;
-  reEnt* ent;
+  reEnt& ent;
 };
 
 /**
@@ -27,14 +27,14 @@ struct reQueryable {
 
 class reEntList {
 public:
-  reEntList(const reWorld* world);
+  reEntList(reAllocator& allocator);
   reEntList(const reEntList& list);
   ~reEntList();
   
   reEntList& operator=(const reEntList& list);
   
-  bool add(reQueryable* q);
-  bool remove(reQueryable* q);
+  bool add(reQueryable& q);
+  bool remove(reQueryable& q);
   void append(const reEntList& list);
   void clear();
   bool empty() const;
@@ -44,11 +44,11 @@ public:
   reLinkedList<reEnt*> sample(reUInt size) const;
   
   struct Node {
-    Node(reQueryable* queryable);
+    Node(reQueryable& queryable);
     
     reUInt entID() const;
     
-    reQueryable* q;
+    reQueryable& q;
     Node* next;
     Node* prev;
   };
@@ -78,14 +78,16 @@ public:
   reEntItor begin() const;
   reEntItor end() const;
   
-  reEnt* first() const { return _first->q->ent; }
+  reEnt* first() const { return (_first == nullptr) ? nullptr : &_first->q.ent; }
+  
+  reEnt* last() const { return (_last == nullptr) ? nullptr : &_last->q.ent; }
   
 private:
-  void appendToNode(Node* node, reQueryable* queryable);
-  void prependToNode(Node* node, reQueryable* queryable);
+  void appendToNode(Node* node, reQueryable& queryable);
+  void prependToNode(Node* node, reQueryable& queryable);
   void detachNode(Node* node);
   
-  const reWorld& _world;
+  reAllocator& _allocator;
   reUInt _size;
   Node* _first;
   Node* _last;
@@ -108,7 +110,7 @@ inline bool reEntList::reEntItor::operator!=(const reEntList::reEntItor& iter) c
 }
 
 inline reEnt& reEntList::reEntItor::operator*() const {
-  return *_node->q->ent;
+  return _node->q.ent;
 }
 
 inline reEntList::reEntItor reEntList::reEntItor::operator+(reUInt i) const {
