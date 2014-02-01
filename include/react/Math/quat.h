@@ -55,7 +55,8 @@ namespace re {
       };
     };
     
-    static const quat random();
+    static const quat rand(reFloat b = 1.0);
+    static const quat unit();
   };
 
   inline quat::quat() : v{ 1.0, 0.0, 0.0, 0.0 } {
@@ -159,8 +160,8 @@ namespace re {
     return quat(*this) /= s;
   }
   
-  inline const quat quat::random() {
-    return quat(reRandom() - 0.5, reRandom() - 0.5, reRandom() - 0.5, reRandom() - 0.5);
+  inline const quat quat::rand(reFloat b) {
+    return quat(re::randf(-b, b), re::randf(-b, b), re::randf(-b, b), re::randf(-b, b));
   }
 }
 

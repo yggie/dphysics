@@ -32,7 +32,7 @@ namespace {
   const re::vec clamp(const re::vec& v) {
     re::vec a;
     for (int i = 0; i < 3; i++) {
-      a[i] = reClamp(v[i], 0.0, 1.0);
+      a[i] = re::clamp(v[i], 0.0, 1.0);
     }
     return a;
   }
@@ -222,8 +222,8 @@ const re::vec RayTracingDemo::shootRay(unsigned int depth, const re::vec& origin
       const re::vec back = re::normalize(light->vect() - intersect);
       const re::vec halfVec = re::normalize(back + ray);
       
-      const re::vec diffuse = clamp(obj->diffuse() * reMax(re::dot(ray, norm), 0.0f));
-      const re::vec specular = clamp(obj->specular() * rePow(reMax(re::dot(norm, halfVec), 0.0f), obj->shininess()));
+      const re::vec diffuse = clamp(obj->diffuse() * re::max(re::dot(ray, norm), 0.0f));
+      const re::vec specular = clamp(obj->specular() * re::pow(re::max(re::dot(norm, halfVec), 0.0f), obj->shininess()));
       
 //      printf("SPECULAR: (%.2f, %.2f, %.2f)\n", specular[0], specular[1], specular[2]);
       
@@ -317,9 +317,9 @@ void RayTracingDemo::renderScene(GLsizei w, GLsizei h) {
       const re::vec color = shootRay(0, eye, ray);
       const int IDX = 4*(h - i - 1)*w + 4*j;
       GLubyte* pix = &_pixels[IDX];
-      pix[0] = (GLubyte)(255.0 * reClamp(color[0], 0.0, 1.0));
-      pix[1] = (GLubyte)(255.0 * reClamp(color[1], 0.0, 1.0));
-      pix[2] = (GLubyte)(255.0 * reClamp(color[2], 0.0, 1.0));
+      pix[0] = (GLubyte)(255.0 * re::clamp(color[0], 0.0, 1.0));
+      pix[1] = (GLubyte)(255.0 * re::clamp(color[1], 0.0, 1.0));
+      pix[2] = (GLubyte)(255.0 * re::clamp(color[2], 0.0, 1.0));
       pix[3] = 0xff;
       RE_ASSERT_MSG((IDX < 4*w*h-3 && IDX >= 0), "Buffer overflow detected\n")
 //      colorPixel(&_pixels[4*(h - i - 1)*w + 4*j], shootRay(0, eye, ray));

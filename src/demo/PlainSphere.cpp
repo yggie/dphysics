@@ -31,8 +31,8 @@ void PlainSphere::draw(Canvas& canvas) {
   canvas.translate(_ent.pos()[0], _ent.pos()[1], _ent.pos()[2]);
   canvas.scale(shape().radius());
   const reFloat ang = acos(q.r);
-  if (reAbs(ang) > RE_FP_TOLERANCE) {
-    const reFloat s = reSin(ang);
+  if (re::abs(ang) > RE_FP_TOLERANCE) {
+    const reFloat s = re::sin(ang);
     canvas.rotate(2 * ang * 180.0 / RE_PI, q.i / s, q.j / s, q.k / s);
   }
   canvas.applyModelView();

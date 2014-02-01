@@ -7,7 +7,7 @@
 
 #include "react/Math/vec3.h"
 
-using namespace re; // sadly, Doxygen is not smart enought
+using namespace re; // sadly, Doxygen is not smart enough
 
 namespace re {
   
@@ -72,7 +72,7 @@ namespace re {
    */
   
   inline reFloat length(const vec3& a) {
-    return reSqrt(lengthSq(a));
+    return re::sqrt(lengthSq(a));
   }
   
   /**
@@ -85,6 +85,31 @@ namespace re {
   
   inline vec3 normalize(const vec3& a) {
     return vec3(a) /= length(a);
+  }
+  
+  /**
+   * Generates a random unit vector
+   * 
+   * @return A random unit vector
+   */
+  
+  inline const vec3 vec3::unit() {
+    return re::normalize(vec3::rand());
+  }
+  
+  /**
+   * @ingroup maths
+   * Returns true if the two vectors are within floating point tolerance.
+   * Difference is calculated using the Euclidean distance metric.
+   * 
+   * @param a The first vector
+   * @param b The second vector
+   * @return True if the Euclidean distance between the two vectors is
+   * negligible
+   */
+  
+  inline bool similar(const vec3& a, const vec3& b) {
+    return re::lengthSq(a - b) < re::sq(RE_FP_TOLERANCE);
   }
 }
 

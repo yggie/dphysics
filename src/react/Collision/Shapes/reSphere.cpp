@@ -15,7 +15,7 @@ reSphere::~reSphere() {
 }
 
 const re::vec3 reSphere::randomPoint() const {
-  return re::normalize(re::vec3::random()) * reRandom() * radius();
+  return re::normalize(re::vec3::rand()) * re::randf() * radius();
 }
 
 bool reSphere::containsPoint(const re::vec3& point) const {
@@ -34,7 +34,7 @@ bool reSphere::intersectsRay(const reRayQuery& query, reRayQueryResult& result) 
   }
   
   // consider only the smaller of the two solutions
-  const reFloat solA = (-b - reSqrt(discriminant)) / (2.0 * a);
+  const reFloat solA = (-b - re::sqrt(discriminant)) / (2.0 * a);
   
   // invalid solutions
   if (solA < RE_FP_TOLERANCE) {

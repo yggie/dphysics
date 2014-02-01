@@ -75,8 +75,8 @@ namespace re {
    */
 
   inline const mat3x3 axisAngle(const vec3& axis, reFloat angle) {
-    const reFloat c = reCos(angle);
-    const reFloat s = reSin(angle);
+    const reFloat c = re::cos(angle);
+    const reFloat s = re::sin(angle);
     const vec3 a = normalize(axis);
     return mat3x3(c) + (1 - c) * outer(a, a) + skew(a) * s;
   }
@@ -125,25 +125,25 @@ namespace re {
     quat q;
     const float tr = trace(m);
     if (tr > 0) {
-      float S = 2.0 * reSqrt(tr + 1.0);
+      float S = 2.0 * re::sqrt(tr + 1.0);
       q.r = 0.25 * S;
       q.i = (m[2][1] - m[1][2]) / S;
       q.j = (m[0][2] - m[2][0]) / S; 
       q.k = (m[1][0] - m[0][1]) / S; 
     } else if ((m[0][0] > m[1][1]) && (m[0][0] > m[2][2])) { 
-      float S = 2.0 * reSqrt(1.0 + m[0][0] - m[1][1] - m[2][2]); 
+      float S = 2.0 * re::sqrt(1.0 + m[0][0] - m[1][1] - m[2][2]); 
       q.r = (m[2][1] - m[1][2]) / S;
       q.i = 0.25 * S;
       q.j = (m[0][1] + m[1][0]) / S; 
       q.k = (m[0][2] + m[2][0]) / S; 
     } else if (m[1][1] > m[2][2]) { 
-      float S = 2.0 * reSqrt(1.0 + m[1][1] - m[0][0] - m[2][2]);
+      float S = 2.0 * re::sqrt(1.0 + m[1][1] - m[0][0] - m[2][2]);
       q.r = (m[0][2] - m[2][0]) / S;
       q.i = (m[0][1] + m[1][0]) / S; 
       q.j = 0.25 * S;
       q.k = (m[1][2] + m[2][1]) / S; 
     } else { 
-      float S = 2.0 * reSqrt(1.0 + m[2][2] - m[0][0] - m[1][1]);
+      float S = 2.0 * re::sqrt(1.0 + m[2][2] - m[0][0] - m[1][1]);
       q.r = (m[1][0] - m[0][1]) / S;
       q.i = (m[0][2] + m[2][0]) / S;
       q.j = (m[1][2] + m[2][1]) / S;
@@ -164,8 +164,8 @@ namespace re {
   
   inline const quat axisAngleQ(const vec3& axis, reFloat angle) {
     quat q;
-    q.r = reCos(angle / 2.0);
-    const reFloat s = reSin(angle / 2.0);
+    q.r = re::cos(angle / 2.0);
+    const reFloat s = re::sin(angle / 2.0);
     const reFloat L = re::length(axis);
     q.i = axis.x * s / L;
     q.j = axis.y * s / L;

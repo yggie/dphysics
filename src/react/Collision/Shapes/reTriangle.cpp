@@ -6,18 +6,18 @@ const re::vec3 reTriangle::randomPoint() const {
   const re::vec3 u = (_verts[0] - _verts[1]);
   const re::vec3 v = (_verts[2] - _verts[1]);
   
-  reFloat s = reRandom();
-  reFloat t = reRandom();
+  reFloat s = re::randf();
+  reFloat t = re::randf();
   while (s + t > 1.0 || s < 0.0 || t < 0.0) {
-    s = reRandom();
-    t = reRandom();
+    s = re::randf();
+    t = re::randf();
   }
   
   return u*s + v*t;
 }
 
 bool reTriangle::containsPoint(const re::vec3& point) const {
-  return reAbs(re::dot(faceNorm(), point - _verts[0])) < RE_FP_TOLERANCE;
+  return re::abs(re::dot(faceNorm(), point - _verts[0])) < RE_FP_TOLERANCE;
 }
 
 bool reTriangle::intersectsRay(const reRayQuery& query, reRayQueryResult& result) const {

@@ -26,8 +26,8 @@ TEST(SphereTest, VertexData) {
   
   ASSERT_EQ(s.numVerts(), 1) << "should only have one vertex";
   
-  // the only vertex should be at the origin
-  ASSERT_VEC_EQ(s.vert(0), re::vec3(0.0, 0.0, 0.0));
+  ASSERT_TRUE(re::similar(s.vert(0), re::vec3(0.0, 0.0, 0.0))) <<
+    "should have its only vertex at the origin";
 }
 
 TEST(SphereTest, QueryTest) {
@@ -41,7 +41,7 @@ TEST(SphereTest, QueryTest) {
     ASSERT_TRUE(s.containsPoint(pt)) <<
       "should be true for any generated point";
     
-    const re::vec3 ptOutside = re::normalize(pt) * (5.1 + 100*reRandom());
+    const re::vec3 ptOutside = re::normalize(pt) * re::randf(5.1, 100.0);
     ASSERT_FALSE(s.containsPoint(ptOutside)) <<
       "should be false for any generated points outside the sphere";
     
@@ -58,11 +58,11 @@ TEST(SphereTest, RayIntersectionSadPaths) {
   
   reRayQueryResult res;
   for (reUInt i = 0; i < NUM_SAMPLES; i++) {
-    const re::vec3 ptOutside = re::normalize(re::vec3::random()) * (2.1 + 111.1 * reRandom());
+    const re::vec3 ptOutside = re::vec3::unit() * re::randf(2.1, 1111.1);
     
     reRayQuery query;
-    const re::vec3 edge = re::normalize(re::cross(ptOutside, re::vec3::random()));
-    query.origin = ptOutside - edge * (100.0 + 1000.0 * reRandom());
+    const re::vec3 edge = re::normalize(re::cross(ptOutside, re::vec3::rand()));
+    query.origin = ptOutside - edge * re::randf(1e2, 1e3);
     query.dir = edge;
     
     ASSERT_FALSE(s.intersectsRay(query, res)) <<

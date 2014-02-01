@@ -11,7 +11,7 @@ void reShape::updateAABB(const re::mat3& parentRotation) {
     const re::vec3 v = parentRotation * vert(i);
     
     for (reUInt j = 0; j < 3; j++) {
-      const reFloat d = reAbs(v[j]) + shell();
+      const reFloat d = re::abs(v[j]) + shell();
       if (d > _aabb.dimens()[j]) {
         _aabb.dimens()[j] = d;
       }

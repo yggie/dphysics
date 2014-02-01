@@ -61,15 +61,15 @@ inline const re::vec3& reAABB::dimens() const {
 }
 
 inline bool reAABB::intersects(const reAABB& aabb, const re::vec3& relPos) const {
-  return (reAbs(relPos.x) < _dimens[0] + aabb._dimens[0] + RE_FP_TOLERANCE) &&
-         (reAbs(relPos.y) < _dimens[1] + aabb._dimens[1] + RE_FP_TOLERANCE) &&
-         (reAbs(relPos.z) < _dimens[2] + aabb._dimens[2] + RE_FP_TOLERANCE);
+  return (re::abs(relPos.x) < _dimens[0] + aabb._dimens[0] + RE_FP_TOLERANCE) &&
+         (re::abs(relPos.y) < _dimens[1] + aabb._dimens[1] + RE_FP_TOLERANCE) &&
+         (re::abs(relPos.z) < _dimens[2] + aabb._dimens[2] + RE_FP_TOLERANCE);
 }
 
 inline bool reAABB::containsPoint(const re::vec3& point) const {
-  return (reAbs(point.x) < _dimens[0] + RE_FP_TOLERANCE) &&
-         (reAbs(point.y) < _dimens[1] + RE_FP_TOLERANCE) &&
-         (reAbs(point.z) < _dimens[2] + RE_FP_TOLERANCE);
+  return (re::abs(point.x) < _dimens[0] + RE_FP_TOLERANCE) &&
+         (re::abs(point.y) < _dimens[1] + RE_FP_TOLERANCE) &&
+         (re::abs(point.z) < _dimens[2] + RE_FP_TOLERANCE);
 }
 
 #endif

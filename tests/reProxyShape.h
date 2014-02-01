@@ -15,7 +15,7 @@ TEST(ProxyShapeTest, QueryTest) {
   reSphere s(5.0);
   reTransform m;
   m.scale(1, 2, 3);
-  m.rotate(50.0*reRandom(), re::vec3::random());
+  m.rotate(re::randf(0.0, 50.0*RE_PI), re::vec3::rand());
   reProxyShape ps(&s, m);
   reRayQueryResult res;
   for (reUInt i = 0; i < NUM_SAMPLES; i++) {
@@ -23,9 +23,9 @@ TEST(ProxyShapeTest, QueryTest) {
     ASSERT_TRUE(ps.containsPoint(pt)) <<
       "should be true for any generated point";
     
-    re::vec3 ptOutside = re::vec3::random() * 1000.0;
+    re::vec3 ptOutside = re::vec3::rand() * 1000.0;
     while (ps.containsPoint(ptOutside)) {
-      ptOutside = re::vec3::random() * 1000.0;
+      ptOutside = re::vec3::rand() * 1000.0;
     }
     ASSERT_FALSE(ps.containsPoint(ptOutside)) <<
       "should be false for any generated points outside the sphere";

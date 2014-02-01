@@ -212,10 +212,10 @@ namespace re {
 
   inline mat4x4& mat4x4::rotate(reFloat angle, reFloat x, reFloat y, reFloat z) {
     // refer to Axis-Angle rotation formula
-    const float s = reSin(angle);
-    const float c = reCos(angle);
+    const float s = re::sin(angle);
+    const float c = re::cos(angle);
     const float c1 = 1 - c;
-    const float l = reSqrt(x*x + y*y + z*z);
+    const float l = re::sqrt(x*x + y*y + z*z);
     x /= l;
     y /= l;
     z /= l;

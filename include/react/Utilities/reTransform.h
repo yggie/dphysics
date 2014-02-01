@@ -103,10 +103,10 @@ namespace re {
   }
 
   inline mat3x4& mat3x4::rotate(reFloat angle, reFloat x, reFloat y, reFloat z) {
-    const reFloat s   = reSin(angle);
-    const reFloat c   = reCos(angle);
+    const reFloat s   = re::sin(angle);
+    const reFloat c   = re::cos(angle);
     const reFloat c1  = 1 - c;
-    const reFloat L   = reSqrt(x*x + y*y + z*z);
+    const reFloat L   = re::sqrt(x*x + y*y + z*z);
     
     x /= L; y /= L; z /= L;
     

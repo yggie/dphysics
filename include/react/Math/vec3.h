@@ -72,7 +72,8 @@ namespace re {
       };
     };
     
-    static const vec3 random();
+    static const vec3 rand(reFloat b = 1.0);
+    static const vec3 unit();
   };
   
   typedef vec3 vec;
@@ -328,7 +329,7 @@ namespace re {
 
   inline bool vec3::equals(const vec3& a) const {
     for (int i = 0; i < 3; i++) {
-      if (reAbs(v[i] - a.v[i]) > RE_FP_TOLERANCE) {
+      if (re::abs(v[i] - a.v[i]) > RE_FP_TOLERANCE) {
         return false;
       }
     }
@@ -367,9 +368,17 @@ namespace re {
   inline void vec3::setZero() {
     x = y = z = 0.0;
   }
+  
+  /**
+   * Returns a random vector with elements within the range of the given b.
+   * i.e. -input < element < input
+   * 
+   * @param b The upper/lower b of the elements
+   * @return The generated vector
+   */
 
-  inline const vec3 vec3::random() {
-    return vec3(reRandom() - 0.5, reRandom() - 0.5, reRandom() - 0.5) *= 2.0;
+  inline const vec3 vec3::rand(reFloat b) {
+    return vec3(re::randf(-b, b), re::randf(-b, b), re::randf(-b, b));
   }
 }
 

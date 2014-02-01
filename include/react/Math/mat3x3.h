@@ -58,7 +58,7 @@ namespace re{
     /** the elements of the matrix stored as an array */
     reFloat e[9];
     
-    static const mat3x3 random();
+    static const mat3x3 rand(reFloat b = 1.0);
   };
   
   typedef mat3x3 mat3;
@@ -293,12 +293,12 @@ namespace re{
     return mat3x3(*this) *= m;
   }
 
-  inline const mat3x3 mat3x3::random() {
+  inline const mat3x3 mat3x3::rand(reFloat b) {
     return mat3x3(
-      reRandom() - 0.5, reRandom() - 0.5, reRandom() - 0.5,
-      reRandom() - 0.5, reRandom() - 0.5, reRandom() - 0.5,
-      reRandom() - 0.5, reRandom() - 0.5, reRandom() - 0.5
-    ) *= 2.0;
+      re::randf(-b, b), re::randf(-b, b), re::randf(-b, b),
+      re::randf(-b, b), re::randf(-b, b), re::randf(-b, b),
+      re::randf(-b, b), re::randf(-b, b), re::randf(-b, b)
+    );
   }
 }
 

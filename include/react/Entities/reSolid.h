@@ -67,8 +67,8 @@ inline void reSolid::setAngVel(reFloat wx, reFloat wy, reFloat wz) {
 inline void reSolid::setFacing(const re::vec3& dir, const re::vec3& up) {
   re::vec3 v = re::normalize(dir);
   re::vec3 upn = re::normalize(up);
-  if (reAbs(re::dot(v, upn) - 1.0) < RE_FP_TOLERANCE) {
-    upn = re::normalize(re::vec3::random());
+  if (re::abs(re::dot(v, upn) - 1.0) < RE_FP_TOLERANCE) {
+    upn = re::vec3::unit();
   }
   const re::vec3 u = re::normalize(re::cross(v, upn));
   const re::vec3 w = re::normalize(re::cross(u, v));

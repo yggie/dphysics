@@ -4,6 +4,7 @@
 #include "vec3.h"
 #include "mat3x3.h"
 #include "quat.h"
+#include "reTransform.h"
 #include "reIntegrator.h"
 
 // shape module unit tests
@@ -13,7 +14,7 @@
 // entity module unit tests
 #include "reRigidBody.h"
 
-// collision module tests
+// collision module unit tests
 #include "reBSPTree.h"
 
 // integration tests

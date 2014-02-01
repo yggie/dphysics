@@ -247,16 +247,16 @@ namespace {
     reUInt* array = new reUInt[size];
     
     if (size == 1) {
-      array[0] = rand() % maxValue;
+      array[0] = re::randi() % maxValue;
       return array;
     }
     
     reUInt i1 = 0;
     reUInt i2 = size - 1;
-    reUInt v1 = rand() % maxValue;
-    reUInt v2 = rand() % maxValue;
+    reUInt v1 = re::randi() % maxValue;
+    reUInt v2 = re::randi() % maxValue;
     while (v2 == v1) {
-      v2 = rand() % maxValue;
+      v2 = re::randi() % maxValue;
     }
     
     if (v1 < v2) {
@@ -273,7 +273,7 @@ namespace {
     
     // loop for each remaining numbers
     for (reUInt i = 2; i < size; i++) {
-      reUInt val = rand() % maxValue;
+      reUInt val = re::randi() % maxValue;
       
       // check if it is repeated at the heads
       if (val == array[i1] || val == array[i2]) {

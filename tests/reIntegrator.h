@@ -17,7 +17,7 @@ TEST(IntegratorTest, ConstantVelocity) {
   }
   
   for (reUInt i = 0; i < 3; i++) {
-    EXPECT_LE(reAbs(v[i] - p[i]), 0.01);
+    EXPECT_LE(re::abs(v[i] - p[i]), 0.01);
   }
 }
 
@@ -37,7 +37,7 @@ TEST(IntegratorTest, ConstantRotation) {
   }
   
   for (reUInt i = 0; i < 4; i++) {
-    EXPECT_LE(reAbs(q[i] - p[i]), 0.01);
+    EXPECT_LE(re::abs(q[i] - p[i]), 0.01);
   }
 }
 

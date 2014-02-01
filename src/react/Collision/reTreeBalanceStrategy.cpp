@@ -43,9 +43,9 @@ void reTreeBalanceStrategy::computeSplitPlane(const re::vec3& parentDir, const r
   anchor.set(0.0, 0.0, 0.0);
   
   re::vec3 dirs[GUESSES] = {
-    re::cross(parentDir, re::vec3::random()),
-    re::cross(parentDir, re::vec3::random()),
-    re::cross(parentDir, re::vec3::random())
+    re::cross(parentDir, re::vec3::rand()),
+    re::cross(parentDir, re::vec3::rand()),
+    re::cross(parentDir, re::vec3::rand())
   };
   
   reFloat vals[GUESSES] = { 0.0 };
@@ -68,13 +68,13 @@ void reTreeBalanceStrategy::computeSplitPlane(const re::vec3& parentDir, const r
     }
     
     for (reUInt i = 1; i < GUESSES; i++) {
-      if (reAbs(vals[i]) < reAbs(vals[index])) {
+      if (re::abs(vals[i]) < re::abs(vals[index])) {
         index = i;
       }
     }
   } else {
     reUInt num = 0;
-    reUInt n = reMin(SAMPLES, entities.size());
+    reUInt n = re::min(SAMPLES, entities.size());
     
     auto end = entities.qEnd();
     for (auto iter = entities.qBegin(); iter != end; ++iter) {
@@ -95,7 +95,7 @@ void reTreeBalanceStrategy::computeSplitPlane(const re::vec3& parentDir, const r
           break;
         }
       }
-      if (i > 0 && reAbs(vals[i]) < reAbs(vals[index])) {
+      if (i > 0 && re::abs(vals[i]) < re::abs(vals[index])) {
         index = i;
       }
     }

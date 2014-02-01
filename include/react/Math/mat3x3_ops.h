@@ -76,6 +76,27 @@ namespace re {
   inline reFloat trace(const mat3x3& m) {
     return m[0][0] + m[1][1] + m[2][2];
   }
+  
+  /**
+   * @ingroup maths
+   * Returns true if the two matrices are the same, within reasonable
+   * tolerances. Difference is calculated using the ??? distance metric.
+   * 
+   * @param a The first matrix
+   * @param b The second matrix
+   * @return True if the maximum ??? distance is within tolerance
+   */
+  
+  inline bool similar(const mat3x3& a, const mat3x3& b) {
+    for (reUInt i = 0; i < 3; i++) {
+      for (reUInt j = 0; j < 3; j++) {
+        if (re::abs(a[i][j] - b[i][j]) > RE_FP_TOLERANCE) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
 }
 
 #endif
