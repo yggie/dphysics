@@ -230,7 +230,7 @@ void RayTracingDemo::createSceneFromFile(const char* filename, bool useOpenGL) {
         tm.v[0] = m[3][0];
         tm.v[1] = m[3][1];
         tm.v[2] = m[3][2];
-        reRigidBody& body = _world.newRigidBody(reSphere(v[3]), tm).at(v[0], v[1], v[2]);
+        reRigidBody& body = _world.build().RigidBody(reSphere(v[3]), tm).at(v[0], v[1], v[2]);
         RayObject* obj = new RayObject();
         body.userdata = obj;
 //        printf("DIFFUSE: (%.2f, %.2f, %.2f)\n", specular[0], specular[1], specular[2]);
@@ -298,7 +298,7 @@ void RayTracingDemo::createSceneFromFile(const char* filename, bool useOpenGL) {
           verts4[i] = m * glm::vec4(verts.at(inds[i]), 1.0f);
           triVerts[i].set(verts4[i][0], verts4[i][1], verts4[i][2]);
         }
-        reRigidBody& body = _world.newRigidBody(
+        reRigidBody& body = _world.build().RigidBody(
           reTriangle(triVerts[0], triVerts[1], triVerts[2])
         ).at(0, 0, 0);
         RayObject* obj = new RayObject();

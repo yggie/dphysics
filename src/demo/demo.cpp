@@ -37,7 +37,9 @@ void testDemo(reWorld& world, demo::App& app) {
 //  reRigidBody* body;
   reSphere sphere(1.0);
   
-  reRigidBody& body = world.newRigidBody(sphere).withMass(5.0).at(0, 0, -2).rotatingWith(0.0, 0.00, 0.01);
+  reBuilder build = world.build();
+  
+  reRigidBody& body = build.RigidBody(sphere).withMass(5.0).at(0, 0, -2).rotatingWith(0.0, 0.00, 0.01);
   app.newPlainSphere(body);
   
 //  for (int i = 0; i < 5; i++) {
@@ -45,14 +47,14 @@ void testDemo(reWorld& world, demo::App& app) {
 //    app.newPlainSphere(body);
 //  }
   
-  reRigidBody& A = world.newRigidBody(sphere).withMass(2.0).at(-3, -1, -5).movingAt(re::vec3(0.01, 0.0, 0.0));
+  reRigidBody& A = build.RigidBody(sphere).withMass(2.0).at(-3, -1, -5).movingAt(re::vec3(0.01, 0.0, 0.0));
   app.newPlainSphere(A);
-  reRigidBody& B = world.newRigidBody(sphere).withMass(2.0).at(3, 3, -5);
+  reRigidBody& B = build.RigidBody(sphere).withMass(2.0).at(3, 3, -5);
   app.newPlainSphere(B);
   
-  world.newGravityInteraction(A, B);
-  world.newGravityInteraction(body, B);
-  world.newGravityInteraction(body, A);
+  build.GravAction(A, B);
+  build.GravAction(body, B);
+  build.GravAction(body, A);
   
   printf("[DEBUG] reIntegrator: %ld:%ld, reTreeBalanceStrategy: %ld:%ld\n", sizeof(reIntegrator), alignof(reIntegrator), sizeof(reTreeBalanceStrategy), alignof(reTreeBalanceStrategy));
   

@@ -13,7 +13,6 @@
 #include "react/Collision/reTreeBalanceStrategy.h"
 
 class reEnt;
-class reWorld;
 struct reBPMeasure;
 
 /**

@@ -8,15 +8,14 @@
 #include "react/common.h"
 #include "react/math.h"
 #include "react/Memory/reAllocator.h"
+#include "react/Utilities/reBuilder.h"
 #include "react/Collision/reSpatialQueries.h"
 
 class reEntList;
 class reBroadPhase;
-class reRigidBody;
 class reEnt;
 class reShape;
 class reIntegrator;
-class reGravAction;
 
 /**
  * Encapsulates the entire implementation of a physics engine
@@ -41,18 +40,12 @@ public:
   reAllocator& allocator() const;
   reBroadPhase& broadPhase() const;
   reIntegrator& integrator() const;
-  
-  // factory methods
-  reRigidBody& newRigidBody(const reShape& shape);
-  reRigidBody& newRigidBody(const reShape& shape, const reTransform& transform);
-  reGravAction& newGravityInteraction(reEnt& A, reEnt& B);
+  reBuilder build();
   
   // spatial queries
   reEnt* queryWithRay(const re::vec3& from, const re::vec3& direction, re::vec3* intersect = nullptr, re::vec3* normal = nullptr);
 
 private:
-  reShape* copyOf(const reShape& shape) const;
-  
   /** The reBroadPhase used in this reWorld */
   reBroadPhase* _broadPhase;
   /** The general purpose reAllocator used in this reWorld */
@@ -84,6 +77,10 @@ inline reBroadPhase& reWorld::broadPhase() const {
 
 inline reIntegrator& reWorld::integrator() const {
   return *_integrator;
+}
+
+inline reBuilder reWorld::build() {
+  return reBuilder(*this);
 }
 
 #endif

@@ -9,8 +9,7 @@ struct BSPTreeTest : public testing::Test {
 };
 
 TEST_F(BSPTreeTest, AddClearActions) {
-  
-  reRigidBody& r = world.newRigidBody(reSphere(1.0));
+  reRigidBody& r = world.build().RigidBody(reSphere(1.0));
   ASSERT_EQ(world.entities().size(), 1) << "can create new entities";
   
   world.add(r);

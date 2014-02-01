@@ -100,38 +100,6 @@ reEntList& reWorld::entities() const {
 }
 
 /**
- * Creates a new reRigidBody and properly initializes it into the reWorld
- * 
- * @return The attached reRigidBody entity
- */
-
-reRigidBody& reWorld::newRigidBody(const reShape& shape) {
-  reRigidBody* body = allocator().alloc_new<reRigidBody>(copyOf(shape));
-  add(*body);
-  return *body;
-}
-
-/**
- * Creates a new reRigidBody and properly initializes it into the reWorld
- * 
- * @return The attached reRigidBody entity
- */
-
-reRigidBody& reWorld::newRigidBody(const reShape& shape, const reTransform& transform) {
-  reShape* base = copyOf(shape);
-  reShape* newShape = allocator().alloc_new<reProxyShape>(base, transform);
-  reRigidBody* body = allocator().alloc_new<reRigidBody>(newShape);
-  add(*body);
-  return *body;
-}
-
-reGravAction& reWorld::newGravityInteraction(reEnt& A, reEnt& B) {
-  reGravAction* action = allocator().alloc_new<reGravAction>();
-  broadPhase().addInteraction(*action, A, B);
-  return *action;
-}
-
-/**
  * Performs a spatial query on the reBroadPhase with a ray defined by the input
  * data. The intersect point and normal is written to the optional parameters.
  * 
@@ -162,34 +130,4 @@ reEnt* reWorld::queryWithRay(const re::vec3& origin, const re::vec3& dir, re::ve
   
   return nullptr;
 }
-
-/**
- * A convenient method to create copies of shapes
- */
-
-reShape* reWorld::copyOf(const reShape& shape) const {
-  switch (shape.type()) {
-    case reShape::SPHERE:
-      return allocator().alloc_new<reSphere>((const reSphere&)shape);
-    
-    case reShape::RECTANGLE:
-      RE_NOT_IMPLEMENTED
-      break;
-    
-    case reShape::COMPOUND:
-      RE_NOT_IMPLEMENTED
-      break;
-    
-    case reShape::TRIANGLE:
-      return allocator().alloc_new<reTriangle>((const reTriangle&)shape);
-    
-    case reShape::PROXY:
-      RE_IMPOSSIBLE
-      break;
-  }
-  
-  RE_IMPOSSIBLE
-  throw 0; // TODO proper exceptions
-}
-
 
