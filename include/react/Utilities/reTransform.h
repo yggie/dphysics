@@ -110,22 +110,20 @@ namespace re {
     
     x /= L; y /= L; z /= L;
     
-    m = mat3x3(
+    mat3x3 rot(
         c + c1*x*x,   c1*x*y - s*z,   c1*x*z + s*y,
       c1*x*y + s*z,     c + c1*y*y,   c1*y*z - s*x,
       c1*x*z - s*y,   c1*y*z + s*x,     c + c1*z*z
-    ) * m;
+    );
+    
+    m = rot * m;
+    v = rot * v;
     
     return *this;
   }
 
   inline mat3x4& mat3x4::scale(const vec3& scaling) {
-    for (reUInt i = 0; i < 3; i++) {
-      m[i][0] *= scaling.x;
-      m[i][1] *= scaling.y;
-      m[i][2] *= scaling.z;
-    }
-    return *this;
+    return scale(scaling.x, scaling.y, scaling.z);
   }
 
   inline mat3x4& mat3x4::scale(reFloat x, reFloat y, reFloat z) {
@@ -134,6 +132,9 @@ namespace re {
       m[i][1] *= y;
       m[i][2] *= z;
     }
+    v[0] *= x;
+    v[1] *= y;
+    v[2] *= z;
     return *this;
   }
 

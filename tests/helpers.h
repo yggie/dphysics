@@ -25,6 +25,9 @@ struct ValueMatchException : public std::exception {
 const reUInt NUM_REPEATS = 50;
 const reUInt NUM_SAMPLES = 1e4;
 
+const re::vec3 ZERO_VEC = re::vec3(0.0, 0.0, 0.0);
+const re::mat3 IDEN_MAT = re::mat3(1.0);
+
 //#define ASSERT_VEC_EQ(a, b) assertEq(a, b, __FILE__, __LINE__, #a, #b)
 //#define ASSERT_QUAT_EQ(q, p) assertEq(q, p, __FILE__, __LINE__, #q, #p)
 //#define ASSERT_MAT_EQ(m, n) assertEq(m, n, __FILE__, __LINE__, #m, #n)

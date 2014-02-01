@@ -15,7 +15,7 @@ reSphere::~reSphere() {
 }
 
 const re::vec3 reSphere::randomPoint() const {
-  return re::normalize(re::vec3::rand()) * re::randf() * radius();
+  return re::normalize(re::vec3::rand()) * re::randf(0.0, 0.99) * radius();
 }
 
 bool reSphere::containsPoint(const re::vec3& point) const {

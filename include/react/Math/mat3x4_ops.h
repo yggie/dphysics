@@ -4,6 +4,15 @@
 #include "react/Utilities/reTransform.h"
 
 namespace re {
+  
+  /**
+   * @ingroup maths
+   * Computes the inverse of the matrix
+   * 
+   * @param tm The matrix to invert
+   * @return The inverse of the input matrix
+   */
+  
   inline const re::mat3x4 inverse(const re::mat3x4& tm) {
     mat3x4 tmp(tm);
     
@@ -33,6 +42,19 @@ namespace re {
     tmp.v /= det;
     
     return tmp;
+  }
+  
+  /**
+   * @ingroup maths
+   * Returns true if the two matrices are similar
+   * 
+   * @param a The first matrix
+   * @param b The second matrix
+   * @return True if the two matrices are similar
+   */
+  
+  inline bool similar(const mat3x4& a, const mat3x4& b) {
+    return re::similar(a.v, b.v) && re::similar(a.m, b.m);
   }
 }
 

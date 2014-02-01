@@ -5,7 +5,6 @@
 #ifndef RE_MATRIX_H
 #define RE_MATRIX_H
 
-#include <string.h>
 #include "react/Math/vec3.h"
 
 namespace re{

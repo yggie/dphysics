@@ -5,7 +5,7 @@
 #ifndef RE_VECTOR_H
 #define RE_VECTOR_H
 
-#include "react/Math/math_funcs.h"
+#include "react/Math/math_common.h"
 
 namespace re {
 

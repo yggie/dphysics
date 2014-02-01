@@ -33,7 +33,7 @@ TEST(ProxyShapeTest, QueryTest) {
     reRayQuery query;
     query.origin = ptOutside;
     query.dir = (pt - ptOutside);
-    ASSERT_TRUE(ps.intersectsRay(query, res)) <<
-      "should intersect segments built from a point outside to a point inside the sphere";
+    EXPECT_TRUE(ps.intersectsRay(query, res)) <<
+      "should intersect segments built from a point outside to a point inside the sphere " << pt[0] << "," << pt[1] << "," << pt[2];
   }
 }
