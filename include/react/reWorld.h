@@ -33,6 +33,8 @@ public:
   
   void clear();
   void add(reEnt& entity);
+  void remove(reEnt& entity);
+  void destroy(reEnt& entity);
   void advance(reFloat dt);
   
   // getters

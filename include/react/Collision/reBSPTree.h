@@ -28,7 +28,7 @@ public:
   bool isLeaf() const;
   
   void add(reQueryable& q);
-  void remove(reQueryable& q);
+  bool remove(reQueryable& q);
   bool contains(const reEnt& ent) const;
   reEntList rebalanceNode(reTreeBalanceStrategy& strategy);
   void updateContacts(reContactGraph& collisions) const;

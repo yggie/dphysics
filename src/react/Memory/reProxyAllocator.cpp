@@ -2,15 +2,19 @@
 
 #include "react/common.h"
 
-#include <cstdio>
-
 reProxyAllocator::reProxyAllocator(reBaseAllocator* allocator) : reAllocator(),
 _allocator(allocator) {
   RE_ASSERT(allocator != nullptr)
 }
 
 reProxyAllocator::~reProxyAllocator() {
-  RE_EXPECT(_allocator->numAllocs() == 0 && _allocator->used() == 0);
+  RE_EXPECT([](reBaseAllocator& base) {
+    bool leaked = base.numAllocs() != 0 || base.used() != 0;
+    if (leaked) {
+      printf("MEMORY LEAKS! REM. ALLOCS = %d\n", base.numAllocs());
+    }
+    return !leaked;
+  }(*_allocator));
   
 //  show();
   

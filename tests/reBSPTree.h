@@ -20,6 +20,9 @@ TEST_F(BSPTreeTest, AddClearActions) {
   world.add(*r2);
   ASSERT_EQ(world.entities().size(), 2) << "add() should accept new entities";
   
+  world.destroy(*r2);
+  ASSERT_EQ(world.entities().size(), 1) << "remove() should remove the specified entity";
+  
   world.clear();
   ASSERT_EQ(world.entities().size(), 0) << "clear() should remove all entities";
 }

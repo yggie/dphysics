@@ -125,16 +125,23 @@ void reBSPTreeNode::add(reQueryable& q) {
  * @param q The queryable object to remove
  */
 
-void reBSPTreeNode::remove(reQueryable& q) {
+bool reBSPTreeNode::remove(reQueryable& q) {
+  bool found = false;
   if (hasChildren()) {
     for (reUInt i = 0; i < 2; i++) {
       if (_child[i]->contains(q.ent)) {
-        _child[i]->remove(q);
+        found = _child[i]->remove(q) || found;
       }
     }
   } else {
-    _entities.remove(q);
+    found = _entities.remove(q);
   }
+  
+  if (found) {
+    _allocator.alloc_delete(&q);
+  }
+  
+  return found;
 }
 
 /**

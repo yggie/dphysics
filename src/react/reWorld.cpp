@@ -70,13 +70,37 @@ void reWorld::clear() {
 }
 
 /**
- * Registers the input reEnt to the reWorld's engine.
+ * Registers the entity to the world.
  * 
  * @param entity The entity to attach
  */
 
 void reWorld::add(reEnt& entity) {
   _broadPhase->add(entity);
+}
+
+/**
+ * Removes the entity from the world. This does NOT deallocate the resources
+ * associated with the entity.
+ * 
+ * @param entity The entity to remove
+ */
+
+void reWorld::remove(reEnt& entity) {
+  _broadPhase->remove(entity);
+}
+
+/**
+ * Removes the entity from the world. This also deallocates the resources
+ * associated with the entity, therefore, the reference will no longer be valid!
+ * 
+ * @param entity The entity to destroy
+ */
+
+void reWorld::destroy(reEnt& entity) {
+  remove(entity);
+  allocator().alloc_delete(entity.shape());
+  allocator().alloc_delete(&entity);
 }
 
 /**
