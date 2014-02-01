@@ -6,3 +6,13 @@ include_directories(${GTEST_INCLUDE_DIRS})
 add_executable(tests main.cpp)
 target_link_libraries(tests ${GTEST_LIBRARIES} pthread react)
 
+add_custom_target(
+  run_all_tests ALL
+)
+
+add_custom_command(
+  TARGET run_all_tests
+  COMMENT "Running all tests"
+  POST_BUILD COMMAND tests
+)
+

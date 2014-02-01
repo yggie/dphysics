@@ -1,3 +1,7 @@
+/**
+ * @file
+ * Contains the definition of mathematical operators for the re::quat class
+ */
 #ifndef RE_QUAT_OPS_H
 #define RE_QUAT_OPS_H
 

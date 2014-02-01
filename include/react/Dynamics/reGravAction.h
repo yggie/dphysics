@@ -9,6 +9,7 @@
 
 /**
  * @ingroup dynamics
+ * Simulates gravity between entities
  */
 
 class reGravAction : public reInteraction {
@@ -22,9 +23,9 @@ namespace {
 
 inline void reGravAction::solve(reEnt& A, reEnt& B) {
   const re::vec3 diff = A.center() - B.center();
-  const re::vec3 f = (-G*A.mass()*B.mass() / re::lengthSq(diff)) * re::normalize(diff);
-  A.addImpulse(f);
-  B.addImpulse(-f);
+  const re::vec3 f = (G*A.mass()*B.mass() / re::lengthSq(diff)) * re::normalize(diff);
+  A.addImpulse(-f);
+  B.addImpulse(f);
 }
 
 #endif

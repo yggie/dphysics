@@ -45,9 +45,9 @@ void testDemo(reWorld& world, demo::App& app) {
 //    app.newPlainSphere(body);
 //  }
   
-  reRigidBody& A = world.newRigidBody(sphere).withMass(2.0).at(-3, 1, -5).movingAt(re::vec3(0.01, 0.0, 0.0));
+  reRigidBody& A = world.newRigidBody(sphere).withMass(2.0).at(-3, -1, -5).movingAt(re::vec3(0.01, 0.0, 0.0));
   app.newPlainSphere(A);
-  reRigidBody& B = world.newRigidBody(sphere).withMass(2.0).at(3, 1, -5);
+  reRigidBody& B = world.newRigidBody(sphere).withMass(2.0).at(3, 3, -5);
   app.newPlainSphere(B);
   
   world.newGravityInteraction(A, B);

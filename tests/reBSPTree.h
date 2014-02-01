@@ -16,7 +16,8 @@ TEST_F(BSPTreeTest, AddClearActions) {
   world.add(&r);
   ASSERT_EQ(world.entities().size(), 1) << "add() should reject repeated entities";
   
-  reRigidBody* r2 = new reRigidBody(nullptr);
+  reSphere* sp = world.allocator().alloc_new<reSphere>(1.0);
+  reRigidBody* r2 = world.allocator().alloc_new<reRigidBody>(sp);
   world.add(r2);
   ASSERT_EQ(world.entities().size(), 2) << "add() should accept new entities";
   
