@@ -23,7 +23,7 @@ void main(void) {
   gl_Position = mProj * tmp;
   
   // transform normal by Normal matrix
-  norm = mNorm * vec4(vNorm, 0.0);
+  norm = normalize(mNorm * vec4(vNorm, 0.0));
   
   // pass through
   color = vColor;

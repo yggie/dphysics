@@ -14,13 +14,14 @@ endif(DEBUG)
 add_definitions(-std=c++11 -Wall -Wextra)
 
 include_directories(
+  ${react_SOURCE_DIR}
   ${react_SOURCE_DIR}/include
   ${react_SOURCE_DIR}/libs/glm
 )
 
 add_subdirectory(src/react)
 add_subdirectory(src/demo)
-add_subdirectory(src/ray)
+add_subdirectory(demos)
 if(TESTS)
   add_subdirectory(tests)
 endif(TESTS)

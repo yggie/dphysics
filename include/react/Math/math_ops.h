@@ -114,6 +114,17 @@ namespace re {
     return m /= lengthSq(q);
   }
   
+  inline const mat3x4 toMat3x4(const mat4x4& m) {
+    re::mat3x4 tm;
+    for (reUInt i = 0; i < 3; i++) {
+      for (reUInt j = 0; j < 3; j++) {
+        tm.m[i][j] = m[i][j];
+      }
+      tm.v[i] = m[i][3];
+    }
+    return tm;
+  }
+  
   /**
    * Constructs a unit quaternion using the given rotation matrix
    * 

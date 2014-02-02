@@ -3,15 +3,15 @@
 
 #include "react/math.h"
 #include "react/reWorld.h"
-#include "demo/glsetup.h"
-#include "demo/DemoApp.h"
-#include "ray/RayLightSource.h"
 
-#include <glm/mat4x4.hpp>
+#include "../Common/glsetup.h"
+#include "../Common/App.h"
+#include "RayLightSource.h"
+
 #include <string>
 #include <vector>
 
-class RayTracingDemo : public DemoApp {
+class RayTracingDemo : public re::demo::App {
 public:
   RayTracingDemo();
   ~RayTracingDemo();
@@ -20,18 +20,19 @@ public:
   void restart() override;
   void release() override;
   void draw() override;
-  void onResize() override;
+  void onResize(unsigned int w, unsigned int h) override;
   void keyEvent(unsigned char key, int x, int y) override;
   void specialKeyEvent(int key, int x, int y) override;
   void mouseEvent(int button, int state, int x, int y) override;
+  
+  re::demo::App::Options options() const override;
   
 private:
   const re::vec shootRay(unsigned int depth, const re::vec& origin, const re::vec& dir);
   void colorPixel(GLubyte* rgbaPixel, const re::vec& color);
   void resizeImage(GLsizei w, GLsizei h);
   void renderScene(GLsizei w, GLsizei h);
-  void createSceneFromFile(const char* filename, bool useOpenGL);
-  GLenum newOpenGLLight();
+  void createSceneFromFile(const char* filename);
   
   reWorld _world;
   GLuint _maxDepth;
@@ -57,8 +58,13 @@ private:
   
   std::string _sceneFile;
   unsigned int _lightNo;
-  bool usingGL;
 };
+
+inline re::demo::App::Options RayTracingDemo::options() const {
+  re::demo::App::Options o;
+  o.trapMouse = false;
+  return o;
+}
 
 inline void RayTracingDemo::colorPixel(GLubyte* rgbaPixel, const re::vec& color) {
   for (int i = 0; i < 3; i++) {

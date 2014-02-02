@@ -17,6 +17,7 @@ namespace re {
   struct vec3 {
     /** default constructor zeroes all values */
     vec3();
+    vec3(reFloat s);
     /** copy constructor @param a The vec3 to copy */
     vec3(const vec3& a);
     vec3(const reFloat* array);
@@ -79,8 +80,17 @@ namespace re {
   typedef vec3 vec;
 
   // inline constructors
-  inline vec3::vec3() : v{0.0} { }
-  inline vec3::vec3(const vec3& a) : x(a.x), y(a.y), z(a.z) { }
+  inline vec3::vec3() : v{0.0} {
+    // do nothing
+  }
+  
+  inline vec3::vec3(reFloat s) : v{s} {
+    // do nothing
+  }
+  
+  inline vec3::vec3(const vec3& a) : x(a.x), y(a.y), z(a.z) {
+    // do nothing
+  }
 
   /**
    * @brief Copies the first 3 elements of the input array into the vec3

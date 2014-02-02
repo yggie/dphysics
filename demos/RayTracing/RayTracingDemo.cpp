@@ -1,9 +1,10 @@
-#include "ray/RayTracingDemo.h"
+#include "RayTracingDemo.h"
+
+#include "RayObject.h"
 
 #include "react/Entities/reEnt.h"
 #include "react/Entities/reRigidBody.h"
 #include "react/Collision/reBroadPhase.h"
-#include "ray/RayObject.h"
 
 #define GLM_FORCE_RADIANS
 #include <glm/gtc/matrix_transform.hpp>
@@ -38,8 +39,8 @@ namespace {
   }
 }
 
-RayTracingDemo::RayTracingDemo() : DemoApp(), _world(), _maxDepth(5), _imageWidth(1), _imageHeight(1), _outputFile(), _fovy(45.0), _viewMat(1.0), _ambient(0.2f, 0.2f, 0.2f), _attenuation(1.0f, 0.0f, 0.0f), _lights(), _pixels(nullptr), _renderWidth(128), _renderHeight(96), _infinityColor(0.0, 0.0, 0.0), _sceneFile(), _lightNo(0), usingGL(false) {
-  _sceneFile = "resources/ray/samples/scene5.test";
+RayTracingDemo::RayTracingDemo() : re::demo::App(), _world(), _maxDepth(5), _imageWidth(1), _imageHeight(1), _outputFile(), _fovy(45.0), _viewMat(1.0), _ambient(0.2f, 0.2f, 0.2f), _attenuation(1.0f, 0.0f, 0.0f), _lights(), _pixels(nullptr), _renderWidth(128), _renderHeight(96), _infinityColor(0.0, 0.0, 0.0), _sceneFile(), _lightNo(0) {
+  _sceneFile = "resources/ray/samples/scene4-specular.test";
 }
 
 RayTracingDemo::~RayTracingDemo() {
@@ -77,7 +78,7 @@ void RayTracingDemo::init() {
 
 void RayTracingDemo::restart() {
   release();
-  createSceneFromFile(_sceneFile.c_str(), false);
+  createSceneFromFile(_sceneFile.c_str());
   
   renderScene(64, 48);
 }
@@ -104,7 +105,7 @@ void RayTracingDemo::release() {
 void RayTracingDemo::draw() {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   
-  if (_pixels != nullptr && !usingGL) {
+  if (_pixels != nullptr) {
     glDrawPixels(_renderWidth, _renderHeight, GL_RGBA, GL_UNSIGNED_BYTE, &_pixels[0]);
     CHECK_GL_ERR;
   }
@@ -112,14 +113,14 @@ void RayTracingDemo::draw() {
   glFlush();
 }
 
-void RayTracingDemo::onResize() {
+void RayTracingDemo::onResize(unsigned int w, unsigned int h) {
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
   glOrtho(0, _renderWidth, 0, _renderHeight, 1.0f, 5.0f);
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
   glRasterPos3f(0.0f, 0.0f, -2.0f);
-  glPixelZoom(width()/double(_renderWidth), height()/double(_renderHeight));
+  glPixelZoom(w/double(_renderWidth), h/double(_renderHeight));
   glutPostRedisplay();
 }
 
@@ -139,10 +140,6 @@ void RayTracingDemo::keyEvent(unsigned char key, int, int) {
       
     case 'f':
       renderScene(_imageWidth, _imageHeight);
-      break;
-      
-    case 'q':
-      createSceneFromFile(_sceneFile.c_str(), true);
       break;
   }
 }
@@ -262,7 +259,7 @@ void RayTracingDemo::resizeImage(GLsizei w, GLsizei h) {
   
   _renderWidth = w;
   _renderHeight = h;
-  onResize();
+  onResize(width(), height());
 }
 
 /**
@@ -270,7 +267,6 @@ void RayTracingDemo::resizeImage(GLsizei w, GLsizei h) {
  */
 
 void RayTracingDemo::renderScene(GLsizei w, GLsizei h) {
-  usingGL = false;
   resizeImage(w, h);
   const float aspectRatio = w / float(h);
   const float fovy = glm::radians(_fovy / 2.0);

@@ -83,7 +83,7 @@ void PlainSphere::setup(GLuint* vao, GLuint* vbo, const Canvas& canvas) {
           jk = j + k;
         }
         vertPos[cnt] = glm::vec3(r[jk]*s[ik], r[jk]*c[ik], z[jk]*ix);
-        vertNorm[cnt] = glm::normalize(vertPos[i]);
+        vertNorm[cnt] = glm::normalize(vertPos[cnt]);
         vertColor[cnt++] = glm::vec4(c[ik], s[ik], 1.0f, 0.9f);
       }
     }

@@ -287,20 +287,7 @@ void App::gPaint() {
 void App::gInit() {
   printf("[DEMO]  Initializing demo graphics engine\n");
   
-  _cam.init();
-  
-  int verMajor, verMinor;
-  glGetIntegerv(GL_MAJOR_VERSION, &verMajor);
-  glGetIntegerv(GL_MINOR_VERSION, &verMinor);
-  printf("[DEMO]  Detected OpenGL version %d.%d\n", verMajor, verMinor);
-  
-  int multisamplingEnabled;
-  glGetIntegerv(GL_SAMPLE_BUFFERS, &multisamplingEnabled);
-  if (multisamplingEnabled == GL_TRUE) {
-    printf("[DEMO]  Multisampling support detected\n");
-  } else {
-    printf("[DEMO]  Multisampling not supported on device\n");
-  }
+  _cam.init(ViewCam::Mode::FIRST_PERSON);
   
   glClearColor(0.3f, 0.3f, 0.3f, 0.5f);
   glLineWidth(1);

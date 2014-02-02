@@ -111,20 +111,6 @@ namespace demo {
     _currentDemo = (_currentDemo + 1) % _demos.size();
     switchToDemo(_currentDemo);
   }
-  
-  /**
-   * @ingroup demo
-   * Used to internally manage VAO, VBO and TBO requests in function
-   * App::gInit()
-   */
-
-  struct Request {
-    Request() : vaoIndex(-1), vboIndex(-1), tboIndex(-1), obj(nullptr) { }
-    int vaoIndex;
-    int vboIndex;
-    int tboIndex;
-    GfxObj* obj;
-  };
 }
 
 #endif

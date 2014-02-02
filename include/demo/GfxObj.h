@@ -48,6 +48,20 @@ namespace demo {
   inline void GfxObj::setApp(App* app) {
     _app = app;
   }
+  
+  /**
+   * @ingroup demo
+   * Used to internally manage VAO, VBO and TBO requests in function
+   * App::gInit()
+   */
+
+  struct Request {
+    Request() : vaoIndex(-1), vboIndex(-1), tboIndex(-1), obj(nullptr) { }
+    int vaoIndex;
+    int vboIndex;
+    int tboIndex;
+    GfxObj* obj;
+  };
 }
 
 #endif

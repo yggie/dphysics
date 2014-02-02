@@ -13,6 +13,7 @@
 namespace demo {
   
   class Shader;
+  class GfxObj;
   
   /**
    * @ingroup demo
@@ -40,8 +41,11 @@ namespace demo {
     virtual ~Canvas();
     
     void init();
-    void use();     // inline
+    void use();
     virtual void release();
+    void releaseObjects();
+    
+    void add(GfxObj* obj);
     
     virtual const GLAttributeIndex& attrs() const = 0;
     virtual const GLUniformIndex& uniforms() const = 0;
@@ -75,12 +79,29 @@ namespace demo {
     void printLog();
     glm::mat4 _mat();
     
+    // shader programs
     GLuint _programID;
     std::vector<Shader*> _shaders;
     
+    // shader uniforms
     glm::mat4 _projMat;
     glm::mat4 _viewMat;
     MatrixStack _modelMatStack;
+    
+    // graphic objects
+    std::vector<GfxObj*> _objects;
+    
+    // allocated VAO and VBO for the application
+    GLuint* _VAOs;
+    GLuint* _VBOs;
+//    GLuint* _TBOs;
+    
+    int _numVAO;
+    int _numVBO;
+//    int _numTBO;
+
+  private:
+    void prepareBuffers();
   };
   
   inline GLuint Canvas::programID() const {

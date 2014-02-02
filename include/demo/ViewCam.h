@@ -15,7 +15,7 @@ namespace demo {
     ViewCam();
     ~ViewCam();
     
-    void init();
+    void init(Mode mode);
     void update();
     void reset();
     

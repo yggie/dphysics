@@ -17,7 +17,8 @@ ViewCam::~ViewCam() {
   // do nothing
 }
 
-void ViewCam::init() {
+void ViewCam::init(ViewCam::Mode mode) {
+  _mode = mode;
   switch (_mode) {
     case FIRST_PERSON:
       glutSetCursor(GLUT_CURSOR_NONE);
@@ -54,9 +55,8 @@ const re::mat4 ViewCam::viewMat() const {
     .rotate(_rota.x, 1, 0, 0);
 }
 
-#include "react/debug.h"
-
 void ViewCam::keyEvent(unsigned char key, int, int) {
+  // TODO why doesn't this work??
   re::mat3 R = re::transpose(re::mat3::rotation(_rota.y, 0, 1, 0) * re::mat3::rotation(_rota.x, 1, 0, 0));
   switch (key) {
     case 'w':
@@ -94,7 +94,9 @@ void ViewCam::mouseEvent(int button, int, int, int) {
 }
 
 void ViewCam::motionEvent(float dx, float dy) {
-  if (re::abs(dx) > RE_FP_TOLERANCE && re::abs(dy) > RE_FP_TOLERANCE) {
+  if (re::abs(dx) > RE_FP_TOLERANCE || re::abs(dy) > RE_FP_TOLERANCE) {
+    _rotTarget.x += 10.0*dy;
+    _rotTarget.y += 10.0*dx;
   }
 }
 
