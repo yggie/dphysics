@@ -72,6 +72,30 @@ namespace re {
   inline bool similar(const quat& a, const quat& b) {
     return re::lengthSq(a - b) < re::sq(RE_FP_TOLERANCE);
   }
+  
+  /**
+   * @ingroup maths
+   * Computes the unit quaternion representing a rotation about the given axis
+   * 
+   * @param angle The anti-clockwise angle of rotation in radians
+   * @param axis The axis of rotation
+   * @return The resulting quaternion
+   */
+  
+  inline const quat quat::rotation(reFloat angle, const vec3& axis) {
+    quat q;
+    q.r = re::cos(angle / 2.0);
+    const reFloat s = re::sin(angle / 2.0);
+    const reFloat L = re::length(axis);
+    q.i = axis.x * s / L;
+    q.j = axis.y * s / L;
+    q.k = axis.z * s / L;
+    return q;
+  }
+  
+  inline const quat quat::rotation(reFloat angle, reFloat x, reFloat y, reFloat z) {
+    return re::quat::rotation(angle, re::vec3(x, y, z));
+  }
 }
 
 #endif

@@ -1,3 +1,5 @@
+cmake_minimum_required(VERSION 2.8)
+
 file(GLOB ray_SOURCE_FILES "*.cpp")
 file(GLOB ray_HEADER_FILES "${react_SOURCE_DIR}/include/ray/*.h")
 

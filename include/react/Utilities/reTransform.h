@@ -128,9 +128,9 @@ namespace re {
 
   inline mat3x4& mat3x4::scale(reFloat x, reFloat y, reFloat z) {
     for (reUInt i = 0; i < 3; i++) {
-      m[i][0] *= x;
-      m[i][1] *= y;
-      m[i][2] *= z;
+      m[0][i] *= x;
+      m[1][i] *= y;
+      m[2][i] *= z;
     }
     v[0] *= x;
     v[1] *= y;

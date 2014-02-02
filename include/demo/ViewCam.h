@@ -36,11 +36,9 @@ namespace demo {
     re::vec3 _translation;
     re::vec3 _target;
     re::vec3 _faceTarget;
+    re::vec3 _rota;
+    re::vec3 _rotTarget;
   };
-  
-  inline const re::mat4 ViewCam::viewMat() const {
-    return re::mat4(_rot, _translation);
-  }
 }
 
 #endif

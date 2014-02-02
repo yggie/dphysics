@@ -28,8 +28,8 @@ TEST(IntegratorTest, ConstantRotation) {
   const vec3 ax(0.0, 0.0, 1.0);
   vec3 w(0.0, 0.0, tr - ir);
   const reFloat dt = 1.0 / steps;
-  quat q = re::axisAngleQ(ax, ir);
-  quat p = re::axisAngleQ(ax, tr);
+  quat q = re::quat::rotation(ir, ax);
+  quat p = re::quat::rotation(tr, ax);
   
   reIntegrator ign;
   for (reUInt i = 0; i < steps; i++) {

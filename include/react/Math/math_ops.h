@@ -66,15 +66,14 @@ namespace re {
   }
   
   /**
-   * @ingroup maths
    * Computes the rotation matrix based on the given axis and angle of rotation
    * 
-   * @param axis The axis of rotation
    * @param angle The anti-clockwise angle of rotation in radians
-   * @return The rotation matrix
+   * @param axis The axis of rotation
+   * @return The 3x3 rotation matrix
    */
 
-  inline const mat3x3 axisAngle(const vec3& axis, reFloat angle) {
+  inline const mat3x3 mat3x3::rotation(reFloat angle, const vec3& axis) {
     const reFloat c = re::cos(angle);
     const reFloat s = re::sin(angle);
     const vec3 a = normalize(axis);
@@ -151,26 +150,6 @@ namespace re {
     }
     
     return re::normalize(q);
-  }
-  
-  /**
-   * @ingroup maths
-   * Computes the unit quaternion representing a rotation about the given axis
-   * 
-   * @param axis The axis of rotation
-   * @param angle The anti-clockwise angle of rotation in radians
-   * @return The resulting quaternion
-   */
-  
-  inline const quat axisAngleQ(const vec3& axis, reFloat angle) {
-    quat q;
-    q.r = re::cos(angle / 2.0);
-    const reFloat s = re::sin(angle / 2.0);
-    const reFloat L = re::length(axis);
-    q.i = axis.x * s / L;
-    q.j = axis.y * s / L;
-    q.k = axis.z * s / L;
-    return q;
   }
 }
 

@@ -109,6 +109,18 @@ namespace re {
 	    w[0], w[1], w[2]
     );
   }
+  
+  /**
+   * Computes the rotation matrix based on the given axis and angle of rotation
+   * 
+   * @param axis The axis of rotation
+   * @param angle The anti-clockwise angle of rotation in radians
+   * @return The 3x3 rotation matrix
+   */
+
+  inline const mat3x3 mat3x3::rotation(reFloat angle, reFloat x, reFloat y, reFloat z) {
+    return re::mat3x3::rotation(angle, re::vec3(x, y, z));
+  }
 }
 
 #endif

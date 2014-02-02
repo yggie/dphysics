@@ -8,6 +8,7 @@
 #include "react/common.h"
 #include "react/Math/vec3.h"
 #include "react/Math/mat3x3.h"
+#include "react/Utilities/reTransform.h"
 
 namespace re {
   
@@ -47,13 +48,13 @@ namespace re {
     
     const vec3 mult(const vec3& a, reFloat w) const;
     mat4x4& preMult(const mat4x4& tm);
-    const vec3 preMult(const vec3& a, reFloat w) const;
     
     const vec3 multDir(const re::vec3& dir) const;
     const vec3 multPoint(const re::vec3& dir) const;
     
     mat4x4& translate(const re::vec3& v);
     mat4x4& translate(reFloat x, reFloat y, reFloat z);
+    mat4x4& scale(const re::vec3& s);
     mat4x4& scale(reFloat x, reFloat y, reFloat z);
     mat4x4& rotate(reFloat angle, const re::vec3& axis);
     mat4x4& rotate(reFloat angle, reFloat x, reFloat y, reFloat z);
@@ -215,31 +216,22 @@ namespace re {
     }
     return *this;
   }
-
-  inline const vec3 mat4x4::preMult(const vec3& a, reFloat w) const {
-    const mat4x4& m = *this;
-    return vec3(
-      a[0]*m[0][0] + a[1]*m[1][0] + a[2]*m[2][0] + w*m[3][0],
-      a[0]*m[0][1] + a[1]*m[1][1] + a[2]*m[2][1] + w*m[3][1],
-      a[0]*m[0][2] + a[1]*m[1][2] + a[2]*m[2][2] + w*m[3][2]
-    );
-  }
   
   inline const vec3 mat4x4::multDir(const vec3& dir) const {
     const mat4x4& m = *this;
     return vec3(
-      dir[0]*m[0][0] + dir[1]*m[1][0] + dir[2]*m[2][0],
-      dir[0]*m[0][1] + dir[1]*m[1][1] + dir[2]*m[2][1],
-      dir[0]*m[0][2] + dir[1]*m[1][2] + dir[2]*m[2][2]
+      dir[0]*m[0][0] + dir[1]*m[0][1] + dir[2]*m[0][2],
+      dir[0]*m[1][0] + dir[1]*m[1][1] + dir[2]*m[1][2],
+      dir[0]*m[2][0] + dir[1]*m[2][1] + dir[2]*m[2][2]
     );
   }
   
   inline const vec3 mat4x4::multPoint(const vec3& pt) const {
     const mat4x4& m = *this;
     return vec3(
-      pt[0]*m[0][0] + pt[1]*m[1][0] + pt[2]*m[2][0] + m[3][0],
-      pt[0]*m[0][1] + pt[1]*m[1][1] + pt[2]*m[2][1] + m[3][1],
-      pt[0]*m[0][2] + pt[1]*m[1][2] + pt[2]*m[2][2] + m[3][2]
+      pt[0]*m[0][0] + pt[1]*m[0][1] + pt[2]*m[0][2] + m[0][3],
+      pt[0]*m[1][0] + pt[1]*m[1][1] + pt[2]*m[1][2] + m[1][3],
+      pt[0]*m[2][0] + pt[1]*m[2][1] + pt[2]*m[2][2] + m[2][3]
     );
   }
   
@@ -248,17 +240,21 @@ namespace re {
   }
 
   inline mat4x4& mat4x4::translate(reFloat x, reFloat y, reFloat z) {
-    v[3]  += x;
-    v[7]  += y;
+    v[3] += x;
+    v[7] += y;
     v[11] += z;
     return *this;
   }
+  
+  inline mat4x4& mat4x4::scale(const re::vec3& s) {
+    return scale(s.x, s.y, s.z);
+  }
 
   inline mat4x4& mat4x4::scale(reFloat x, reFloat y, reFloat z) {
-    for (reUInt i = 0; i < 3; i++) {
-      v[4*i + 0] *= x;
-      v[4*i + 1] *= y;
-      v[4*i + 2] *= z;
+    for (reUInt i = 0; i < 4; i++) {
+      v[i + 0] *= x;
+      v[i + 4] *= y;
+      v[i + 8] *= z;
     }
     return *this;
   }
@@ -268,22 +264,7 @@ namespace re {
   }
 
   inline mat4x4& mat4x4::rotate(reFloat angle, reFloat x, reFloat y, reFloat z) {
-    // refer to Axis-Angle rotation formula
-    const float s = re::sin(angle);
-    const float c = re::cos(angle);
-    const float c1 = 1 - c;
-    const float l = re::sqrt(x*x + y*y + z*z);
-    x /= l;
-    y /= l;
-    z /= l;
-    const reFloat abc[] = {
-        c + c1*x*x, c1*x*y - s*z, c1*x*z + s*y, 0.0f,
-      c1*x*y + s*z,   c + c1*y*y, c1*y*z - s*x, 0.0f,
-      c1*x*z - s*y, c1*y*z + s*x,   c + c1*z*z, 0.0f,
-              0.0f,         0.0f,         0.0f, 1.0f
-    };
-    this->preMult(mat4x4(&abc[0]));
-    return *this;
+    return (*this) = re::mat4x4(reTransform().rotate(angle, x, y, z).m) * (*this);
   }
 }
 

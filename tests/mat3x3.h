@@ -113,13 +113,14 @@ TEST(MatrixTest, Inverse) {
   }
 }
 
-TEST(MatrixTest, AxisAngle) {
+TEST(MatrixTest, Rotation) {
   for (reUInt i = 0; i < NUM_REPEATS; i++) {
-    const re::mat3x3 r = re::axisAngle(re::vec3::rand(), re::randf(-1e5, 1e5));
+    const re::mat3x3 r = re::mat3::rotation(re::randf(-1e5, 1e5), re::vec3::rand());
     
     ASSERT_TRUE(re::similar(re::inverse(r), re::transpose(r))) <<
       "the inverse and transpose should be equivalent for a rotation matrix";
-    ASSERT_FLOAT_EQ(re::determinant(r), 1.0) <<
+
+    ASSERT_LE(re::abs(re::determinant(r) - 1.0), RE_FP_TOLERANCE) <<
       "should have determinant equal to 1.0";
   }
 }

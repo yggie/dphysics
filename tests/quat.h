@@ -28,8 +28,8 @@ TEST(QuaternionTest, AdditionAndSubtraction) {
   }
 }
 
-TEST(QuaternionTest, AxisAngle) {
-  quat p = re::axisAngleQ(re::vec3(1, 1, 1), 0.0);
+TEST(QuaternionTest, Rotation) {
+  quat p = re::quat::rotation(0.0, re::vec3(1, 1, 1));
   
   const reFloat c = re::cos(1.0);
   const reFloat s = re::sin(1.0);
@@ -37,18 +37,18 @@ TEST(QuaternionTest, AxisAngle) {
   ASSERT_TRUE(re::similar(p, quat(1.0, 0.0, 0.0, 0.0))) <<
     "should be equal to the predicted quantity";
   
-  quat g = re::axisAngleQ(re::vec3(1, 0, 0), 2.0);
+  quat g = re::quat::rotation(2.0, re::vec3(1, 0, 0));
   
   ASSERT_TRUE(re::similar(g, quat(c, s, 0.0, 0.0))) <<
     "should be equal to the predicted quantity";
   
-  quat b = re::axisAngleQ(re::vec3(0, 1, 0), 2.0);
+  quat b = re::quat::rotation(2.0, re::vec3(0, 1, 0));
   
   ASSERT_TRUE(re::similar(b, quat(c, 0.0, s, 0.0))) <<
     "should be equal to the predicted quantity";
   
   for (reUInt i = 0; i < 100; i++) {
-    quat q = re::axisAngleQ(re::vec3::rand(), re::randf(-1e5, 1e5));
+    quat q = re::quat::rotation(re::randf(-1e5, 1e5), re::vec3::rand());
     ASSERT_FLOAT_EQ(re::length(q), 1.0) <<
       "should always be a unit quaternion";
   }
@@ -100,7 +100,7 @@ TEST(QuaternionTest, ScalarMultiplicationAndDivision) {
 
 TEST(QuaternionTest, MatrixConversionTest) {
   for (reUInt i = 0; i < NUM_REPEATS; i++) {
-    re::mat3 m = re::axisAngle(re::vec3::rand(), re::randf(-1e5, 1e5));
+    re::mat3 m = re::mat3::rotation(re::randf(-1e5, 1e5), re::vec3::rand());
     quat q = re::toQuat(m);
     re::mat3 n = re::toMat(q);
     ASSERT_TRUE(re::similar(m, n)) <<

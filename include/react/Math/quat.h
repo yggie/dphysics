@@ -57,6 +57,8 @@ namespace re {
     
     static const quat rand(reFloat b = 1.0);
     static const quat unit();
+    static const quat rotation(reFloat angle, const re::vec3& axis);
+    static const quat rotation(reFloat angle, reFloat x, reFloat y, reFloat z);
   };
 
   inline quat::quat() : v{ 1.0, 0.0, 0.0, 0.0 } {
