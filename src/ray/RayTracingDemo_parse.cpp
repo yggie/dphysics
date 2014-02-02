@@ -197,13 +197,13 @@ void RayTracingDemo::createSceneFromFile(const char* filename, bool useOpenGL) {
   			  glMatrixMode(GL_MODELVIEW);
 			  }
 			}
-		  _viewMat = reTMatrix(
+		  _viewMat = re::mat4x4(
 		    u[0], u[1], u[2], -glm::dot(eye, u),
 		    v[0], v[1], v[2], -glm::dot(eye, v),
 		    w[0], w[1], w[2], -glm::dot(eye, w),
 		       0,    0,    0,         1
 		  );
-		  _inverseViewMat = _viewMat.inverse();
+		  _inverseViewMat = re::inverse(_viewMat);
 			RAY_PRINTF("    %-35s", "CAMERA")
       
       /**

@@ -7,7 +7,44 @@
 
 demo::App app;
 
+int lastX, lastY;
+int W, H;
+
 // proxy functions, because glut won't accept otherwise
+void passiveMotionFunc(int x, int y) {
+  if (lastX == -1 || lastY == -1) {
+    lastX = x;
+    lastY = y;
+    return;
+  }
+  app.passiveMotionEvent((x - lastX)/float(W/2), (y - lastY)/float(H/2));
+  lastX = x;
+  lastY = y;
+  
+  if (fabs(W/2 - x) > 25 || fabs(H/2 - y) > 25) {
+    glutWarpPointer(W/2, H/2);
+    lastX = W/2;
+    lastY = H/2;
+  }
+}
+
+void motionFunc(int x, int y) {
+  if (lastX == -1 || lastY == -1) {
+    lastX = x;
+    lastY = y;
+    return;
+  }
+  app.motionEvent((x - lastX)/float(W/2), (y - lastY)/float(H/2));
+  lastX = x;
+  lastY = y;
+  
+  if (fabs(W/2 - x) > 25 || fabs(H/2 - y) > 25) {
+    glutWarpPointer(W/2, H/2);
+    lastX = W/2;
+    lastY = H/2;
+  }
+}
+
 void keyboardFunc(unsigned char key, int x, int y) {
   app.keyEvent(key, x, y);
 }
@@ -21,6 +58,10 @@ void paint(void) {
 }
 
 void reshape(int w, int h) {
+  W = w;
+  H = h;
+  lastX = -1;
+  lastY = -1;
   app.gResizeScreen(w, h);
 }
 
@@ -97,6 +138,8 @@ int main(int argc, char** argv) {
   glutKeyboardFunc(keyboardFunc);
   glutReshapeFunc(reshape);
   glutSpecialFunc(specialKeys);
+  glutMotionFunc(motionFunc);
+  glutPassiveMotionFunc(passiveMotionFunc);
   
   app.addDemo(testDemo);
   

@@ -3,6 +3,8 @@
 
 #include "react/Utilities/reTransform.h"
 
+using namespace re; // just for Doxygen
+
 namespace re {
   
   /**

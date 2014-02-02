@@ -5,7 +5,7 @@
 #include "react/reWorld.h"
 #include "demo/MatrixStack.h"
 #include "demo/SimpleCanvas.h"
-#include "demo/FlyingCam.h"
+#include "demo/ViewCam.h"
 
 #include <GL/gl.h>
 #include <GL/freeglut.h>
@@ -42,6 +42,8 @@ namespace demo {
     
     void keyEvent(unsigned char key, int x, int y);
     void specialKeyEvent(int key, int x, int y);
+    void passiveMotionEvent(float dx, float dy);
+    void motionEvent(float dx, float dy);
     
     void clearObjects();
     
@@ -91,7 +93,7 @@ namespace demo {
     
     bool _paused;
     
-    FlyingCam _cam;
+    ViewCam _cam;
   };
   
   inline const Canvas& App::canvas() const {

@@ -97,6 +97,18 @@ namespace re {
     }
     return true;
   }
+  
+  inline const mat3x3 facing(const vec3& dir, const vec3& up) {
+    const re::vec3& w = re::normalize(-dir);
+    const re::vec3& u = re::normalize(re::cross(up, w));
+    const re::vec3& v = re::normalize(re::cross(w, u));
+    
+    return re::mat3x3(
+	    u[0], u[1], u[2],
+	    v[0], v[1], v[2],
+	    w[0], w[1], w[2]
+    );
+  }
 }
 
 #endif

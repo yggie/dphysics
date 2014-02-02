@@ -40,8 +40,8 @@ private:
   std::string _outputFile;
   
   float _fovy;
-  reTMatrix _viewMat;
-  reTMatrix _inverseViewMat;
+  re::mat4x4 _viewMat;
+  re::mat4x4 _inverseViewMat;
   
   re::vec _ambient;
   re::vec _attenuation;

@@ -9,19 +9,23 @@
 #include "react/Math/vec3.h"
 #include "react/Math/mat3x3.h"
 
-/**
- * Defines a transformation matrix in sparse matrix form.
- */
-
 namespace re {
+  
+  /**
+   * @ingroup maths
+   * Defines a 4x4 matrix
+   */
+  
   class mat4x4 {
   public:
     /** Default constructor initializes the matrix to identity */
     mat4x4();
+    mat4x4(const mat3x3& m);
     mat4x4(const mat4x4& tm);
     mat4x4(const reFloat* raw);
     mat4x4(reFloat d);
     mat4x4(const mat3x3& rotation, const vec3& translation);
+    mat4x4(reFloat m11, reFloat m22, reFloat m33, reFloat m44);
     mat4x4(
       reFloat m11, reFloat m12, reFloat m13, reFloat m14,
       reFloat m21, reFloat m22, reFloat m23, reFloat m24,
@@ -33,8 +37,8 @@ namespace re {
     
     reFloat* ptr();
     
-    reFloat* operator[](int i);
-    const reFloat* operator[](int i) const;
+    reFloat* operator[](reUInt i);
+    const reFloat* operator[](reUInt i) const;
     
     mat4x4& operator*=(const mat4x4& tm);
     mat4x4& operator=(const mat4x4& tm);
@@ -45,17 +49,37 @@ namespace re {
     mat4x4& preMult(const mat4x4& tm);
     const vec3 preMult(const vec3& a, reFloat w) const;
     
+    const vec3 multDir(const re::vec3& dir) const;
+    const vec3 multPoint(const re::vec3& dir) const;
+    
+    mat4x4& translate(const re::vec3& v);
     mat4x4& translate(reFloat x, reFloat y, reFloat z);
     mat4x4& scale(reFloat x, reFloat y, reFloat z);
+    mat4x4& rotate(reFloat angle, const re::vec3& axis);
     mat4x4& rotate(reFloat angle, reFloat x, reFloat y, reFloat z);
-    
-    const mat4x4 inverse() const;
     
     reFloat v[16];
   };
+  
+  typedef mat4x4 mat4;
 
   inline mat4x4::mat4x4() : mat4x4(1.0) {
     // do nothing
+  }
+
+  inline mat4x4::mat4x4(const mat3x3& tm) {
+    for (reUInt i = 0; i < 3; i++) {
+      for (reUInt j = 0; j < 3; j++) {
+        (*this)[i][j] = tm[i][j];
+      }
+    }
+    v[3] = 0.0;
+    v[7] = 0.0;
+    v[11] = 0.0;
+    v[12] = 0.0;
+    v[13] = 0.0;
+    v[14] = 0.0;
+    v[15] = 1.0;
   }
 
   inline mat4x4::mat4x4(const mat4x4& tm) {
@@ -94,6 +118,13 @@ namespace re {
     }
     v[15] = 1.0;
   }
+  
+  inline mat4x4::mat4x4(reFloat m11, reFloat m22, reFloat m33, reFloat m44) : v{0.0} {
+    v[0] = m11;
+    v[5] = m22;
+    v[10] = m33;
+    v[15] = m44;
+  }
 
   inline mat4x4::mat4x4(
     reFloat m11, reFloat m12, reFloat m13, reFloat m14,
@@ -122,7 +153,7 @@ namespace re {
    * @return A reference to the row values
    */
 
-  inline reFloat* mat4x4::operator[](int i) {
+  inline reFloat* mat4x4::operator[](reUInt i) {
     return &v[4*i];
   }
 
@@ -135,7 +166,7 @@ namespace re {
    * @return A reference to the row values
    */
 
-  inline const reFloat* mat4x4::operator[](int i) const {
+  inline const reFloat* mat4x4::operator[](reUInt i) const {
     return &v[4*i];
   }
 
@@ -193,6 +224,28 @@ namespace re {
       a[0]*m[0][2] + a[1]*m[1][2] + a[2]*m[2][2] + w*m[3][2]
     );
   }
+  
+  inline const vec3 mat4x4::multDir(const vec3& dir) const {
+    const mat4x4& m = *this;
+    return vec3(
+      dir[0]*m[0][0] + dir[1]*m[1][0] + dir[2]*m[2][0],
+      dir[0]*m[0][1] + dir[1]*m[1][1] + dir[2]*m[2][1],
+      dir[0]*m[0][2] + dir[1]*m[1][2] + dir[2]*m[2][2]
+    );
+  }
+  
+  inline const vec3 mat4x4::multPoint(const vec3& pt) const {
+    const mat4x4& m = *this;
+    return vec3(
+      pt[0]*m[0][0] + pt[1]*m[1][0] + pt[2]*m[2][0] + m[3][0],
+      pt[0]*m[0][1] + pt[1]*m[1][1] + pt[2]*m[2][1] + m[3][1],
+      pt[0]*m[0][2] + pt[1]*m[1][2] + pt[2]*m[2][2] + m[3][2]
+    );
+  }
+  
+  inline mat4x4& mat4x4::translate(const vec3& v) {
+    return translate(v.x, v.y, v.z);
+  }
 
   inline mat4x4& mat4x4::translate(reFloat x, reFloat y, reFloat z) {
     v[3]  += x;
@@ -202,12 +255,16 @@ namespace re {
   }
 
   inline mat4x4& mat4x4::scale(reFloat x, reFloat y, reFloat z) {
-    for (int i = 0; i < 3; i++) {
+    for (reUInt i = 0; i < 3; i++) {
       v[4*i + 0] *= x;
       v[4*i + 1] *= y;
       v[4*i + 2] *= z;
     }
     return *this;
+  }
+  
+  inline mat4x4& mat4x4::rotate(reFloat angle, const vec3& axis) {
+    return rotate(angle, axis.x, axis.y, axis.z);
   }
 
   inline mat4x4& mat4x4::rotate(reFloat angle, reFloat x, reFloat y, reFloat z) {
@@ -230,6 +287,6 @@ namespace re {
   }
 }
 
-typedef re::mat4x4 reTMatrix;
+#include "react/Math/mat4x4_ops.h"
 
 #endif

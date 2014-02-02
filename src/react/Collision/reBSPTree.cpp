@@ -5,8 +5,6 @@
 #include "react/Memory/reAllocator.h"
 #include "react/Collision/Shapes/reProxyShape.h"
 
-#include <cstdio>
-
 reBSPTreeNode::reBSPTreeNode(reAllocator& allocator, reUInt depth, re::vec3 dir, re::vec3 anchor) : dir(dir), anchor(anchor), depth(depth), _allocator(allocator), _entities(allocator), _child{nullptr} {
   // do nothing
 }
@@ -107,16 +105,18 @@ reBPMeasure reBSPTreeNode::measure() const {
  * @param q The queryable object to add
  */
 
-void reBSPTreeNode::add(reQueryable& q) {
+bool reBSPTreeNode::add(reQueryable& q) {
+  bool success = false;
   if (hasChildren()) {
     for (reUInt i = 0; i < 2; i++) {
       if (_child[i]->contains(q.ent)) {
-        _child[i]->add(q);
+        success = _child[i]->add(q) || success;
       }
     }
   } else {
-    _entities.add(q);
+    success = _entities.add(q);
   }
+  return success;
 }
 
 /**

@@ -8,7 +8,7 @@
 #include "react/Math/math_common.h"
 #include "react/Math/vec3.h"
 #include "react/Math/mat3x3.h"
-#include "react/Utilities/reTMatrix.h"
+#include "react/Math/mat4x4.h"
 #include "react/Utilities/reTransform.h"
 #include "react/Math/quat.h"
 #include "react/Math/math_ops.h"

@@ -28,6 +28,7 @@ const reUInt NUM_SAMPLES = 1e4;
 const re::vec3 ZERO_VEC = re::vec3(0.0, 0.0, 0.0);
 const re::mat3 IDEN_MAT = re::mat3(1.0);
 const re::mat3x4 IDEN_MAT3x4 = re::mat3x4(IDEN_MAT, ZERO_VEC);
+const re::mat4 IDEN_MAT4x4 = re::mat4(1.0);
 
 //#define ASSERT_VEC_EQ(a, b) assertEq(a, b, __FILE__, __LINE__, #a, #b)
 //#define ASSERT_QUAT_EQ(q, p) assertEq(q, p, __FILE__, __LINE__, #q, #p)

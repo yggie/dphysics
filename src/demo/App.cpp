@@ -60,7 +60,9 @@ void App::run() {
   glutMainLoop();
 }
 
-void App::keyEvent(unsigned char key, int, int) {
+void App::keyEvent(unsigned char key, int x, int y) {
+  _cam.keyEvent(key, x, y);
+  
   switch (key) {
     case 27: // ESC
       glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_CONTINUE_EXECUTION);
@@ -76,44 +78,16 @@ void App::keyEvent(unsigned char key, int, int) {
   }
 }
 
-#define PUSH  1.0f
-#define TWIRL 0.4f
+void App::specialKeyEvent(int key, int x, int y) {
+  _cam.specialKeyEvent(key, x, y);
+}
 
-void App::specialKeyEvent(int key, int, int) {
-  int modifiers = glutGetModifiers();
-  switch (key) {
-    case GLUT_KEY_UP:
-      if (modifiers & GLUT_ACTIVE_ALT) {
-        _cam.rotUp(TWIRL);
-      } else {
-        _cam.pushForward(PUSH);
-      }
-      break;
-    
-    case GLUT_KEY_LEFT:
-      if (modifiers & GLUT_ACTIVE_ALT) {
-        _cam.rotLeft(TWIRL);
-      } else {
-        _cam.pushLeft(PUSH);
-      }
-      break;
-      
-    case GLUT_KEY_RIGHT:
-      if (modifiers & GLUT_ACTIVE_ALT) {
-        _cam.rotRight(TWIRL);
-      } else {
-        _cam.pushRight(PUSH);
-      }
-      break;
-    
-    case GLUT_KEY_DOWN:
-      if (modifiers & GLUT_ACTIVE_ALT) {
-        _cam.rotDown(TWIRL);
-      } else {
-        _cam.pushBack(PUSH);
-      }
-      break;
-  }
+void App::passiveMotionEvent(float dx, float dy) {
+  _cam.passiveMotionEvent(dx, dy);
+}
+
+void App::motionEvent(float dx, float dy) {
+  _cam.motionEvent(dx, dy);
 }
 
 void App::clearObjects() {
@@ -223,7 +197,7 @@ void App::gPaint() {
   
 #ifndef USE_OLD_SYNTAX
   _canvas.clearStack();
-  _cam.step();
+  _cam.update();
   _canvas.setViewMat(_cam.viewMat());
   _canvas.push();
   for_each(_gfxObjs.begin(), _gfxObjs.end(), [&](GfxObj* obj) {
@@ -312,6 +286,8 @@ void App::gPaint() {
 
 void App::gInit() {
   printf("[DEMO]  Initializing demo graphics engine\n");
+  
+  _cam.init();
   
   int verMajor, verMinor;
   glGetIntegerv(GL_MAJOR_VERSION, &verMajor);

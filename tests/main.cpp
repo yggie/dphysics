@@ -5,6 +5,7 @@
 #include "mat3x3.h"
 #include "quat.h"
 #include "reTransform.h"
+#include "mat4x4.h"
 #include "reIntegrator.h"
 
 // shape module unit tests

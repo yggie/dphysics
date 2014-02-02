@@ -27,7 +27,7 @@ public:
   bool isRoot() const;
   bool isLeaf() const;
   
-  void add(reQueryable& q);
+  bool add(reQueryable& q);
   bool remove(reQueryable& q);
   bool contains(const reEnt& ent) const;
   reEntList rebalanceNode(reTreeBalanceStrategy& strategy);

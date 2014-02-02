@@ -36,7 +36,7 @@ inline void rePrint(const re::mat3& m) {
   }
 }
 
-inline void rePrint(const reTMatrix& m) {
+inline void rePrint(const re::mat4x4& m) {
   for (int i = 0; i < 4; i++) {
     printf(" | %+f, %+f, %+f, %+f |\n", m[i][0], m[i][1], m[i][2], m[i][3]);
   }
