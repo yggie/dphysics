@@ -90,19 +90,19 @@ namespace re {
     }
 
     inline void MatrixStack::scale(float s) {
-      top().scale(s, s, s);
+      scale(s, s, s);
     }
 
     inline void MatrixStack::scale(float x, float y, float z) {
-      top().scale(x, y, z);
+      top() *= re::mat4::scaling(x, y, z);
     }
 
     inline void MatrixStack::translate(float x, float y, float z) {
-      top().translate(x, y, z);
+      top() *= re::mat4::translation(x, y, z);
     }
 
     inline void MatrixStack::rotate(float angle, float x, float y, float z) {
-      top().rotate(angle, re::vec3(x, y, z));
+      top() *= re::mat4::rotation(angle, re::vec3(x, y, z));
     }
 
     inline void MatrixStack::loadIdentity() {

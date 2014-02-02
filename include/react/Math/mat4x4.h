@@ -60,6 +60,13 @@ namespace re {
     mat4x4& rotate(reFloat angle, reFloat x, reFloat y, reFloat z);
     
     reFloat v[16];
+    
+    static const mat4x4 translation(const re::vec3& v);
+    static const mat4x4 translation(reFloat x, reFloat y, reFloat z);
+    static const mat4x4 scaling(const re::vec3& s);
+    static const mat4x4 scaling(reFloat x, reFloat y, reFloat z);
+    static const mat4x4 rotation(reFloat angle, const re::vec3& axis);
+    static const mat4x4 rotation(reFloat angle, reFloat x, reFloat y, reFloat z);
   };
   
   typedef mat4x4 mat4;
@@ -264,7 +271,31 @@ namespace re {
   }
 
   inline mat4x4& mat4x4::rotate(reFloat angle, reFloat x, reFloat y, reFloat z) {
-    return (*this) = re::mat4x4(reTransform().rotate(angle, x, y, z).m) * (*this);
+    return (*this) = re::mat4x4(re::mat3::rotation(angle, x, y, z)) * (*this);
+  }
+  
+  inline const mat4x4 mat4x4::translation(const vec3& t) {
+    return re::mat4x4().translate(t);
+  }
+  
+  inline const mat4x4 mat4x4::translation(reFloat x, reFloat y, reFloat z) {
+    return re::mat4x4().translate(x, y, z);
+  }
+  
+  inline const mat4x4 mat4x4::scaling(const vec3& s) {
+    return re::mat4x4().scale(s);
+  }
+  
+  inline const mat4x4 mat4x4::scaling(reFloat x, reFloat y, reFloat z) {
+    return re::mat4x4().scale(x, y, z);
+  }
+  
+  inline const mat4x4 mat4x4::rotation(reFloat angle, const vec3& axis) {
+    return re::mat4x4().rotate(angle, axis);
+  }
+  
+  inline const mat4x4 mat4x4::rotation(reFloat angle, reFloat x, reFloat y, reFloat z) {
+    return re::mat4x4().rotate(angle, x, y, z);
   }
 }
 

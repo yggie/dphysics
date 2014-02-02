@@ -66,8 +66,17 @@ TEST(reTransformTest, Rotation) {
     ASSERT_TRUE(re::similar(transform1.multDir(axis), axis)) <<
       "should leave the axis unchanged when applied";
     
+    ASSERT_TRUE(re::similar(axis, transform1.multPoint(axis))) <<
+      "should not have a translational component";
+    
     ASSERT_TRUE(re::similar(transform1, transform2)) <<
       "should give the same result with an un-normalized axis";
+    
+    ASSERT_TRUE(re::similar(re::inverse(transform1), re::mat3x4(re::transpose(transform1.m), re::vec3()))) <<
+      "the inverse and transpose should be equivalent";
+    
+    ASSERT_LE(re::abs(re::det(transform1) - 1.0), RE_FP_TOLERANCE) <<
+      "the determinant should equal to one";
   }
 }
 

@@ -23,6 +23,39 @@ namespace re {
     );
   }
   
+  inline reFloat det(const mat4x4& m) {
+    const reFloat m0 = m.v[5]  * m.v[10] * m.v[15] - 
+                       m.v[5]  * m.v[11] * m.v[14] - 
+                       m.v[9]  * m.v[6]  * m.v[15] + 
+                       m.v[9]  * m.v[7]  * m.v[14] +
+                       m.v[13] * m.v[6]  * m.v[11] - 
+                       m.v[13] * m.v[7]  * m.v[10];
+    
+
+    const reFloat m1 = -m.v[4]  * m.v[10] * m.v[15] + 
+                        m.v[4]  * m.v[11] * m.v[14] + 
+                        m.v[8]  * m.v[6]  * m.v[15] - 
+                        m.v[8]  * m.v[7]  * m.v[14] - 
+                        m.v[12] * m.v[6]  * m.v[11] + 
+                        m.v[12] * m.v[7]  * m.v[10];
+
+    const reFloat m2 = m.v[4]  * m.v[9] * m.v[15] - 
+                       m.v[4]  * m.v[11] * m.v[13] - 
+                       m.v[8]  * m.v[5] * m.v[15] + 
+                       m.v[8]  * m.v[7] * m.v[13] + 
+                       m.v[12] * m.v[5] * m.v[11] - 
+                       m.v[12] * m.v[7] * m.v[9];
+
+    const reFloat m3 =  -m.v[4]  * m.v[9] * m.v[14] + 
+                         m.v[4]  * m.v[10] * m.v[13] +
+                         m.v[8]  * m.v[5] * m.v[14] - 
+                         m.v[8]  * m.v[6] * m.v[13] - 
+                         m.v[12] * m.v[5] * m.v[10] + 
+                         m.v[12] * m.v[6] * m.v[9];
+    
+    return m.v[0] * m0 + m.v[1] * m1 + m.v[2] * m2 + m.v[3] * m3;
+  }
+  
   inline const mat4x4 inverse(const mat4x4& m) {
     reFloat inv[16];
 

@@ -7,6 +7,14 @@ using namespace re; // just for Doxygen
 
 namespace re {
   
+  inline reFloat det(const re::mat3x4& tm) {
+    const reFloat m0 = tm.m[1][1]*tm.m[2][2] - tm.m[1][2]*tm.m[2][1];
+    const reFloat m1 = tm.m[1][2]*tm.m[2][0] - tm.m[1][0]*tm.m[2][2];
+    const reFloat m2 = tm.m[1][0]*tm.m[2][1] - tm.m[1][1]*tm.m[2][0];
+    
+    return tm.m[0][0]*m0 + tm.m[0][1]*m1 + tm.m[0][2]*m2;
+  }
+  
   /**
    * @ingroup maths
    * Computes the inverse of the matrix

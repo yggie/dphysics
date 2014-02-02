@@ -66,8 +66,17 @@ TEST(Matrix4x4Test, Rotation) {
     ASSERT_TRUE(re::similar(m1.multDir(axis), axis)) <<
       "should leave the axis unchanged when applied";
     
+    ASSERT_TRUE(re::similar(axis, m1.multPoint(axis))) <<
+      "should not have a translational component";
+    
     ASSERT_TRUE(re::similar(m1, m2)) <<
       "should give the same result with an un-normalized axis";
+    
+    ASSERT_TRUE(re::similar(re::transpose(m1), re::inverse(m1))) <<
+      "the transpose and inverse should be equivalent";
+    
+    ASSERT_LE(re::abs(re::det(m1) - 1.0), RE_FP_TOLERANCE) <<
+      "the determinant should be equal to one";
   }
 }
 

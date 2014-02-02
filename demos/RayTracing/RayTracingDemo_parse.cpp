@@ -5,11 +5,8 @@
 
 #include "react/Entities/reRigidBody.h"
 #include "react/Collision/Shapes/shapes.h"
-#include "demo/MatrixStack.h"
+#include "demos/Common/MatrixStack.h"
 
-#define GLM_FORCE_RADIANS
-#include <glm/vec3.hpp>
-#include <glm/gtc/matrix_transform.hpp>
 #include <cstdio>
 #include <iostream>
 #include <fstream>
@@ -21,8 +18,8 @@
 
 namespace {
   struct Pair {
-    glm::vec3 vert;
-    glm::vec3 norm;
+    re::vec3 vert;
+    re::vec3 norm;
   };
   
   /**
@@ -62,7 +59,7 @@ void RayTracingDemo::createSceneFromFile(const char* filename) {
   unsigned int maxNorms = 0;
   unsigned int cVerts = 0;
   unsigned int cNorms = 0;
-  std::vector<glm::vec3> verts;
+  std::vector<re::vec3> verts;
   std::vector<Pair> vertsWithNorms;
   
   // SPHERE DEFINITION
@@ -73,17 +70,17 @@ void RayTracingDemo::createSceneFromFile(const char* filename) {
   unsigned int cTriNorm = 0;
   
   // MATERIALS DEFINITION
-  glm::vec3 diffuse(0.0, 0.0, 0.0);
-  glm::vec3 emission(0.0, 0.0, 0.0);
-  glm::vec3 specular(0.0, 0.0, 0.0);
+  re::vec3 diffuse(0.0, 0.0, 0.0);
+  re::vec3 emission(0.0, 0.0, 0.0);
+  re::vec3 specular(0.0, 0.0, 0.0);
   float shininess = 0.0f;
   
-  glm::mat4 view;
+  re::mat4 view;
   
   // UNKNOWN COUNT
   unsigned int unknowns = 0;
   
-  ::demo::MatrixStack stack;
+  re::demo::MatrixStack stack;
   
   for (std::string line; std::getline(file, line); ) {
     if (!(line.find_first_not_of(" \t\r\n") != std::string::npos) ||
@@ -128,21 +125,12 @@ void RayTracingDemo::createSceneFromFile(const char* filename) {
       float values[10];
       readFloats(10, &values[0]);
       
-			glm::vec3 eye(values[0], values[1], values[2]);
-			glm::vec3 center(values[3], values[4], values[5]);
-			glm::vec3 up(values[6], values[7], values[8]);
+			re::vec3 eye(values[0], values[1], values[2]);
+			re::vec3 center(values[3], values[4], values[5]);
+			re::vec3 up(values[6], values[7], values[8]);
 			_fovy = values[9];
-
-			glm::vec3 w = glm::normalize(eye - center);
-			glm::vec3 u = glm::normalize(glm::cross(up, w));
-			glm::vec3 v = glm::normalize(glm::cross(w, u));
 			
-		  _viewMat = re::mat4x4(
-		    u[0], u[1], u[2], -glm::dot(eye, u),
-		    v[0], v[1], v[2], -glm::dot(eye, v),
-		    w[0], w[1], w[2], -glm::dot(eye, w),
-		       0,    0,    0,         1
-		  );
+			_viewMat = re::lookat(eye, center, up);
 		  _inverseViewMat = re::inverse(_viewMat);
 			RAY_PRINTF("    %-35s", "CAMERA")
       
@@ -154,16 +142,8 @@ void RayTracingDemo::createSceneFromFile(const char* filename) {
       float v[4];
       readFloats(4, &v[0]);
       
-      glm::mat4 m = stack.mat();
-      reTransform tm;
-      for (int i = 0; i < 3; i++) {
-        for (int j = 0; j < 3; j++) {
-          tm.m[i][j] = m[j][i];
-        }
-      }
-      tm.v[0] = m[3][0];
-      tm.v[1] = m[3][1];
-      tm.v[2] = m[3][2];
+      re::mat4 m = stack.mat();
+      reTransform tm = re::toMat3x4(m);
       reRigidBody& body = _world.build().RigidBody(reSphere(v[3]), tm).at(v[0], v[1], v[2]);
       RayObject* obj = new RayObject();
       body.userdata = obj;
@@ -189,7 +169,7 @@ void RayTracingDemo::createSceneFromFile(const char* filename) {
       RAY_PRINTF("    %-30s%5d", "MAX NORMS", maxNorms)
       
     } else if (cmd == "vertex") {
-      glm::vec3 vert;
+      re::vec3 vert;
       readFloats(3, &vert[0]);
       verts.push_back(vert);
       RAY_PRINTF("    %-6s%6d%+11.1f, %+4.1f, %+4.1f",
@@ -203,8 +183,8 @@ void RayTracingDemo::createSceneFromFile(const char* filename) {
       float a[6];
       readFloats(3, &a[0]);
       Pair p;
-      p.vert = glm::vec3(a[0], a[1], a[2]);
-      p.norm = glm::vec3(a[3], a[4], a[5]);
+      p.vert = re::vec3(a[0], a[1], a[2]);
+      p.norm = re::vec3(a[3], a[4], a[5]);
       vertsWithNorms.push_back(p);
       RAY_PRINTF(
         "    %-6s#%-5d%+4.1f,%+4.1f,%+4.1f,%+2.0f,%+2.0f,%+2.0f",
@@ -217,15 +197,13 @@ void RayTracingDemo::createSceneFromFile(const char* filename) {
     } else if (cmd == "tri") {
       unsigned int inds[3];
       readUInts(3, &inds[0]);
-      glm::mat4 m = stack.mat();
-      glm::vec4 verts4[3];
-      re::vec triVerts[3];
+      re::mat4 m = stack.mat();
+      re::vec tverts[3];
       for (int i = 0; i < 3; i++) {
-        verts4[i] = m * glm::vec4(verts.at(inds[i]), 1.0f);
-        triVerts[i].set(verts4[i][0], verts4[i][1], verts4[i][2]);
+        tverts[i] = m.multPoint(verts.at(inds[i]));
       }
       reRigidBody& body = _world.build().RigidBody(
-        reTriangle(triVerts[0], triVerts[1], triVerts[2])
+        reTriangle(tverts[0], tverts[1], tverts[2])
       ).at(0, 0, 0);
       RayObject* obj = new RayObject();
       body.userdata = obj;
@@ -258,7 +236,7 @@ void RayTracingDemo::createSceneFromFile(const char* filename) {
     } else if (cmd == "rotate") {
       float r[4];
       readFloats(4, &r[0]);
-      stack.rotate(r[3], r[0], r[1], r[2]);
+      stack.rotate(RE_PI * r[3] / 180.0, r[0], r[1], r[2]);
       RAY_PRINTF("    %-12s%6.1f %+4.1f, %+4.1f, %+4.1f",
                  "ROTATE", r[3], r[0], r[1], r[2])
       
