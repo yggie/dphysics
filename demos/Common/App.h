@@ -1,6 +1,8 @@
 #ifndef DEMO_App_H
 #define DEMO_App_H
 
+#include "demos/Common/ViewCam.h"
+
 /**
  * The base class which all demo applications should extend
  */
@@ -13,6 +15,7 @@ namespace re {
       
       struct Options {
         bool trapMouse;
+        bool dynamic;
       };
       
       App();
@@ -27,7 +30,7 @@ namespace re {
       virtual void specialKeyEvent(int, int, int) { }
       virtual void mouseEvent(int, int, int, int) { } // stub
       virtual void motionEvent(float, float) { }  // stub
-      virtual void passiveMotionEvent(float, float) { } // stub
+      virtual void passiveMotionEvent(float, float) { }
       virtual Options options() const = 0;
       
       unsigned int width() const;

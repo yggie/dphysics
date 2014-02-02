@@ -17,11 +17,5 @@ add_library(ray_lib
 
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp")
 
-target_link_libraries(ray_lib GL GLU glut react demo_lib demos_common)
-
-add_executable(ray ray.cpp)
-target_link_libraries(ray GL glut react demo_lib demos_common ray_lib)
-set_target_properties(ray PROPERTIES
-  RUNTIME_OUTPUT_DIRECTORY ${react_BINARY_DIR}
-)
+target_link_libraries(ray_lib GL GLU glut react demos_common)
 

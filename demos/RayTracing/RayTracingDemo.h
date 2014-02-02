@@ -61,9 +61,10 @@ private:
 };
 
 inline re::demo::App::Options RayTracingDemo::options() const {
-  re::demo::App::Options o;
-  o.trapMouse = false;
-  return o;
+  re::demo::App::Options opt;
+  opt.trapMouse = false;
+  opt.dynamic = false;
+  return opt;
 }
 
 inline void RayTracingDemo::colorPixel(GLubyte* rgbaPixel, const re::vec& color) {

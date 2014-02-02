@@ -1,8 +1,8 @@
-#include "demo/ViewCam.h"
+#include "ViewCam.h"
 
-#include "demo/glsetup.h"
+#include "glsetup.h"
 
-using namespace demo;
+using namespace re::demo;
 
 namespace {
   const float step = 1.0f;

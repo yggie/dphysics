@@ -1,13 +1,13 @@
-#include "demo/Canvas.h"
+#include "demos/Common/Canvas.h"
 
-#include "demo/glsetup.h"
-#include "demo/Shader.h"
-#include "demo/GfxObj.h"
+#include "demos/Common/glsetup.h"
+#include "demos/Common/Shader.h"
+#include "demos/Common/CanvasObject.h"
 
-using namespace demo;
+using namespace re::demo;
 
 Canvas::Canvas() : _programID(0), _shaders(), _projMat(1.0f),
-_viewMat(1.0f), _modelMatStack() {
+_viewMat(1.0f), _modelMatStack(), _sceneReady(false) {
 }
 
 Canvas::~Canvas() {
@@ -44,8 +44,6 @@ void Canvas::init() {
   postInit();
   
   glUseProgram(_programID);
-  
-  prepareBuffers();
 }
   
 void Canvas::use() {
@@ -96,7 +94,7 @@ void Canvas::releaseObjects() {
     return;
   }
   
-  for (GfxObj* obj : _objects) {
+  for (CanvasObject* obj : _objects) {
     delete obj;
   }
   _objects.clear();
@@ -110,14 +108,22 @@ void Canvas::releaseObjects() {
   
   _VAOs = nullptr;
   _VBOs = nullptr;
+  
+  _sceneReady = false;
 }
 
-void Canvas::add(GfxObj* obj) {
-  if (_programID != 0) {
-    throw 0;
+void Canvas::add(CanvasObject* obj) {
+  if (_sceneReady) {
+    throw 0; // TODO better way
   }
-  
   _objects.push_back(obj);
+}
+
+void Canvas::renderScene() {
+  clearStack();
+  for (CanvasObject* obj : _objects) {
+    obj->draw(*this);
+  }
 }
 
 bool Canvas::isFalse(GLenum option) const {
@@ -149,7 +155,7 @@ V GetWithDef(const  std::map <K,V> & m, const K & key, const V & defval ) {
    }
 }
 
-void Canvas::prepareBuffers() {
+void Canvas::prepareScene() {
   if (_objects.empty()) {
     return;
   }
@@ -158,8 +164,8 @@ void Canvas::prepareBuffers() {
   std::vector<Request> requests;
   
   int numVAO(0), numVBO(0);//, numTBO(0);
-  std::map<GfxObj::Type, bool> processed;
-  for (GfxObj* obj : _objects) {
+  std::map<CanvasObject::Type, bool> processed;
+  for (CanvasObject* obj : _objects) {
     if (!GetWithDef(processed, obj->type(), false)) {
 //      numTBO += obj->numTBOReq();
       // set request object
@@ -198,5 +204,7 @@ void Canvas::prepareBuffers() {
   for (Request& req : requests) {
     req.obj->setup(&_VAOs[req.vaoIndex], &_VBOs[req.vboIndex], *this);
   }
+  
+  _sceneReady = true;
 }
 

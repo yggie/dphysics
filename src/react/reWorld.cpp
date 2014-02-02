@@ -30,8 +30,6 @@ namespace {
   private:
     reUInt n;
   };
-  
-  SimpleAllocator* tmp;
 }
 
 /**
@@ -39,7 +37,7 @@ namespace {
  */
 
 reWorld::reWorld() : _broadPhase(nullptr), _allocator(nullptr), _integrator(nullptr) {
-  tmp = new SimpleAllocator();
+  SimpleAllocator* tmp = new SimpleAllocator();
   _allocator = new reProxyAllocator(tmp);
   _broadPhase = allocator().alloc_new<reBSPTree>(allocator());
   _integrator = allocator().alloc_new<reIntegrator>();
@@ -56,8 +54,9 @@ reWorld::~reWorld() {
   allocator().alloc_delete(_integrator);
   
   if (_allocator != nullptr) {
+    reBaseAllocator* al = ((reProxyAllocator*)_allocator)->allocator();
     delete _allocator;
-    delete tmp;
+    delete al;
   }
 }
 

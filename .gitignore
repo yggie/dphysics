@@ -22,9 +22,10 @@ cmake_install.cmake*
 Makefile*
 
 # Ignore generated executable
-/demo
+/planets
 /ray
 /tests/tests
+/legacy
 
 # Ignore generated Makefiles
 *.d

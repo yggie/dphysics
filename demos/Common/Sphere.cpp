@@ -1,30 +1,28 @@
-#include "demo/PlainSphere.h"
+#include "demos/Common/Sphere.h"
 
-#include "react/common.h"
-#include "demo/Canvas.h"
-#include "demo/App.h"
-#include "demo/MatrixStack.h"
+#include "demos/Common/Canvas.h"
+#include "demos/Common/MatrixStack.h"
 
 #include <glm/vec4.hpp>
 #include <cmath>
 
-using namespace demo;
+using namespace re::demo;
 
-GLuint PlainSphere::_globalVAO = 0;
-GLuint PlainSphere::_globalVBO = 0;
+GLuint Sphere::_globalVAO = 0;
+GLuint Sphere::_globalVBO = 0;
 
 const int nSlices = 10; // number of slices
 const int nVerts = nSlices * nSlices * 2;
 
-PlainSphere::PlainSphere(const reEnt& ent) : _ent(ent) {
+Sphere::Sphere(const reEnt& ent) : _ent(ent) {
   shape(); // ensure the shape is correct
 }
 
-PlainSphere::~PlainSphere() {
+Sphere::~Sphere() {
   // do nothing
 }
 
-void PlainSphere::draw(Canvas& canvas) {
+void Sphere::draw(Canvas& canvas) {
 //  canvas.modelMat();
   canvas.push();
   re::quat q = _ent.quat();
@@ -33,25 +31,25 @@ void PlainSphere::draw(Canvas& canvas) {
   const reFloat ang = acos(q.r);
   if (re::abs(ang) > RE_FP_TOLERANCE) {
     const reFloat s = re::sin(ang);
-    canvas.rotate(2 * ang * 180.0 / RE_PI, q.i / s, q.j / s, q.k / s);
+    canvas.rotate(ang, q.i / s, q.j / s, q.k / s);
   }
   canvas.applyModelView();
-  glBindVertexArray(PlainSphere::_globalVAO);
-  glBindBuffer(GL_ARRAY_BUFFER, PlainSphere::_globalVBO);
+  glBindVertexArray(Sphere::_globalVAO);
+  glBindBuffer(GL_ARRAY_BUFFER, Sphere::_globalVBO);
   glDrawArrays(GL_TRIANGLE_STRIP, 0, nVerts);
   canvas.pop();
 }
 
-void PlainSphere::setup(GLuint* vao, GLuint* vbo, const Canvas& canvas) {
-  if (PlainSphere::_globalVAO != 0 ||
-      PlainSphere::_globalVBO != 0) {
-    printf("[DEMO]  Allocated too many VAO for class PlainSphere");
+void Sphere::setup(GLuint* vao, GLuint* vbo, const Canvas& canvas) {
+  if (Sphere::_globalVAO != 0 ||
+      Sphere::_globalVBO != 0) {
+    printf("[DEMO]  Allocated too many VAO for class Sphere");
   }
-  PlainSphere::_globalVAO = vao[0];
-  PlainSphere::_globalVBO = vbo[0];
+  Sphere::_globalVAO = vao[0];
+  Sphere::_globalVBO = vbo[0];
   
-  glm::vec3 vertPos[nVerts];
-  glm::vec3 vertNorm[nVerts];
+  re::vec3 vertPos[nVerts];
+  re::vec3 vertNorm[nVerts];
   glm::vec4 vertColor[nVerts];
   
   int cnt = 0;
@@ -61,7 +59,7 @@ void PlainSphere::setup(GLuint* vao, GLuint* vbo, const Canvas& canvas) {
   double r[nSlices+1];
   double z[nSlices+1];
   for (int i = 0; i <= nSlices; i++) {
-    double a = 2 * PI * i / (double)nSlices;
+    double a = 2 * RE_PI * i / (double)nSlices;
     double b = a / 2;
     s[i] = sin(a);
     c[i] = cos(a);
@@ -82,8 +80,8 @@ void PlainSphere::setup(GLuint* vao, GLuint* vbo, const Canvas& canvas) {
           ik = i + 1 - k;
           jk = j + k;
         }
-        vertPos[cnt] = glm::vec3(r[jk]*s[ik], r[jk]*c[ik], z[jk]*ix);
-        vertNorm[cnt] = glm::normalize(vertPos[cnt]);
+        vertPos[cnt] = re::vec3(r[jk]*s[ik], r[jk]*c[ik], z[jk]*ix);
+        vertNorm[cnt] = re::normalize(vertPos[cnt]);
         vertColor[cnt++] = glm::vec4(c[ik], s[ik], 1.0f, 0.9f);
       }
     }

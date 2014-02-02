@@ -1,8 +1,8 @@
-#include "demo/Shader.h"
+#include "demos/Common/Shader.h"
 
 #include <fstream>
 
-using namespace demo;
+using namespace re::demo;
 
 Shader::Shader(const char* filename, int type) : _type(type), _id(0),
 _src(), _filename(filename) {

@@ -1,29 +1,29 @@
-#include "demo/StaticGfx.h"
+#include "demos/Common/StaticObject.h"
 
-#include "demo/Canvas.h"
+#include "demos/Common/Canvas.h"
 
 #include <algorithm>
 
-using namespace demo;
+using namespace re::demo;
 
-StaticGfx::StaticGfx() : _vaoDefs(), _pos(0.0f) {
+StaticObject::StaticObject() : _vaoDefs(), _pos(0.0f) {
   // do nothing
 }
 
-StaticGfx::~StaticGfx() {
+StaticObject::~StaticObject() {
   for_each(_vaoDefs.begin(), _vaoDefs.end(), [&](VAODef* def) {
     delete def;
   });
   _vaoDefs.clear();
 }
 
-StaticGfx::VAODef& StaticGfx::newVAO(GLenum drawMode, GLsizei numVerts) {
-  StaticGfx::VAODef* def = new StaticGfx::VAODef(drawMode, numVerts);
+StaticObject::VAODef& StaticObject::newVAO(GLenum drawMode, GLsizei numVerts) {
+  StaticObject::VAODef* def = new StaticObject::VAODef(drawMode, numVerts);
   _vaoDefs.push_back(def);
   return *def;
 }
 
-void StaticGfx::draw(Canvas& canvas) {
+void StaticObject::draw(Canvas& canvas) {
   canvas.push();
   canvas.translate(_pos[0], _pos[1], _pos[2]);
   canvas.applyModelView();
@@ -35,13 +35,13 @@ void StaticGfx::draw(Canvas& canvas) {
   canvas.pop();
 }
 
-void StaticGfx::setup(GLuint* vao, GLuint* vbo, const Canvas&) {
+void StaticObject::setup(GLuint* vao, GLuint* vbo, const Canvas&) {
   for (unsigned int i = 0; i < _vaoDefs.size(); i++) {
     VAODef& def = *_vaoDefs.at(i);
     def.vao = vao[i];
     def.vbo = vbo[i];
     GLuint totalSize = 0;
-    for_each(def.buffers.begin(), def.buffers.end(), [&](const StaticGfx::VAODef::BufferObj& obj) {
+    for_each(def.buffers.begin(), def.buffers.end(), [&](const StaticObject::VAODef::BufferObj& obj) {
       totalSize += obj.size;
     });
     
@@ -57,7 +57,7 @@ void StaticGfx::setup(GLuint* vao, GLuint* vbo, const Canvas&) {
     
     // count the cumulative bytes used
     size_t offset = 0;
-    for_each(def.buffers.begin(), def.buffers.end(), [&](StaticGfx::VAODef::BufferObj& obj) {
+    for_each(def.buffers.begin(), def.buffers.end(), [&](StaticObject::VAODef::BufferObj& obj) {
       if (obj.data != nullptr) {
         glBufferSubData(GL_ARRAY_BUFFER, offset, obj.size, obj.data);
         CHECK_GL_ERR;
@@ -73,12 +73,12 @@ void StaticGfx::setup(GLuint* vao, GLuint* vbo, const Canvas&) {
   }
 }
 
-StaticGfx::VAODef::VAODef(GLenum drawMode, GLsizei numVerts) : vao(0),
+StaticObject::VAODef::VAODef(GLenum drawMode, GLsizei numVerts) : vao(0),
 vbo(0), drawMode(drawMode), numVerts(numVerts), buffers() {
   // do nothing
 }
 
-StaticGfx::VAODef::~VAODef() {
+StaticObject::VAODef::~VAODef() {
   for_each(buffers.begin(), buffers.end(), [](BufferObj& obj) {
     if (obj.data != nullptr) {
       free(obj.data);

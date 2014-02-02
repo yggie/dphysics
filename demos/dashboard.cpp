@@ -1,13 +1,15 @@
-#include "dashboard.h"
+#include "demos/dashboard.h"
 
-#include "App.h"
-#include "glsetup.h"
+#include "demos/Common/App.h"
+#include "demos/Common/glsetup.h"
 
-#include "../RayTracing/RayTracingDemo.h"
+#include "demos/RayTracing/RayTracingDemo.h"
+#include "demos/PlanetaryMotion/PlanetaryMotionDemo.h"
 
 namespace {
   re::demo::App* demos[] = {
     new RayTracingDemo(),
+    new re::demo::PlanetaryMotionDemo()
   };
   
   re::demo::App::Options options;
@@ -69,6 +71,12 @@ namespace {
 
   void displayFunc() {
     demo().draw();
+    
+    glutSwapBuffers();
+    
+    if (options.dynamic) {
+      glutPostRedisplay();
+    }
   }
   
   /**
@@ -179,9 +187,9 @@ int startDemo(int argc, char** argv, DemoID demoNum) {
   currentDemo = demoNum;
   
   glutInit(&argc, argv);
-  glutInitDisplayMode(GLUT_SINGLE | GLUT_RGBA | GLUT_DEPTH);
-  glutInitWindowSize(640, 480);
-  glutInitWindowPosition(200, 150);
+  glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
+  glutInitWindowSize(1024, 640);
+  glutInitWindowPosition(200, 50);
   glutCreateWindow("react Physics Engine -- Demos");
   
   // register all the callback functions to be used

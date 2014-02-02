@@ -40,7 +40,7 @@ namespace {
 }
 
 RayTracingDemo::RayTracingDemo() : re::demo::App(), _world(), _maxDepth(5), _imageWidth(1), _imageHeight(1), _outputFile(), _fovy(45.0), _viewMat(1.0), _ambient(0.2f, 0.2f, 0.2f), _attenuation(1.0f, 0.0f, 0.0f), _lights(), _pixels(nullptr), _renderWidth(128), _renderHeight(96), _infinityColor(0.0, 0.0, 0.0), _sceneFile(), _lightNo(0) {
-  _sceneFile = "resources/ray/samples/scene4-specular.test";
+  _sceneFile = "resources/ray/samples/scene6.test";
 }
 
 RayTracingDemo::~RayTracingDemo() {

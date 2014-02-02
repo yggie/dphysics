@@ -1,14 +1,11 @@
-#include "demo/SimpleCanvas.h"
+#include "demos/Common/SimpleCanvas.h"
 
-#include "demo/Shader.h"
+#include "demos/Common/Shader.h"
 
 #include <algorithm>
 #include <cstdio>
 
-#define INVALID_ATTRIBUTE_INDEX(who) \
-  printf("[WARN]  Invalid shader attribute index for %s\n", who);
-
-using namespace demo;
+using namespace re::demo;
 
 SimpleCanvas::SimpleCanvas() : Canvas(), _attrs(), _uniforms() {
   _shaders.push_back(new Shader("src/demo/shader.vert", GL_VERTEX_SHADER));
@@ -55,27 +52,18 @@ void SimpleCanvas::postInit() {
 }
 
 void SimpleCanvas::applyModelView() {
-  glm::mat4 m = viewMat() * modelMat();
+  re::mat4 m = viewMat() * modelMat();
 
   if (_uniforms.modelViewMat != -1) {
-    glUniformMatrix4fv(_uniforms.modelViewMat, 1, GL_FALSE, &m[0][0]);
+    glUniformMatrix4fv(_uniforms.modelViewMat, 1, GL_TRUE, &m[0][0]);
   } else {
     INVALID_ATTRIBUTE_INDEX("mModelView")
   }
 
-  m = glm::inverse(glm::transpose(m));
+  m = re::inverse(re::transpose(m));
   if (_uniforms.normMat != -1) {
-    glUniformMatrix4fv(_uniforms.normMat, 1, GL_FALSE, &m[0][0]);
+    glUniformMatrix4fv(_uniforms.normMat, 1, GL_TRUE, &m[0][0]);
   } else {
     INVALID_ATTRIBUTE_INDEX("mNorm")
-  }
-}
-
-void SimpleCanvas::frustum(float left ,float right, float btm, float top, float near, float far) {
-  _projMat = glm::frustum(left, right, btm, top, near, far);
-  if (_uniforms.projMat) {
-    glUniformMatrix4fv(_uniforms.projMat, 1, GL_FALSE, &_projMat[0][0]);
-  } else {
-    INVALID_ATTRIBUTE_INDEX("mProj")
   }
 }
