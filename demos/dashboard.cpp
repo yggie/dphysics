@@ -8,7 +8,7 @@
 
 namespace {
   re::demo::App* demos[] = {
-    new RayTracingDemo(),
+    new re::demo::RayTracingDemo(),
     new re::demo::PlanetaryMotionDemo()
   };
   

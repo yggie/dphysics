@@ -1,6 +1,6 @@
-#include "RayTracingDemo.h"
+#include "demos/RayTracing/RayTracingDemo.h"
 
-#include "RayObject.h"
+#include "demos/RayTracing/RayObject.h"
 
 #include "react/Entities/reEnt.h"
 #include "react/Entities/reRigidBody.h"
@@ -11,6 +11,8 @@
 #include <algorithm>
 #include <cstring>
 #include <sys/time.h>
+
+using namespace re::demo;
 
 namespace {
   long timeBetween(timeval& start, timeval& end) {
@@ -30,7 +32,7 @@ namespace {
     }
   }
   
-  const re::vec clamp(const re::vec& v) {
+  const re::vec3 clamp(const re::vec& v) {
     re::vec a;
     for (int i = 0; i < 3; i++) {
       a[i] = re::clamp(v[i], 0.0, 1.0);
@@ -196,7 +198,7 @@ const re::vec RayTracingDemo::shootRay(unsigned int depth, const re::vec& origin
   const RayObject* obj = (RayObject*)ent->userdata;
   
   // initialize color with emission and ambient components
-  re::vec color = clamp(_ambient + obj->emission());
+  re::vec3 color = ::clamp(_ambient + obj->emission());
   
   // determine lighting contributions
   for (auto it = _lights.begin(); it != _lights.end(); it++) {
@@ -219,16 +221,16 @@ const re::vec RayTracingDemo::shootRay(unsigned int depth, const re::vec& origin
       const re::vec back = re::normalize(light->vect() - intersect);
       const re::vec halfVec = re::normalize(back + ray);
       
-      const re::vec diffuse = clamp(obj->diffuse() * re::max(re::dot(ray, norm), 0.0f));
-      const re::vec specular = clamp(obj->specular() * re::pow(re::max(re::dot(norm, halfVec), 0.0f), obj->shininess()));
+      const re::vec3 diffuse = ::clamp(obj->diffuse() * re::max(re::dot(ray, norm), 0.0f));
+      const re::vec3 specular = ::clamp(obj->specular() * re::pow(re::max(re::dot(norm, halfVec), 0.0f), obj->shininess()));
       
 //      printf("SPECULAR: (%.2f, %.2f, %.2f)\n", specular[0], specular[1], specular[2]);
       
       if (light->isDirectional()) {
-        color += clamp(light->color() * (diffuse + specular));
+        color += ::clamp(light->color() * (diffuse + specular));
       } else {
         const float dist = re::length(light->vect() - intersect);
-        color += clamp(light->color() * (diffuse + specular) / (_attenuation[0] + _attenuation[1] * dist + _attenuation[2] * dist * dist));
+        color += ::clamp(light->color() * (diffuse + specular) / (_attenuation[0] + _attenuation[1] * dist + _attenuation[2] * dist * dist));
       }
     }
   };
@@ -237,7 +239,7 @@ const re::vec RayTracingDemo::shootRay(unsigned int depth, const re::vec& origin
   if (re::length(obj->specular()) > RE_FP_TOLERANCE) {
     const re::vec reflec = re::normalize(dir - norm * 2.0 * re::dot(norm, dir));
     // shoot secondary rays
-    color += clamp(obj->specular() * shootRay(depth + 1, intersect, reflec));
+    color += ::clamp(obj->specular() * shootRay(depth + 1, intersect, reflec));
   }
   
   return color;

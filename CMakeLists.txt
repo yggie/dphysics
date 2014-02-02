@@ -18,7 +18,7 @@ include_directories(
   ${react_SOURCE_DIR}/include
 )
 
-add_subdirectory(src/react)
+add_subdirectory(src)
 if(DEMOS)
   add_subdirectory(demos)
 endif(DEMOS)

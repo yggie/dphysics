@@ -13,6 +13,8 @@
 #include <sstream>
 #include <vector>
 
+using namespace re::demo;
+
 //#define RAY_PRINTF(...)   printf(__VA_ARGS__);
 #define RAY_PRINTF(...)   
 
