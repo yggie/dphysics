@@ -18,7 +18,8 @@ namespace re {
       enum Type {
         SPHERE,
         STATIC_GRAPHIC,
-        SIMPLE_WRAPPER
+        SIMPLE_WRAPPER,
+        PLANE
       };
       
       SceneObject();
@@ -32,6 +33,13 @@ namespace re {
       virtual GLuint numVAOReq() const = 0;
       virtual GLuint numVBOReq() const = 0;
       virtual GLuint numTBOReq() const = 0;
+    };
+    
+    class ObjectInstance : public SceneObject {
+      virtual void setup(GLuint*, GLuint*, const Canvas&) override { }
+      virtual GLuint numVAOReq() const override { return 0; }
+      virtual GLuint numVBOReq() const override { return 0; }
+      virtual GLuint numTBOReq() const override { return 0; }
     };
     
     inline SceneObject::SceneObject() {

@@ -1,7 +1,6 @@
 #include "demos/Common/Sphere.h"
 
 #include "demos/Common/Canvas.h"
-#include "demos/Common/MatrixStack.h"
 
 #include <glm/vec4.hpp>
 #include <cmath>

@@ -3,6 +3,7 @@
 #include "demos/Common/glsetup.h"
 #include "demos/Common/Shader.h"
 #include "demos/Common/Sphere.h"
+#include "demos/Common/Plane.h"
 
 #include "react/Entities/reEnt.h"
 #include "react/Collision/Shapes/shapes.h"
@@ -13,6 +14,8 @@ Canvas::Canvas() : _programID(0), _shaders(), _projMat(1.0f),
 _viewMat(1.0f), _modelMatStack(), _sceneReady(false) {
   _sphere = new Sphere();
   add(_sphere);
+  _plane = new Plane();
+  add(_plane);
 }
 
 Canvas::~Canvas() {
@@ -129,6 +132,7 @@ void Canvas::releaseObjects() {
   _VBOs = nullptr;
   
   _sphere = nullptr;
+  _plane = nullptr;
   
   _sceneReady = false;
 }
@@ -145,6 +149,12 @@ void Canvas::renderScene() {
   for (SceneObject* obj : _objects) {
     obj->draw(*this);
   }
+}
+
+Plane::Instance& Canvas::addPlane(const re::vec3& normal, const re::vec3& side, const re::vec3& center, float width) {
+  Plane::Instance* plane = new Plane::Instance(normal, side, center, width, width);
+  add(plane);
+  return *plane;
 }
 
 void Canvas::setMaterial(ShaderMaterial& material) {
@@ -170,6 +180,11 @@ EntityWrapper& Canvas::bind(reEnt& ent) {
 void Canvas::drawUnitSphere() {
   applyModelView();
   _sphere->draw();
+}
+
+void Canvas::drawUnitPlane() {
+  applyModelView();
+  _plane->draw();
 }
 
 bool Canvas::isFalse(GLenum option) const {

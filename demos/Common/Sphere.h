@@ -26,8 +26,6 @@ namespace re {
       void draw(Canvas&) override { }
       void setup(GLuint* vao, GLuint* vbo, const Canvas& canvas);
       
-      const reSphere& shape() const;
-      
       GLuint numVAOReq() const override;
       GLuint numVBOReq() const override;
       GLuint numTBOReq() const override;

@@ -86,28 +86,30 @@ void PlanetaryMotionDemo::prepareWorld() {
     _canvas.bind(ent).withColor(re::normalize(re::vec3::rand(0.0, 1.0))).withAlpha(0.8f);
   }
   
-  const float m = 10.0f;
-  const float pos[] = {
-    m, -1, m,
-    -m, -1, m,
-    m, -1, -m,
-    -m, -1, -m
-  };
+  _canvas.addPlane(re::vec3(0, -1, 0), re::vec3(0, 0, 1), re::vec3(0, -1, 0), 10.0f).material.diffuse = re::vec3(1.0, 0.3, 0.5);
   
-  const float norm[] = {
-    0, 1, 0,
-    0, 1, 0,
-    0, 1, 0,
-    0, 1, 0
-  };
+//  const float m = 10.0f;
+//  const float pos[] = {
+//    m, -1, m,
+//    -m, -1, m,
+//    m, -1, -m,
+//    -m, -1, -m
+//  };
+//  
+//  const float norm[] = {
+//    0, 1, 0,
+//    0, 1, 0,
+//    0, 1, 0,
+//    0, 1, 0
+//  };
   
-  StaticObject* floor = new StaticObject();
-  floor->newVAO(GL_TRIANGLE_STRIP, 4)
-          .withAttrib(_canvas.attrs().vertPos(), sizeof(pos), &pos[0], 3)
-          .withAttrib(_canvas.attrs().vertNorm(), sizeof(norm), &norm[0], 3);
-  floor->material.alpha = 1.0f;
-  floor->material.diffuse = re::vec3(1.0, 0.3, 0.5);
-  _canvas.add(floor);
+//  StaticObject* floor = new StaticObject();
+//  floor->newVAO(GL_TRIANGLE_STRIP, 4)
+//          .withAttrib(_canvas.attrs().vertPos(), sizeof(pos), &pos[0], 3)
+//          .withAttrib(_canvas.attrs().vertNorm(), sizeof(norm), &norm[0], 3);
+//  floor->material.alpha = 1.0f;
+//  floor->material.diffuse = re::vec3(1.0, 0.3, 0.5);
+//  _canvas.add(floor);
   
   _world.broadPhase().rebalance();
   ((reBSPTree&)_world.broadPhase()).execute([](reBSPTreeNode& node) {

@@ -7,6 +7,7 @@
 #include "demos/Common/EntityWrapper.h"
 #include "demos/Common/MatrixStack.h"
 #include "demos/Shaders/ShaderDetails.h"
+#include "demos/Common/Plane.h"
 
 #include <vector>
 
@@ -43,10 +44,13 @@ namespace demo {
       void prepareScene();
       void renderScene();
       
+      Plane::Instance& addPlane(const re::vec3& normal, const re::vec3& side, const re::vec3& center, float width);
+      
       void setMaterial(ShaderMaterial& material);
       EntityWrapper& bind(reEnt& ent);
       
       void drawUnitSphere();
+      void drawUnitPlane();
       
       const ShaderAttributes& attrs() const;
       const ShaderUniforms& uniforms() const;
@@ -69,7 +73,7 @@ namespace demo {
       void translate(float x, float y, float z);              // inline
       void rotate(float angle, float x, float y, float z);    // inline
       void loadIdentity();                                    // inline
-      void loadMatrix(const re::mat4& m);                    // inline
+      void loadMatrix(const re::mat4& m);                     // inline
       
       void frustum(float left ,float right, float btm, float top, float near, float far);
       
@@ -93,6 +97,7 @@ namespace demo {
       
       // default objects
       Sphere* _sphere;
+      Plane* _plane;
       
       // allocated VAO and VBO for the application
       GLuint* _VAOs;
