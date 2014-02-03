@@ -1,6 +1,7 @@
 #include "demos/PlanetaryMotion/PlanetaryMotionDemo.h"
 
 #include "react/reWorld.h"
+#include "react/Collision/reBSPTree.h"
 #include "react/Entities/reRigidBody.h"
 #include "react/Dynamics/reGravAction.h"
 #include "react/Collision/Shapes/shapes.h"
@@ -68,7 +69,6 @@ void PlanetaryMotionDemo::prepareWorld() {
   reBuilder build = _world.build();
   
   reRigidBody& body = build.RigidBody(sphere).withMass(5.0).at(0, 0, -2).rotatingWith(0.0, 0.00, 0.01);
-  _canvas.add(new Sphere(body));
   
 //  for (int i = 0; i < 5; i++) {
 //    reRigidBody& body = world.newRigidBody(sphere.withRadius(1)).withMass(5.0).at(2.5*i - 3 , 1, -5).facing(re::vec3(0.0, -1.0, 1.0), re::vec3(0.0, 1.0, 0.0)).rotatingWith(0.0, 0.01, 0.0).movingAt(re::vec3(0.01, 0.0, 0.0));
@@ -76,13 +76,15 @@ void PlanetaryMotionDemo::prepareWorld() {
 //  }
   
   reRigidBody& A = build.RigidBody(sphere).withMass(2.0).at(-3, -1, -5).movingAt(re::vec3(0.01, 0.0, 0.0));
-  _canvas.add(new Sphere(A));
   reRigidBody& B = build.RigidBody(sphere).withMass(2.0).at(3, 3, -5);
-  _canvas.add(new Sphere(B));
   
   build.GravAction(A, B);
   build.GravAction(body, B);
   build.GravAction(body, A);
+  
+  for (reEnt& ent : _world.entities()) {
+    _canvas.bind(ent).withColor(re::normalize(re::vec3::rand(0.0, 1.0))).withAlpha(0.8f);
+  }
   
   const float m = 10.0f;
   const float pos[] = {
@@ -103,8 +105,14 @@ void PlanetaryMotionDemo::prepareWorld() {
   floor->newVAO(GL_TRIANGLE_STRIP, 4)
           .withAttrib(_canvas.attrs().vertPos(), sizeof(pos), &pos[0], 3)
           .withAttrib(_canvas.attrs().vertNorm(), sizeof(norm), &norm[0], 3);
-  floor->material().alpha = 1.0f;
-  floor->material().diffuse = re::vec3(1.0, 0.3, 0.5);
+  floor->material.alpha = 1.0f;
+  floor->material.diffuse = re::vec3(1.0, 0.3, 0.5);
   _canvas.add(floor);
+  
+  _world.broadPhase().rebalance();
+  ((reBSPTree&)_world.broadPhase()).execute([](reBSPTreeNode& node) {
+    printf("DEPTH: %d\n", node.depth);
+    return false;
+  });
 }
 

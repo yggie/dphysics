@@ -4,6 +4,7 @@
 #include "react/math.h"
 
 #include "demos/Common/glsetup.h"
+#include "demos/Common/EntityWrapper.h"
 #include "demos/Common/MatrixStack.h"
 #include "demos/Shaders/ShaderDetails.h"
 
@@ -15,10 +16,13 @@
 #define INVALID_ATTRIBUTE_INDEX(who) \
   printf("[WARN]  Invalid shader attribute index for %s\n", who);
 
+class reEnt;
+
 namespace re {
-namespace demo {  
+namespace demo { 
+ 
     class Shader;
-    class SceneObject;
+    class Sphere;
     
     /**
      * @ingroup demo
@@ -38,6 +42,11 @@ namespace demo {
       void add(SceneObject* obj);
       void prepareScene();
       void renderScene();
+      
+      void setMaterial(ShaderMaterial& material);
+      EntityWrapper& bind(reEnt& ent);
+      
+      void drawUnitSphere();
       
       const ShaderAttributes& attrs() const;
       const ShaderUniforms& uniforms() const;
@@ -81,6 +90,9 @@ namespace demo {
       
       // graphic objects
       std::vector<SceneObject*> _objects;
+      
+      // default objects
+      Sphere* _sphere;
       
       // allocated VAO and VBO for the application
       GLuint* _VAOs;

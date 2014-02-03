@@ -27,6 +27,7 @@ void StaticObject::draw(Canvas& canvas) {
   canvas.push();
   canvas.translate(_pos[0], _pos[1], _pos[2]);
   canvas.applyModelView();
+  canvas.setMaterial(material);
   for_each(_vaoDefs.begin(), _vaoDefs.end(), [&](VAODef* def) {
     glBindVertexArray(def->vao);
     glBindBuffer(GL_ARRAY_BUFFER, def->vbo);

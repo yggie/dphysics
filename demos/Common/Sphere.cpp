@@ -14,32 +14,18 @@ GLuint Sphere::_globalVBO = 0;
 const int nSlices = 10; // number of slices
 const int nVerts = nSlices * nSlices * 2;
 
-Sphere::Sphere(const reEnt& ent) : _ent(ent) {
-  shape(); // ensure the shape is correct
-  material().diffuse = re::normalize(re::vec3::rand(0.0, 1.0));
-  material().alpha = 0.8f;
+Sphere::Sphere() {
+  // do nothing
 }
 
 Sphere::~Sphere() {
   // do nothing
 }
 
-void Sphere::draw(Canvas& canvas) {
-//  canvas.modelMat();
-  canvas.push();
-  re::quat q = _ent.quat();
-  canvas.translate(_ent.pos()[0], _ent.pos()[1], _ent.pos()[2]);
-  canvas.scale(shape().radius());
-  const reFloat ang = acos(q.r);
-  if (re::abs(ang) > RE_FP_TOLERANCE) {
-    const reFloat s = re::sin(ang);
-    canvas.rotate(ang, q.i / s, q.j / s, q.k / s);
-  }
-  canvas.applyModelView();
+void Sphere::draw() {
   glBindVertexArray(Sphere::_globalVAO);
   glBindBuffer(GL_ARRAY_BUFFER, Sphere::_globalVBO);
   glDrawArrays(GL_TRIANGLE_STRIP, 0, nVerts);
-  canvas.pop();
 }
 
 void Sphere::setup(GLuint* vao, GLuint* vbo, const Canvas& canvas) {
@@ -115,5 +101,20 @@ void Sphere::setup(GLuint* vao, GLuint* vbo, const Canvas& canvas) {
 //  glEnableVertexAttribArray(canvas.attrs().vertColor());
   
   RE_ASSERT_MSG(cnt == nVerts, "Number expected was wrong");
+}
+
+void Sphere::Wrapper::draw(Canvas& canvas) {
+  canvas.push();
+  re::quat q = entity.quat();
+  canvas.translate(entity.pos()[0], entity.pos()[1], entity.pos()[2]);
+  canvas.scale(shape().radius()*1.05);
+  const reFloat ang = acos(q.r);
+  if (re::abs(ang) > RE_FP_TOLERANCE) {
+    const reFloat s = re::sin(ang);
+    canvas.rotate(ang, q.i / s, q.j / s, q.k / s);
+  }
+  canvas.setMaterial(material);
+  canvas.drawUnitSphere();
+  canvas.pop();
 }
 

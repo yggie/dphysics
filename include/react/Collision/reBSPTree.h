@@ -9,6 +9,10 @@
 #include "react/Collision/reAABB.h"
 #include "react/Utilities/reEntList.h"
 
+class reBSPTreeNode;
+
+typedef bool(*reBSPTreeCallback)(reBSPTreeNode& node);
+
 /**
  * @ingroup collision
  * Represents a node in the BSP tree
@@ -38,6 +42,8 @@ public:
   
   // measurement
   reBPMeasure measure() const;
+  
+  bool execute(reBSPTreeCallback callback);
   
   /** The split direction of the node */
   const re::vec3 dir;

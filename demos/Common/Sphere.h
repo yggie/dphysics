@@ -1,8 +1,8 @@
 #ifndef DEMO_SPHERE_H
 #define DEMO_SPHERE_H
 
-#include "SceneObject.h"
-#include "MatrixStack.h"
+#include "demos/Common/EntityWrapper.h"
+
 #include "react/Entities/reEnt.h"
 #include "react/Collision/Shapes/reSphere.h"
 
@@ -17,12 +17,13 @@ namespace re {
     
     class Sphere : public SceneObject {
     public:
-      Sphere(const reEnt& ent);
+      Sphere();
       ~Sphere();
       
       Type type() const override;
       bool isDynamic() const override;
-      void draw(Canvas& canvas) override;
+      void draw();
+      void draw(Canvas&) override { }
       void setup(GLuint* vao, GLuint* vbo, const Canvas& canvas);
       
       const reSphere& shape() const;
@@ -31,22 +32,23 @@ namespace re {
       GLuint numVBOReq() const override;
       GLuint numTBOReq() const override;
       
+      struct Wrapper : public EntityWrapper {
+        Wrapper(const reEnt& ent);
+        const reSphere& shape() const;
+        void draw(Canvas& canvas) override;
+      };
+      
     private:
-      const reEnt& _ent;
       static GLuint _globalVAO;
       static GLuint _globalVBO;
     };
     
     inline SceneObject::Type Sphere::type() const {
-      return SceneObject::SIMPLE_SPHERE;
+      return SceneObject::SPHERE;
     }
     
     inline bool Sphere::isDynamic() const {
       return false;
-    }
-    
-    inline const reSphere& Sphere::shape() const {
-      return *((reSphere*)_ent.shape());
     }
     
     inline GLuint Sphere::numVAOReq() const {
@@ -59,6 +61,14 @@ namespace re {
     
     inline GLuint Sphere::numTBOReq() const {
       return 0;
+    }
+    
+    inline Sphere::Wrapper::Wrapper(const reEnt& ent) : EntityWrapper(ent) {
+      shape();
+    }
+    
+    inline const reSphere& Sphere::Wrapper::shape() const {
+      return *((reSphere*)entity.shape());
     }
   }
 }

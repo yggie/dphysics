@@ -309,6 +309,17 @@ void reBSPTreeNode::measureRecursive(reBPMeasure& m) const {
   }
 }
 
+bool reBSPTreeNode::execute(reBSPTreeCallback callback) {
+  if (hasChildren()) {
+    if (_child[0]->execute(callback)) return true;
+    if (_child[1]->execute(callback)) return true;
+  }
+  
+  if (callback(*this)) return true;
+  
+  return false;
+}
+
 reBSPTree::reBSPTree(reAllocator& allocator) : reBroadPhase(), reBSPTreeNode(allocator, 0, re::vec3(1.0, 0.0, 0.0), re::vec3(0.0, 0.0, 0.0)), _contacts(allocator), _strategy() {
   // do nothing
 }

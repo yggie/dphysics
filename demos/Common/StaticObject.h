@@ -60,6 +60,8 @@ namespace re {
       GLuint numVBOReq() const override;
       GLuint numTBOReq() const override;
       
+      ShaderMaterial material;
+      
     private:
       std::vector<VAODef*> _vaoDefs;
       glm::vec3 _pos;

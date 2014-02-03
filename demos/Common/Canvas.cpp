@@ -2,12 +2,17 @@
 
 #include "demos/Common/glsetup.h"
 #include "demos/Common/Shader.h"
-#include "demos/Common/SceneObject.h"
+#include "demos/Common/Sphere.h"
+
+#include "react/Entities/reEnt.h"
+#include "react/Collision/Shapes/shapes.h"
 
 using namespace re::demo;
 
 Canvas::Canvas() : _programID(0), _shaders(), _projMat(1.0f),
 _viewMat(1.0f), _modelMatStack(), _sceneReady(false) {
+  _sphere = new Sphere();
+  add(_sphere);
 }
 
 Canvas::~Canvas() {
@@ -123,6 +128,8 @@ void Canvas::releaseObjects() {
   _VAOs = nullptr;
   _VBOs = nullptr;
   
+  _sphere = nullptr;
+  
   _sceneReady = false;
 }
 
@@ -136,9 +143,33 @@ void Canvas::add(SceneObject* obj) {
 void Canvas::renderScene() {
   clearStack();
   for (SceneObject* obj : _objects) {
-    obj->material().apply(_uniforms);
     obj->draw(*this);
   }
+}
+
+void Canvas::setMaterial(ShaderMaterial& material) {
+  material.apply(_uniforms);
+}
+
+EntityWrapper& Canvas::bind(reEnt& ent) {
+  switch (ent.shape()->type()) {
+    case reShape::SPHERE:
+      {
+        EntityWrapper* wrapper = new Sphere::Wrapper(ent);
+        add(wrapper);
+        return *wrapper;
+      }
+      break;
+    
+    default:
+      RE_NOT_IMPLEMENTED
+      throw 0;
+  }
+}
+
+void Canvas::drawUnitSphere() {
+  applyModelView();
+  _sphere->draw();
 }
 
 bool Canvas::isFalse(GLenum option) const {

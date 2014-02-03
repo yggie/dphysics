@@ -16,8 +16,9 @@ namespace re {
     public:
       
       enum Type {
-        SIMPLE_SPHERE,
-        STATIC_GRAPHIC
+        SPHERE,
+        STATIC_GRAPHIC,
+        SIMPLE_WRAPPER
       };
       
       SceneObject();
@@ -31,11 +32,6 @@ namespace re {
       virtual GLuint numVAOReq() const = 0;
       virtual GLuint numVBOReq() const = 0;
       virtual GLuint numTBOReq() const = 0;
-      
-      ShaderMaterial& material();
-    
-    protected:
-      ShaderMaterial _material;
     };
     
     inline SceneObject::SceneObject() {
@@ -44,10 +40,6 @@ namespace re {
 
     inline SceneObject::~SceneObject() {
       // do nothing
-    }
-    
-    inline ShaderMaterial& SceneObject::material() {
-      return _material;
     }
     
     /**
