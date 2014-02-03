@@ -33,7 +33,7 @@ public:
   
   bool add(reQueryable& q);
   bool remove(reQueryable& q);
-  bool contains(const reEnt& ent) const;
+  bool intersects(const reEnt& ent) const;
   reEntList rebalanceNode(reTreeBalanceStrategy& strategy);
   void updateContacts(reContactGraph& collisions) const;
   
@@ -81,6 +81,7 @@ public:
   void clear() override { reBSPTreeNode::clear(); }
   bool add(reEnt& ent) override;
   bool remove(reEnt& ent) override;
+  bool contains(const reEnt& ent) const override;
   void rebalance(reTreeBalanceStrategy* strategy = nullptr) override;
   void advance(reIntegrator& integrator, reFloat dt) override;
   

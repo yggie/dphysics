@@ -14,7 +14,11 @@
  */
 
 struct reQueryable {
+  reQueryable() = delete;
   reQueryable(reEnt& entity) : queryID(0), ent(entity) { }
+  reQueryable(const reQueryable& q) = delete;
+  reQueryable& operator=(const reQueryable& q) = delete;
+  
   reUInt queryID;
   reEnt& ent;
 };
@@ -35,9 +39,12 @@ public:
   
   bool add(reQueryable& q);
   bool remove(reQueryable& q);
+  bool contains(const reEnt& ent) const;
   void append(const reEntList& list);
   void clear();
   bool empty() const;
+  
+  reEnt* at(reUInt index);
   
   reUInt size() const;
   
@@ -95,6 +102,20 @@ private:
 
 inline bool reEntList::empty() const {
   return _size == 0;
+}
+
+inline reEnt* reEntList::at(reUInt index) {
+  if (empty()) return nullptr;
+  
+  reUInt i = 0;
+  Node* node = _first;
+  while (i++ != index) {
+    node = node->next;
+    if (node == nullptr) {
+      return nullptr;
+    }
+  }
+  return &node->q.ent;
 }
 
 inline reUInt reEntList::size() const {

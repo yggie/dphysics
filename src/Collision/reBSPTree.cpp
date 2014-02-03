@@ -40,7 +40,7 @@ void reBSPTreeNode::clear() {
   _entities.clear();
 }
 
-bool reBSPTreeNode::contains(const reEnt& ent) const {
+bool reBSPTreeNode::intersects(const reEnt& ent) const {
   return ent.intersectsHyperplane(anchor, dir);
 }
 
@@ -109,7 +109,7 @@ bool reBSPTreeNode::add(reQueryable& q) {
   bool success = false;
   if (hasChildren()) {
     for (reUInt i = 0; i < 2; i++) {
-      if (_child[i]->contains(q.ent)) {
+      if (_child[i]->intersects(q.ent)) {
         success = _child[i]->add(q) || success;
       }
     }
@@ -129,7 +129,7 @@ bool reBSPTreeNode::remove(reQueryable& q) {
   bool found = false;
   if (hasChildren()) {
     for (reUInt i = 0; i < 2; i++) {
-      if (_child[i]->contains(q.ent)) {
+      if (_child[i]->intersects(q.ent)) {
         found = _child[i]->remove(q) || found;
       }
     }
@@ -161,14 +161,19 @@ reEntList reBSPTreeNode::rebalanceNode(reTreeBalanceStrategy& strategy) {
       return rebalanceNode(strategy);
     } else {
       for (reUInt i = 0; i < 2; i++) {
-        list.append(_child[i]->rebalanceNode(strategy));
+        reEntList el = _child[i]->rebalanceNode(strategy);
+        printf("LOOKING@%d\n", _child[i]->depth);
+        for (reEnt& ent : el) {
+          RE_ASSERT(&ent != nullptr)
+        }
+        list.append(el);
         
         // moves entities between children if necessary
         auto end = list.qEnd();
         for (auto iter = list.qBegin(); iter != end; ++iter) {
           reQueryable& q = *iter;
           const reUInt j = (i + 1) % 2;
-          if (_child[j]->contains(q.ent)) {
+          if (_child[j]->intersects(q.ent)) {
             _child[j]->add(q);
             list.remove(q);
           }
@@ -177,6 +182,7 @@ reEntList reBSPTreeNode::rebalanceNode(reTreeBalanceStrategy& strategy) {
     }
   } else {
     // checks if entities are still contained
+    printf("APP@%d\n", depth);
     list.append(trim());
     // split tree if necessary
     if (strategy.shouldSplit(*this)) {
@@ -184,6 +190,7 @@ reEntList reBSPTreeNode::rebalanceNode(reTreeBalanceStrategy& strategy) {
     }
   }
   
+  printf("REBALANCE@%d=%d\n", depth, list.size());
   // returns a list of rejected entities
   return list;
 }
@@ -226,12 +233,17 @@ reEntList reBSPTreeNode::trim() {
   auto end = _entities.qEnd();
   for (auto iter = _entities.qBegin(); iter != end; ++iter) {
     reQueryable& q = *iter;
-    if (!contains(q.ent)) {
-      remove(q);
+    if (!intersects(q.ent)) {
       rejected.add(q);
     }
   }
   
+  end = rejected.qEnd();
+  for (auto iter = rejected.qBegin(); iter != end; ++iter) {
+    remove(*iter);
+  }
+  
+  printf("TRIM@%d\n", depth);
   return rejected;
 }
 
@@ -256,7 +268,7 @@ void reBSPTreeNode::split(reTreeBalanceStrategy& strategy) {
     auto end = _entities.qEnd();
     for (auto iter = _entities.qBegin(); iter != end; ++iter) {
       reQueryable& q = *iter;
-      if (_child[i]->contains(q.ent)) {
+      if (_child[i]->intersects(q.ent)) {
         _child[i]->add(q);
       }
     }
@@ -333,7 +345,7 @@ bool reBSPTree::add(reEnt& ent) {
   if (_entities.add(*q)) {
     if (hasChildren()) {
       for (reUInt i = 0; i < 2; i++) {
-        if (_child[i]->contains(ent)) {
+        if (_child[i]->intersects(ent)) {
           _child[i]->add(*q);
         }
       }
@@ -352,7 +364,7 @@ bool reBSPTree::remove(reEnt& ent) {
     if (q.ent.id() == ent.id()) {
       if (hasChildren()) {
         for (reUInt i = 0; i < 2; i++) {
-          if (_child[i]->contains(ent)) {
+          if (_child[i]->intersects(ent)) {
             _child[i]->remove(q);
           }
         }
@@ -364,6 +376,10 @@ bool reBSPTree::remove(reEnt& ent) {
   }
   
   return false;
+}
+
+bool reBSPTree::contains(const reEnt& ent) const {
+  return _entities.contains(ent);
 }
 
 void reBSPTree::rebalance(reTreeBalanceStrategy* strategy) {
@@ -383,7 +399,7 @@ void reBSPTree::rebalance(reTreeBalanceStrategy* strategy) {
         for (auto iter = list.qBegin(); iter != end; ++iter) {
           reQueryable& q = *iter;
           const reUInt j = (i + 1) % 2;
-          if (_child[j]->contains(q.ent)) {
+          if (_child[j]->intersects(q.ent)) {
             _child[j]->add(q);
           }
         }

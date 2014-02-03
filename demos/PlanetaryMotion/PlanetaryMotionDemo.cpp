@@ -70,10 +70,15 @@ void PlanetaryMotionDemo::prepareWorld() {
   
   reRigidBody& body = build.RigidBody(sphere).withMass(5.0).at(0, 0, -2).rotatingWith(0.0, 0.00, 0.01);
   
-//  for (int i = 0; i < 5; i++) {
-//    reRigidBody& body = world.newRigidBody(sphere.withRadius(1)).withMass(5.0).at(2.5*i - 3 , 1, -5).facing(re::vec3(0.0, -1.0, 1.0), re::vec3(0.0, 1.0, 0.0)).rotatingWith(0.0, 0.01, 0.0).movingAt(re::vec3(0.01, 0.0, 0.0));
-//    app.newPlainSphere(body);
-//  }
+  for (int i = 0; i < 15; i++) {
+    reRigidBody& b = build.RigidBody(sphere.withRadius(1))
+      .withMass(5.0)
+      .at(2.5*i - 3 , 1, -5)
+      .facing(re::vec3(0.0, -1.0, 1.0), re::vec3(0.0, 1.0, 0.0))
+      .rotatingWith(0.0, 0.01, 0.0)
+      .movingAt(re::vec3(0.01, 0.0, 0.0));
+    build.GravAction(body, b);
+  }
   
   reRigidBody& A = build.RigidBody(sphere).withMass(2.0).at(-3, -1, -5).movingAt(re::vec3(0.01, 0.0, 0.0));
   reRigidBody& B = build.RigidBody(sphere).withMass(2.0).at(3, 3, -5);
@@ -87,29 +92,6 @@ void PlanetaryMotionDemo::prepareWorld() {
   }
   
   _canvas.addPlane(re::vec3(0, -1, 0), re::vec3(0, 0, 1), re::vec3(0, -1, 0), 10.0f).material.diffuse = re::vec3(1.0, 0.3, 0.5);
-  
-//  const float m = 10.0f;
-//  const float pos[] = {
-//    m, -1, m,
-//    -m, -1, m,
-//    m, -1, -m,
-//    -m, -1, -m
-//  };
-//  
-//  const float norm[] = {
-//    0, 1, 0,
-//    0, 1, 0,
-//    0, 1, 0,
-//    0, 1, 0
-//  };
-  
-//  StaticObject* floor = new StaticObject();
-//  floor->newVAO(GL_TRIANGLE_STRIP, 4)
-//          .withAttrib(_canvas.attrs().vertPos(), sizeof(pos), &pos[0], 3)
-//          .withAttrib(_canvas.attrs().vertNorm(), sizeof(norm), &norm[0], 3);
-//  floor->material.alpha = 1.0f;
-//  floor->material.diffuse = re::vec3(1.0, 0.3, 0.5);
-//  _canvas.add(floor);
   
   _world.broadPhase().rebalance();
   ((reBSPTree&)_world.broadPhase()).execute([](reBSPTreeNode& node) {

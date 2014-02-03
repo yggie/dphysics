@@ -11,10 +11,12 @@ reEntList::reEntList(reAllocator& allocator) : _allocator(allocator), _size(0), 
 }
 
 reEntList::reEntList(const reEntList& list) : reEntList(list._allocator) {
+  clear();
   append(list);
 }
 
 reEntList::~reEntList() {
+  printf("CLEAR=%d\n", size());
   clear();
 }
 
@@ -25,6 +27,7 @@ reEntList& reEntList::operator=(const reEntList& list) {
 }
 
 bool reEntList::add(reQueryable& q) {
+  RE_ASSERT(&q.ent != nullptr)
   if (_last != nullptr && _last->entID() < q.ent.id()) {
     appendToNode(_last, q);
     _last = _last->next;
@@ -107,10 +110,28 @@ bool reEntList::remove(reQueryable& q) {
   return false;
 }
 
+bool reEntList::contains(const reEnt& ent) const {
+  for (const reEnt& e : *this) {
+    if (e.id() == ent.id()) {
+      return true;
+    }
+  }
+  return false;
+}
+
 void reEntList::append(const reEntList& list) {
-  if (empty() || list._first->entID() > _last->entID()) {
+  if (list.empty()) {
+    return;
+  }
+  
+  // can append all elements to the front
+  if (empty() || 
+      list._first->entID() > _last->entID()) {
     auto end = list.qEnd();
+    printf("APPENDING=%d\n", list.size());
+    int i = 0;
     for (auto iter = list.qBegin(); iter != end; ++iter) {
+      printf("@@@AADSA@@@ +++++ %d\n", ++i);
       add(*iter);
     }
     return;
@@ -120,19 +141,25 @@ void reEntList::append(const reEntList& list) {
   Node* node = _first;
   Node* thatNode = list._first;
   while (node != nullptr && thatNode != nullptr) {
-    if (node->entID() > thatNode->entID()) {
-      if (node->prev->entID() != thatNode->entID()) {
-        prependToNode(node, thatNode->q);
-        _size++;
-      } else {
-        thatNode = thatNode->next;
+    if (node->entID() < thatNode->entID()) {
+      node = node->next;
+    } else if (node->entID() > thatNode->entID()) {
+      RE_ASSERT(node->prev == nullptr ||
+                node->prev->entID() < thatNode->entID())
+      prependToNode(node, thatNode->q);
+      _size++;
+      thatNode = thatNode->next;
+      if (node == _first) {
+        _first = node->prev;
       }
     } else {
       node = node->next;
+      thatNode = thatNode->next;
     }
   }
   
   if (node == nullptr) {
+    RE_ASSERT(thatNode == nullptr || _last->entID() < thatNode->entID())
     while (thatNode != nullptr) {
       appendToNode(_last, thatNode->q);
       _last = _last->next;
