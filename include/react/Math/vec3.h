@@ -74,6 +74,7 @@ namespace re {
     };
     
     static const vec3 rand(reFloat b = 1.0);
+    static const vec3 rand(reFloat a, reFloat b);
     static const vec3 unit();
   };
   
@@ -383,12 +384,24 @@ namespace re {
    * Returns a random vector with elements within the range of the given b.
    * i.e. -input < element < input
    * 
-   * @param b The upper/lower b of the elements
+   * @param b The upper/lower bound of the elements value
    * @return The generated vector
    */
 
   inline const vec3 vec3::rand(reFloat b) {
-    return vec3(re::randf(-b, b), re::randf(-b, b), re::randf(-b, b));
+    return rand(-b, b);
+  }
+  
+  /**
+   * Returns a random vector with elements within the range of the input.
+   * 
+   * @param a The lower bound of the elements value
+   * @param b The upper bound of the elements value
+   * @return The generated vector
+   */
+
+  inline const vec3 vec3::rand(reFloat a, reFloat b) {
+    return vec3(re::randf(a, b), re::randf(a, b), re::randf(a, b));
   }
 }
 

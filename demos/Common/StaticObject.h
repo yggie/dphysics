@@ -1,7 +1,7 @@
-#ifndef DEMO_StaticObject_H
-#define DEMO_StaticObject_H
+#ifndef DEMO_STATICOBJECT_H
+#define DEMO_STATICOBJECT_H
 
-#include "demos/Common/CanvasObject.h"
+#include "demos/Common/SceneObject.h"
 
 #include <glm/vec3.hpp>
 #include <vector>
@@ -18,7 +18,7 @@ namespace re {
      * change. At the moment, it does not support textures
      */
     
-    class StaticObject : public CanvasObject {
+    class StaticObject : public SceneObject {
     public:
       
       class VAODef {
@@ -65,7 +65,7 @@ namespace re {
       glm::vec3 _pos;
     };
     
-    inline CanvasObject::Type StaticObject::type() const {
+    inline SceneObject::Type StaticObject::type() const {
       return STATIC_GRAPHIC;
     }
     

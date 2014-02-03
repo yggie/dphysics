@@ -92,13 +92,6 @@ void PlanetaryMotionDemo::prepareWorld() {
     -m, -1, -m
   };
   
-  const float color[] = {
-    0.6f, 0.1f, 0.0f,
-    0.6f, 0.1f, 0.0f,
-    0.6f, 0.1f, 0.0f,
-    0.6f, 0.1f, 0.0f
-  };
-  
   const float norm[] = {
     0, 1, 0,
     0, 1, 0,
@@ -108,9 +101,10 @@ void PlanetaryMotionDemo::prepareWorld() {
   
   StaticObject* floor = new StaticObject();
   floor->newVAO(GL_TRIANGLE_STRIP, 4)
-          .withAttrib(_canvas.attrs().vertPos, sizeof(pos), &pos[0], 3)
-          .withAttrib(_canvas.attrs().vertNorm, sizeof(norm), &norm[0], 3)
-          .withAttrib(_canvas.attrs().vertColor, sizeof(color), &color[0], 3);
+          .withAttrib(_canvas.attrs().vertPos(), sizeof(pos), &pos[0], 3)
+          .withAttrib(_canvas.attrs().vertNorm(), sizeof(norm), &norm[0], 3);
+  floor->material().alpha = 1.0f;
+  floor->material().diffuse = re::vec3(1.0, 0.3, 0.5);
   _canvas.add(floor);
 }
 

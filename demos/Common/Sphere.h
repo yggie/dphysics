@@ -1,7 +1,7 @@
-#ifndef DEMO_Sphere_H
-#define DEMO_Sphere_H
+#ifndef DEMO_SPHERE_H
+#define DEMO_SPHERE_H
 
-#include "CanvasObject.h"
+#include "SceneObject.h"
 #include "MatrixStack.h"
 #include "react/Entities/reEnt.h"
 #include "react/Collision/Shapes/reSphere.h"
@@ -15,7 +15,7 @@ namespace re {
      * Represents a single solid Sphere with pre-defined colors
      */
     
-    class Sphere : public CanvasObject {
+    class Sphere : public SceneObject {
     public:
       Sphere(const reEnt& ent);
       ~Sphere();
@@ -37,8 +37,8 @@ namespace re {
       static GLuint _globalVBO;
     };
     
-    inline CanvasObject::Type Sphere::type() const {
-      return CanvasObject::SIMPLE_SPHERE;
+    inline SceneObject::Type Sphere::type() const {
+      return SceneObject::SIMPLE_SPHERE;
     }
     
     inline bool Sphere::isDynamic() const {

@@ -1,7 +1,7 @@
-#ifndef DEMO_CanvasObject_H
-#define DEMO_CanvasObject_H
+#ifndef DEMO_SCENEOBJECT_H
+#define DEMO_SCENEOBJECT_H
 
-#include "glsetup.h"
+#include "demos/Shaders/ShaderDetails.h"
 
 namespace re {
   namespace demo {
@@ -10,11 +10,9 @@ namespace re {
     /**
      * @ingroup demo
      * Represents a graphical entity which can be drawn
-     * 
-     * @see re::Ent
      */
     
-    class CanvasObject {
+    class SceneObject {
     public:
       
       enum Type {
@@ -22,8 +20,8 @@ namespace re {
         STATIC_GRAPHIC
       };
       
-      CanvasObject();
-      virtual ~CanvasObject();
+      SceneObject();
+      virtual ~SceneObject();
       
       virtual Type type() const = 0;
       virtual bool isDynamic() const = 0;
@@ -33,14 +31,23 @@ namespace re {
       virtual GLuint numVAOReq() const = 0;
       virtual GLuint numVBOReq() const = 0;
       virtual GLuint numTBOReq() const = 0;
+      
+      ShaderMaterial& material();
+    
+    protected:
+      ShaderMaterial _material;
     };
     
-    inline CanvasObject::CanvasObject() {
+    inline SceneObject::SceneObject() {
       // do nothing
     }
 
-    inline CanvasObject::~CanvasObject() {
+    inline SceneObject::~SceneObject() {
       // do nothing
+    }
+    
+    inline ShaderMaterial& SceneObject::material() {
+      return _material;
     }
     
     /**
@@ -54,7 +61,7 @@ namespace re {
       int vaoIndex;
       int vboIndex;
       int tboIndex;
-      CanvasObject* obj;
+      SceneObject* obj;
     };
   }
 }

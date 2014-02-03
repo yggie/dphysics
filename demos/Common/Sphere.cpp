@@ -16,6 +16,8 @@ const int nVerts = nSlices * nSlices * 2;
 
 Sphere::Sphere(const reEnt& ent) : _ent(ent) {
   shape(); // ensure the shape is correct
+  material().diffuse = re::normalize(re::vec3::rand(0.0, 1.0));
+  material().alpha = 0.8f;
 }
 
 Sphere::~Sphere() {
@@ -50,7 +52,7 @@ void Sphere::setup(GLuint* vao, GLuint* vbo, const Canvas& canvas) {
   
   re::vec3 vertPos[nVerts];
   re::vec3 vertNorm[nVerts];
-  glm::vec4 vertColor[nVerts];
+//  glm::vec4 vertColor[nVerts];
   
   int cnt = 0;
   const double radius = 1;
@@ -82,7 +84,8 @@ void Sphere::setup(GLuint* vao, GLuint* vbo, const Canvas& canvas) {
         }
         vertPos[cnt] = re::vec3(r[jk]*s[ik], r[jk]*c[ik], z[jk]*ix);
         vertNorm[cnt] = re::normalize(vertPos[cnt]);
-        vertColor[cnt++] = glm::vec4(c[ik], s[ik], 1.0f, 0.9f);
+//        vertColor[cnt] = glm::vec4(c[ik], s[ik], 1.0f, 0.9f);
+        cnt++;
       }
     }
   }
@@ -92,25 +95,25 @@ void Sphere::setup(GLuint* vao, GLuint* vbo, const Canvas& canvas) {
   glBindBuffer(GL_ARRAY_BUFFER, vao[0]);
   
   // write data
-  glBufferData(GL_ARRAY_BUFFER, sizeof(vertPos) + sizeof(vertColor) + sizeof(vertNorm), nullptr, GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(vertPos) + sizeof(vertNorm), nullptr, GL_STATIC_DRAW);
+//  glBufferData(GL_ARRAY_BUFFER, sizeof(vertPos) + sizeof(vertColor) + sizeof(vertNorm), nullptr, GL_STATIC_DRAW);
   
   glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertPos), &vertPos[0][0]);
   glBufferSubData(GL_ARRAY_BUFFER, sizeof(vertPos), sizeof(vertNorm), &vertNorm[0][0]);
-  glBufferSubData(GL_ARRAY_BUFFER, sizeof(vertPos) + sizeof(vertNorm), sizeof(vertColor), &vertColor[0][0]);
+//  glBufferSubData(GL_ARRAY_BUFFER, sizeof(vertPos) + sizeof(vertNorm), sizeof(vertColor), &vertColor[0][0]);
   
   // vertex positions attribute
-  glVertexAttribPointer(canvas.attrs().vertPos, 3, GL_FLOAT, GL_FALSE, 0, 0);
+  glVertexAttribPointer(canvas.attrs().vertPos(), 3, GL_FLOAT, GL_FALSE, 0, 0);
   // vertex norms attribute
-  glVertexAttribPointer(canvas.attrs().vertNorm, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid*)sizeof(vertPos));
+  glVertexAttribPointer(canvas.attrs().vertNorm(), 3, GL_FLOAT, GL_FALSE, 0, (GLvoid*)sizeof(vertPos));
   // vertex colors attribute
-  glVertexAttribPointer(canvas.attrs().vertColor, 4, GL_FLOAT, GL_FALSE, 0, (GLvoid*)(sizeof(vertPos) + sizeof(vertNorm)));
+//  glVertexAttribPointer(canvas.attrs().vertColor(), 4, GL_FLOAT, GL_FALSE, 0, (GLvoid*)(sizeof(vertPos) + sizeof(vertNorm)));
   
   // ensure required attributes are enabled
-  glEnableVertexAttribArray(canvas.attrs().vertPos);
-  glEnableVertexAttribArray(canvas.attrs().vertNorm);
-  glEnableVertexAttribArray(canvas.attrs().vertColor);
+  glEnableVertexAttribArray(canvas.attrs().vertPos());
+  glEnableVertexAttribArray(canvas.attrs().vertNorm());
+//  glEnableVertexAttribArray(canvas.attrs().vertColor());
   
-  printf("[DEMO]  Expected: %d got %d\n", nVerts, cnt);
   RE_ASSERT_MSG(cnt == nVerts, "Number expected was wrong");
 }
 

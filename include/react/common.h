@@ -73,14 +73,14 @@ namespace re {
   fprintf(re::logFile, "[WARN]  %s:%d: ", RE_FILE, __LINE__), \
   fprintf(re::logFile, __VA_ARGS__);
 
+#ifndef RE_SOFT_STOP
+  #define _RE_KILL_PROGRAM    __builtin_trap();
+#else
+  #define _RE_KILL_PROGRAM
+#endif
+
 #ifdef NDEBUG
   #define RE_ZERO_MEMORY
-  
-  #ifndef RE_SOFT_STOP
-    #define _RE_STOP_PROGRAM    __builtin_trap();
-  #else
-    #define _RE_STOP_PROGRAM
-  #endif
 
   #define RE_DEBUG(...) \
     fprintf(re::logFile, "[DEBUG] %s:%d: ", RE_FILE, __LINE__), \
@@ -99,7 +99,7 @@ namespace re {
   do { \
     if(!(expr)) { \
       fprintf(re::logFile, "[FATAL] %s:%d: Assertion in expression (%s) failed! %s\n", RE_FILE, __LINE__, #expr, msg); \
-      _RE_STOP_PROGRAM \
+      _RE_KILL_PROGRAM \
     } \
   } while(0);
   

@@ -47,24 +47,24 @@ void StaticObject::setup(GLuint* vao, GLuint* vbo, const Canvas&) {
     
     // bind the vertex array object
     glBindVertexArray(vao[i]);
-    CHECK_GL_ERR;
+    EXPECT_NO_GL_ERROR();
     // bind the buffer
     glBindBuffer(GL_ARRAY_BUFFER, vbo[i]);
-    CHECK_GL_ERR;
+    EXPECT_NO_GL_ERROR();
     // initialize storage
     glBufferData(GL_ARRAY_BUFFER, totalSize, nullptr, GL_STATIC_DRAW);
-    CHECK_GL_ERR;
+    EXPECT_NO_GL_ERROR();
     
     // count the cumulative bytes used
     size_t offset = 0;
     for_each(def.buffers.begin(), def.buffers.end(), [&](StaticObject::VAODef::BufferObj& obj) {
       if (obj.data != nullptr) {
         glBufferSubData(GL_ARRAY_BUFFER, offset, obj.size, obj.data);
-        CHECK_GL_ERR;
+        EXPECT_NO_GL_ERROR();
         glVertexAttribPointer(obj.attr, obj.stride, obj.type, GL_FALSE, 0, (GLvoid*)offset);
-        CHECK_GL_ERR;
+        EXPECT_NO_GL_ERROR();
         glEnableVertexAttribArray(obj.attr);
-        CHECK_GL_ERR;
+        EXPECT_NO_GL_ERROR();
         offset += obj.size;
         free(obj.data);
         obj.data = nullptr;

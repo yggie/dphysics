@@ -5,6 +5,7 @@
 
 #include "demos/Common/glsetup.h"
 #include "demos/Common/MatrixStack.h"
+#include "demos/Shaders/ShaderDetails.h"
 
 #include <vector>
 
@@ -17,7 +18,7 @@
 namespace re {
 namespace demo {  
     class Shader;
-    class CanvasObject;
+    class SceneObject;
     
     /**
      * @ingroup demo
@@ -26,21 +27,6 @@ namespace demo {
     
     class Canvas {
     public:
-      
-      struct GLAttributeIndex {
-        GLAttributeIndex() : vertPos(-1), vertColor(-1), vertNorm(-1) { }
-        GLint vertPos;
-        GLint vertColor;
-        GLint vertNorm;
-      };
-      
-      struct GLUniformIndex {
-        GLUniformIndex() : modelViewMat(-1), projMat(-1), normMat(-1) { }
-        GLint modelViewMat;
-        GLint projMat;
-        GLint normMat;
-      };
-      
       Canvas();
       virtual ~Canvas();
       
@@ -49,12 +35,12 @@ namespace demo {
       virtual void release();
       void releaseObjects();
       
-      void add(CanvasObject* obj);
+      void add(SceneObject* obj);
       void prepareScene();
       void renderScene();
       
-      virtual const GLAttributeIndex& attrs() const = 0;
-      virtual const GLUniformIndex& uniforms() const = 0;
+      const ShaderAttributes& attrs() const;
+      const ShaderUniforms& uniforms() const;
       
       GLuint programID() const;
       
@@ -94,7 +80,7 @@ namespace demo {
       MatrixStack _modelMatStack;
       
       // graphic objects
-      std::vector<CanvasObject*> _objects;
+      std::vector<SceneObject*> _objects;
       
       // allocated VAO and VBO for the application
       GLuint* _VAOs;
@@ -106,10 +92,21 @@ namespace demo {
   //    int _numTBO;
   
       bool _sceneReady;
+      
+      ShaderAttributes _attrs;
+      ShaderUniforms _uniforms;
     };
     
     inline GLuint Canvas::programID() const {
       return _programID;
+    }
+    
+    inline const ShaderAttributes& Canvas::attrs() const {
+      return _attrs;
+    }
+    
+    inline const ShaderUniforms& Canvas::uniforms() const {
+      return _uniforms;
     }
     
     inline void Canvas::push() {
@@ -171,11 +168,7 @@ namespace demo {
         0.0, 0.0, -(far + near)/(far - near), -2.0*far*near/(far - near),
         0.0, 0.0, -1.0, 0.0
       );
-      if (uniforms().projMat) {
-        glUniformMatrix4fv(uniforms().projMat, 1, GL_TRUE, &_projMat[0][0]);
-      } else {
-        INVALID_ATTRIBUTE_INDEX("mProj")
-      }
+      glUniformMatrix4fv(uniforms().projMat(), 1, GL_TRUE, &_projMat[0][0]);
     }
   }
 }

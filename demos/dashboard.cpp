@@ -51,14 +51,14 @@ namespace {
     int verMajor, verMinor;
     glGetIntegerv(GL_MAJOR_VERSION, &verMajor);
     glGetIntegerv(GL_MINOR_VERSION, &verMinor);
-    printf("[DEMO]   Detected OpenGL version %d.%d\n", verMajor, verMinor);
+    printf("[DEMO]  Detected OpenGL version %d.%d\n", verMajor, verMinor);
     
     int multisamplingEnabled;
     glGetIntegerv(GL_SAMPLE_BUFFERS, &multisamplingEnabled);
     if (multisamplingEnabled == GL_TRUE) {
-      printf("[DEMO]   Multisampling support detected\n");
+      printf("[DEMO]  Multisampling support detected\n");
     } else {
-      printf("[DEMO]   Multisampling NOT supported on this device\n");
+      printf("[DEMO]  Multisampling NOT supported on this device\n");
     }
     
     changeDemo(currentDemo);

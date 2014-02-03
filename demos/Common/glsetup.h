@@ -12,15 +12,23 @@
 
 const int LOG_BUFFER_LENGTH = 255;
 
-#define CHECK_GL_ERR glErr(__FILE__, __LINE__)
+#define ASSERT_NO_GL_ERROR() glAssertNoErr(RE_FILE, __LINE__)
 
-inline bool glErr(const char* filename, int line) {
+#define EXPECT_NO_GL_ERROR() glExpectNoErr(RE_FILE, __LINE__)
+
+inline void glAssertNoErr(const char* filename, int line) {
   GLenum err = glGetError();
   if (err != GL_NO_ERROR) {
-    printf("[DEMO] %s:%d: OpenGL error ~ %s\n", filename, line, gluErrorString(err));
-    return true;
+    printf("[FATAL] %s:%d: OpenGL Error: %s\n", filename, line, gluErrorString(err));
+    _RE_KILL_PROGRAM
   }
-  return false;
+}
+
+inline void glExpectNoErr(const char* filename, int line) {
+  GLenum err = glGetError();
+  if (err != GL_NO_ERROR) {
+    printf("[WARN]  %s:%d: OpenGL Error: %s\n", filename, line, gluErrorString(err));
+  }
 }
 
 #endif

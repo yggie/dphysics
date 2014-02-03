@@ -2,7 +2,7 @@
 
 #include "demos/Common/glsetup.h"
 #include "demos/Common/Shader.h"
-#include "demos/Common/CanvasObject.h"
+#include "demos/Common/SceneObject.h"
 
 using namespace re::demo;
 
@@ -39,6 +39,20 @@ void Canvas::init() {
   if (isFalse(GL_LINK_STATUS)) {
     printLog();
     throw 0;
+  }
+  
+  for (unsigned int i = 0; i < _attrs.size; i++) {
+    _attrs.vars[i].index = glGetAttribLocation(_programID, _attrs.vars[i].name);
+    if (_attrs.vars[i].index == -1) {
+      RE_WARN("Invalid shader index for attribute \"%s\"\n", _attrs.vars[i].name);
+    }
+  }
+  
+  for (unsigned int i = 0; i < _uniforms.size; i++) {
+    _uniforms.vars[i].index = glGetUniformLocation(_programID, _uniforms.vars[i].name);
+    if (_uniforms.vars[i].index == -1) {
+      RE_WARN("Invalid shader index for uniform \"%s\"\n", _uniforms.vars[i].name);
+    }
   }
   
   postInit();
@@ -94,7 +108,7 @@ void Canvas::releaseObjects() {
     return;
   }
   
-  for (CanvasObject* obj : _objects) {
+  for (SceneObject* obj : _objects) {
     delete obj;
   }
   _objects.clear();
@@ -112,7 +126,7 @@ void Canvas::releaseObjects() {
   _sceneReady = false;
 }
 
-void Canvas::add(CanvasObject* obj) {
+void Canvas::add(SceneObject* obj) {
   if (_sceneReady) {
     throw 0; // TODO better way
   }
@@ -121,7 +135,8 @@ void Canvas::add(CanvasObject* obj) {
 
 void Canvas::renderScene() {
   clearStack();
-  for (CanvasObject* obj : _objects) {
+  for (SceneObject* obj : _objects) {
+    obj->material().apply(_uniforms);
     obj->draw(*this);
   }
 }
@@ -164,8 +179,8 @@ void Canvas::prepareScene() {
   std::vector<Request> requests;
   
   int numVAO(0), numVBO(0);//, numTBO(0);
-  std::map<CanvasObject::Type, bool> processed;
-  for (CanvasObject* obj : _objects) {
+  std::map<SceneObject::Type, bool> processed;
+  for (SceneObject* obj : _objects) {
     if (!GetWithDef(processed, obj->type(), false)) {
 //      numTBO += obj->numTBOReq();
       // set request object
