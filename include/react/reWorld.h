@@ -10,8 +10,8 @@
 #include "react/Memory/reAllocator.h"
 #include "react/Utilities/reBuilder.h"
 #include "react/Collision/reSpatialQueries.h"
+#include "react/Utilities/reLinkedList.h"
 
-class reEntList;
 class reBroadPhase;
 class reEnt;
 class reShape;
@@ -38,7 +38,7 @@ public:
   void advance(reFloat dt);
   
   // getters
-  reEntList& entities() const;
+  const reLinkedList<reEnt*>& entities() const;
   reAllocator& allocator() const;
   reBroadPhase& broadPhase() const;
   reIntegrator& integrator() const;

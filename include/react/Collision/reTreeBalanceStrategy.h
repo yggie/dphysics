@@ -6,18 +6,26 @@
 #define RE_TREE_BALANCE_STRATEGY
 
 #include "react/math.h"
-#include "react/Utilities/reEntList.h"
+#include "react/Utilities/reLinkedList.h"
 
-class reBSPTreeNode;
+class reEnt;
+class reBSPNode;
+
+namespace re {
+  struct SplitPlane {
+    re::vec3 normal;
+    re::vec3 center;
+  };
+}
 
 class reTreeBalanceStrategy {
 public:
   reTreeBalanceStrategy();
   
-  bool shouldMerge(const reBSPTreeNode& node);
-  bool shouldSplit(const reBSPTreeNode& node);
+  bool shouldMerge(const reBSPNode& node);
+  bool shouldSplit(const reBSPNode& node);
   
-  void computeSplitPlane(const re::vec3& parentDir, const reEntList& entities, re::vec3& anchor, re::vec3& dir);
+  re::SplitPlane computeSplitPlane(const re::vec3& parentDir, const reLinkedList<const reEnt*>& sample);
 };
 
 inline reTreeBalanceStrategy::reTreeBalanceStrategy() {

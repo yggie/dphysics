@@ -8,13 +8,7 @@ _allocator(allocator) {
 }
 
 reProxyAllocator::~reProxyAllocator() {
-  RE_EXPECT([](reBaseAllocator& base) {
-    bool leaked = base.numAllocs() != 0 || base.used() != 0;
-    if (leaked) {
-      printf("MEMORY LEAKS! REM. ALLOCS = %d\n", base.numAllocs());
-    }
-    return !leaked;
-  }(*_allocator));
+  RE_EXPECT(_allocator->numAllocs() == 0 && _allocator->used() == 0)
   
 //  show();
   

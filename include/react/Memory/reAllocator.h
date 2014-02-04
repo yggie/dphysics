@@ -37,9 +37,9 @@ public:
   template <class T> T* alloc_new();
   template <class X, class Y> X* alloc_new(Y& arg);
   template <class X, class Y> X* alloc_new(const Y& arg);
+  template <class X, class Y, class Z> X* alloc_new(Y& arg1, const Z& arg2);
   template <class X, class Y, class Z> X* alloc_new(const Y& arg1, const Z& arg2);
   template <class X, class Y, class Z, class W> X* alloc_new(Y& arg1, Z& arg2, W& arg3);
-  template <class A, class B, class C, class D, class E> A* alloc_new(B& arg1, const C& arg2, const D& arg3, const E& arg4);
   template <class T> void alloc_delete(T* ptr);
   
   void* nextAlignedAddress(void* ptr, u8 alignment) const;
@@ -99,6 +99,9 @@ template <class X, class Y> inline X* reAllocator::alloc_new(const Y& arg) {
  * @return The allocated instance
  */
 
+template <class X, class Y, class Z> inline X* reAllocator::alloc_new(Y& arg1, const Z& arg2) {
+  return new (alloc(sizeof(X), __alignof(X))) X(arg1, arg2);
+}
 
 template <class X, class Y, class Z> inline X* reAllocator::alloc_new(const Y& arg1, const Z& arg2) {
   return new (alloc(sizeof(X), __alignof(X))) X(arg1, arg2);
@@ -106,10 +109,6 @@ template <class X, class Y, class Z> inline X* reAllocator::alloc_new(const Y& a
 
 template <class X, class Y, class Z, class W> inline X* reAllocator::alloc_new(Y& arg1, Z& arg2, W& arg3) {
   return new (alloc(sizeof(X), __alignof(X))) X(arg1, arg2, arg3);
-}
-
-template <class A, class B, class C, class D, class E> inline A* reAllocator::alloc_new(B& arg1, const C& arg2, const D& arg3, const E& arg4) {
-  return new (alloc(sizeof(A), __alignof(A))) A(arg1, arg2, arg3, arg4);
 }
 
 /**

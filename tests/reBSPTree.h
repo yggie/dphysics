@@ -35,13 +35,17 @@ TEST_F(reBSPTreeTest, Creation) {
   ASSERT_TRUE(tree.isLeaf()) <<
     "should initially be the leaf node";
   
-  ASSERT_EQ(tree.depth, 0) <<
+  ASSERT_EQ(tree.depth(), 0) <<
     "root node should be at depth 0";
 }
 
 TEST_F(reBSPTreeTest, AddContainRemoveActions) {
   generateFixtures(1000);
   reRigidBody& body = *fixtures.at(0);
+  
+  // TODO proper TEAR-DOWN, for some reason failing here wont remove fixtures
+//  ASSERT_FALSE(tree.contains(body)) <<
+//    "should return false for an entity which has not been added";
   
   ASSERT_TRUE(tree.add(body)) <<
     "should be able to add entities";
@@ -100,10 +104,24 @@ TEST_F(reBSPTreeTest, TreeBalancing) {
   ASSERT_EQ(tree.size(), fixtures.size()) <<
     "should not change in size when rebalanced";
   
-  for (reEnt& ent : tree.entities()) {
-    ent.setPos(re::vec3::rand(250.0));
+  ASSERT_FALSE(tree.isLeaf()) <<
+    "should branch off when containing a large number of entities";
+  
+  reBPMeasure m = tree.measure();
+  ASSERT_EQ(m.references, m.entities) <<
+    "should contain an equal number of references and entities";
+  
+  for (reEnt* ent : tree.entities()) {
+    ent->setPos(re::vec3::rand(250.0));
   }
   tree.rebalance();
+  
+  ASSERT_FALSE(tree.isLeaf()) <<
+    "should not lose all its nodes after rebalancing";
+  
+  m = tree.measure();
+  ASSERT_EQ(m.references, m.entities) <<
+    "should keep a 1:1 ratio between references and entities";
   
   ASSERT_EQ(tree.size(), fixtures.size()) <<
     "should not change in size when rebalanced";

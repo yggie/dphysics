@@ -1,6 +1,6 @@
 /**
  * @file
- * Contains the definition of the reBSPTreeNode and reBSPTree class
+ * Contains the definition of the reBSPNode and reBSPTree class
  */
 #ifndef RE_BSPTREE_H
 #define RE_BSPTREE_H
@@ -9,62 +9,72 @@
 #include "react/Collision/reAABB.h"
 #include "react/Utilities/reEntList.h"
 
-class reBSPTreeNode;
+class reBSPNode;
+class reBSPTree;
 
-typedef bool(*reBSPTreeCallback)(reBSPTreeNode& node);
+typedef bool(*reBSPTreeCallback)(reBSPNode& node);
 
 /**
  * @ingroup collision
  * Represents a node in the BSP tree
  */
 
-class reBSPTreeNode {
+class reBSPNode {
 public:
-  reBSPTreeNode(reAllocator& allocator, reUInt depth, re::vec3 dir, re::vec3 anchor);
-  ~reBSPTreeNode();
+  
+  struct Marker {
+    Marker(reEnt& e) : entity(e), node(nullptr), queryID(0) { }
+    
+    reEnt& entity;
+    reBSPNode* node;
+    reUInt queryID;
+  };
+  
+  reBSPNode(reAllocator& allocator, reUInt depth);
+  ~reBSPNode();
   
   void clear();
-  reBSPTreeNode& child(reUInt i) const { return *_child[i]; }
+  const reBSPNode& child(reUInt i) const;
   
-  reUInt size() const;
+  bool remove(Marker& marker);
+  
   bool hasChildren() const;
   bool isRoot() const;
   bool isLeaf() const;
   
-  bool add(reQueryable& q);
-  bool remove(reQueryable& q);
-  bool intersects(const reEnt& ent) const;
-  reEntList rebalanceNode(reTreeBalanceStrategy& strategy);
-  void updateContacts(reContactGraph& collisions) const;
+  reAllocator& allocator() const;
+  reUInt depth() const;
+  reUInt placements() const;
   
-  // spatial queries
-  reEnt* queryWithRay(const reRayQuery& query, reRayQueryResult& result) const;
+  void rebalanceNode(reTreeBalanceStrategy& strategy);
+  void updateContacts(reContactGraph& collisions, reEnt& entity) const;
   
-  // measurement
-  reBPMeasure measure() const;
+  void measureRecursive(reBPMeasure& m) const;
   
   bool execute(reBSPTreeCallback callback);
-  
-  /** The split direction of the node */
-  const re::vec3 dir;
-  /** A point along the split plane */
-  const re::vec3 anchor;
-  /** The current depth */
-  const reUInt depth;
-  
-protected:
-  reEntList trim();
   void split(reTreeBalanceStrategy& strategy);
   void merge();
   
-  void measureRecursive(reBPMeasure& m) const;
+  const reLinkedList<const reEnt*> sample(reUInt size) const;
+  
+  // spatial queries
+//  reEnt* queryWithRay(const reRayQuery& query, reRayQueryResult& result) const;
+  
+protected:
+  reBSPNode* place(Marker& marker);
   
   /** The allocator object used for allocating memory */
   reAllocator& _allocator;
   /** The list of entities contained in this structure */
-  reEntList _entities;
+  reLinkedList<Marker*> _markers;
   /** The direct descendents of this node */
-  reBSPTreeNode* _child[2];
+  reBSPNode* _children[2];
+  /** The split direction of the node */
+  re::vec3 _normal;
+  /** A point along the split plane */
+  re::vec3 _center;
+  /** The current depth */
+  const reUInt _depth;
 };
 
 /**
@@ -73,53 +83,84 @@ protected:
  * queries
  */
 
-class reBSPTree : public reBroadPhase, public reBSPTreeNode {
+class reBSPTree : public reBroadPhase, public reBSPNode {
 public:
   reBSPTree(reAllocator& allocator);
   ~reBSPTree();
   
-  void clear() override { reBSPTreeNode::clear(); }
+  void clear() override;
   bool add(reEnt& ent) override;
   bool remove(reEnt& ent) override;
   bool contains(const reEnt& ent) const override;
+  reUInt size() const override;
   void rebalance(reTreeBalanceStrategy* strategy = nullptr) override;
   void advance(reIntegrator& integrator, reFloat dt) override;
   
   void addInteraction(reInteraction& action, reEnt& A, reEnt& B) override;
   
-  reEntList& entities() override;
+  const reLinkedList<reEnt*>& entities() const override;
   
   // spatial queries
-  reEnt* queryWithRay(const reRayQuery& query, reRayQueryResult& result) const override { return reBSPTreeNode::queryWithRay(query, result); }
+  reEnt* queryWithRay(const reRayQuery&, reRayQueryResult&) const override { return nullptr; }
   
   // measurement
-  reBPMeasure measure() const override { return reBSPTreeNode::measure(); }
+  reBPMeasure measure() const override;
+  
+  reBSPNode* place(Marker& m);
   
 protected:
+  
   /** The structure maintaining collision interactions between entities */
   reContactGraph _contacts;
   /** The strategy used to balance the tree */
   reTreeBalanceStrategy _strategy;
+  reLinkedList<Marker*> _masterMarkersList;
+  reLinkedList<reEnt*> _masterEntityList;
 };
 
-inline reUInt reBSPTreeNode::size() const {
-  return _entities.size();
+inline const reBSPNode& reBSPNode::child(reUInt i) const {
+  return *_children[i];
 }
 
-inline bool reBSPTreeNode::hasChildren() const {
-  return _child[0] != nullptr;
+inline bool reBSPNode::hasChildren() const {
+  return _children[0] != nullptr;
 }
 
-inline bool reBSPTreeNode::isRoot() const {
-  return depth == 0;
+inline bool reBSPNode::isRoot() const {
+  return _depth == 0;
 }
 
-inline bool reBSPTreeNode::isLeaf() const {
+inline bool reBSPNode::isLeaf() const {
   return !hasChildren();
 }
 
-inline reEntList& reBSPTree::entities() {
-  return _entities;
+inline reAllocator& reBSPNode::allocator() const {
+  return _allocator;
+}
+
+inline reUInt reBSPNode::depth() const {
+  return _depth;
+}
+
+inline reUInt reBSPNode::placements() const {
+  return _markers.size();
+}
+
+inline const reLinkedList<reEnt*>& reBSPTree::entities() const {
+  return _masterEntityList;
+}
+
+inline reUInt reBSPTree::size() const {
+  return _masterEntityList.size();
+}
+
+inline reBPMeasure reBSPTree::measure() const {
+  reBPMeasure m;
+  m.entities = _masterEntityList.size();
+  reBSPNode::measureRecursive(m);
+  m.children--; // account for the root node
+  m.meanLeafDepth /= m.leafs;
+  return m;
 }
 
 #endif

@@ -14,18 +14,11 @@
  */
 
 template<class T>
-class reLinkedNode {
-public:
-  reLinkedNode();
+struct reLinkedNode {
+  reLinkedNode() : value(), next(nullptr) { }
   
-  T& value();
-  const T& value() const;
-  reLinkedNode*& next();
-  const reLinkedNode*& next() const;
-  
-private:
-  T _value;
-  reLinkedNode<T>* _next;
+  T value;
+  reLinkedNode<T>* next;
 };
 
 /**
@@ -57,6 +50,7 @@ public:
   
   void add(T value);
   bool remove(T value);
+  bool contains(const T& value) const;
   void append(const reLinkedList<T>& list);
   void clear();
   bool empty() const;
@@ -71,31 +65,6 @@ private:
   reLinkedNode<T>* _last;
   reUInt _size;
 };
-
-template <class T>
-reLinkedNode<T>::reLinkedNode() : _value(), _next(nullptr) {
-  // do nothing
-}
-
-template <class T>
-T& reLinkedNode<T>::value() {
-  return _value;
-}
-
-template <class T>
-inline const T& reLinkedNode<T>::value() const {
-  return _value;
-}
-
-template <class T>
-inline reLinkedNode<T>*& reLinkedNode<T>::next() {
-  return _next;
-}
-
-template <class T>
-inline const reLinkedNode<T>*& reLinkedNode<T>::next() const {
-  return _next;
-}
 
 template <class T>
 reLinkedList<T>::reLinkedList(reAllocator& allocator) : _allocator(allocator), _first(nullptr), _last(nullptr), _size(0) {
@@ -115,12 +84,12 @@ reLinkedList<T>::~reLinkedList() {
 template <class T>
 inline void reLinkedList<T>::add(T t) {
   reLinkedNode<T>* node = _allocator.alloc_new<reLinkedNode<T>>();
-  node->value() = t;
+  node->value = t;
   if (_first == nullptr) {
     _first = node;
     _last = node;
   } else {
-    _last->next() = node;
+    _last->next = node;
     _last = node;
   }
   _size++;
@@ -131,12 +100,12 @@ inline bool reLinkedList<T>::remove(T t) {
   reLinkedNode<T>* node = _first;
   reLinkedNode<T>* prevNode = nullptr;
   while (node != nullptr) {
-    if (node->value() == t) {
+    if (node->value == t) {
       if (prevNode == nullptr) {
-        _first = node->next();
+        _first = node->next;
       } else {
-        prevNode->next() = node->next();
-        if (prevNode->next() == nullptr) {
+        prevNode->next = node->next;
+        if (prevNode->next == nullptr) {
           _last = prevNode;
         }
       }
@@ -146,7 +115,20 @@ inline bool reLinkedList<T>::remove(T t) {
       return true;
     }
     prevNode = node;
-    node = node->next();
+    node = node->next;
+  }
+  
+  return false;
+}
+
+template <class T>
+inline bool reLinkedList<T>::contains(const T& t) const {
+  const reLinkedNode<T>* node = _first;
+  while (node != nullptr) {
+    if (node->value == t) {
+      return true;
+    }
+    node = node->next;
   }
   
   return false;
@@ -173,7 +155,7 @@ template <class T>
 inline void reLinkedList<T>::clear() {
   reLinkedNode<T>* node = _first;
   while (node != nullptr) {
-    reLinkedNode<T>*tmp = node->next();
+    reLinkedNode<T>*tmp = node->next;
     _allocator.alloc_delete(node);
     node = tmp;
   }
@@ -193,12 +175,12 @@ bool reIterator<T>::operator!=(const reIterator<T>& iter) const {
 
 template <class T>
 T& reIterator<T>::operator*() const {
-  return node->value();
+  return node->value;
 }
 
 template <class T>
 const reIterator<T>& reIterator<T>::operator++() {
-  node = node->next();
+  node = node->next;
   return *this;
 }
 

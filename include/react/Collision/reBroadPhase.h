@@ -33,12 +33,13 @@ public:
   virtual bool add(reEnt& ent) = 0;
   virtual bool remove(reEnt& ent) = 0;
   virtual bool contains(const reEnt& ent) const = 0;
+  virtual reUInt size() const = 0;
   virtual void rebalance(reTreeBalanceStrategy* strategy = nullptr) = 0;
   virtual void advance(reIntegrator& integrator, reFloat dt) = 0;
   
   virtual void addInteraction(reInteraction& action, reEnt& A, reEnt& B) = 0;
   
-  virtual reEntList& entities() = 0;
+  virtual const reLinkedList<reEnt*>& entities() const = 0;
   
   // spatial queries
   virtual reEnt* queryWithRay(const reRayQuery& query, reRayQueryResult& result) const = 0;
@@ -53,7 +54,7 @@ public:
  */
 
 struct reBPMeasure {
-  reBPMeasure() : entities(0), children(0), leafs(0), references(0), meanDepth(0.0) { }
+  reBPMeasure() : entities(0), children(0), leafs(0), references(0), meanLeafDepth(0.0) { }
   /** The number of entities in the structure */
   reUInt entities;
   /** The number of child nodes */
@@ -63,7 +64,7 @@ struct reBPMeasure {
   /** The number of references kept in the structure */
   reUInt references;
   /** The mean depth for all leaf nodes */
-  reFloat meanDepth;
+  reFloat meanLeafDepth;
 };
 
 inline reBroadPhase::reBroadPhase() {

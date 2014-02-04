@@ -3,8 +3,8 @@
 // entity module unit tests
 #include "reRigidBody.h"
 
-// utility module unit tests
-#include "reEntList.h"
+//// utility module unit tests
+//#include "reEntList.h"
 
 // collision module unit tests
 #include "reBSPTree.h"

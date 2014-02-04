@@ -110,6 +110,13 @@ bool reEntList::remove(reQueryable& q) {
   return false;
 }
 
+void reEntList::remove(const reEntList& list) {
+  auto end = list.qEnd();
+  for (auto iter = list.qBegin(); iter != end; ++iter) {
+    remove(*iter);
+  }
+}
+
 bool reEntList::contains(const reEnt& ent) const {
   for (const reEnt& e : *this) {
     if (e.id() == ent.id()) {
@@ -127,12 +134,12 @@ void reEntList::append(const reEntList& list) {
   // can append all elements to the front
   if (empty() || 
       list._first->entID() > _last->entID()) {
-    auto end = list.qEnd();
     printf("APPENDING=%d\n", list.size());
+    auto end = list.qEnd();
     int i = 0;
-    for (auto iter = list.qBegin(); iter != end; ++iter) {
+    for (auto it = list.qBegin(); it != end; ++it) {
+      add(*it);
       printf("@@@AADSA@@@ +++++ %d\n", ++i);
-      add(*iter);
     }
     return;
   }
@@ -242,31 +249,6 @@ void reEntList::detachNode(Node* node) {
   if (node->next != nullptr) {
     node->next->prev = node->prev;
   }
-}
-
-reEntList::Iterator::Iterator(Node* start) : node(start) {
-  // do nothing
-}
-
-bool reEntList::Iterator::operator!=(const reEntList::Iterator& iter) const {
-  return node != iter.node;
-}
-
-reQueryable& reEntList::Iterator::operator*() const {
-  return node->q;
-}
-
-const reEntList::Iterator& reEntList::Iterator::operator++() {
-  node = node->next;
-  return *this;
-}
-
-reEntList::Iterator reEntList::qBegin() const {
-  return reEntList::Iterator(_first);
-}
-
-reEntList::Iterator reEntList::qEnd() const {
-  return reEntList::Iterator(nullptr);
 }
 
 namespace {

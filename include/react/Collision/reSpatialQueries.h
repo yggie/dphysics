@@ -47,14 +47,14 @@ struct reRayQueryResult {
   reFloat distSq;
 };
 
-/**
- * The struct which defines spatial queries using hyperplanes
- */
-
-struct reHyperplaneQuery : reSpatialQuery {
-  reHyperplaneQuery() : reSpatialQuery(), point(), dir() { }
-  re::vec point;
-  re::vec dir;
-};
+namespace re {
+  struct PlaneQuery {
+    enum FastResult {
+      FRONT,
+      INTERSECTS,
+      BEHIND
+    };
+  };
+}
 
 #endif

@@ -39,6 +39,7 @@ public:
   
   bool add(reQueryable& q);
   bool remove(reQueryable& q);
+  void remove(const reEntList& list);
   bool contains(const reEnt& ent) const;
   void append(const reEntList& list);
   void clear();
@@ -120,6 +121,31 @@ inline reEnt* reEntList::at(reUInt index) {
 
 inline reUInt reEntList::size() const {
   return _size;
+}
+
+inline reEntList::Iterator::Iterator(Node* start) : node(start) {
+  // do nothing
+}
+
+inline bool reEntList::Iterator::operator!=(const reEntList::Iterator& iter) const {
+  return node != iter.node;
+}
+
+inline reQueryable& reEntList::Iterator::operator*() const {
+  return node->q;
+}
+
+inline const reEntList::Iterator& reEntList::Iterator::operator++() {
+  node = node->next;
+  return *this;
+}
+
+inline reEntList::Iterator reEntList::qBegin() const {
+  return reEntList::Iterator(_first);
+}
+
+inline reEntList::Iterator reEntList::qEnd() const {
+  return reEntList::Iterator(nullptr);
 }
 
 inline reEntList::reEntItor::reEntItor(reEntList::Node* node) : _node(node) {

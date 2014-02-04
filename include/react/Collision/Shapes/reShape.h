@@ -61,7 +61,7 @@ public:
   
   virtual bool intersectsRay(const reRayQuery& query, reRayQueryResult& result) const = 0;
   
-  virtual bool intersectsHyperplane(const reTransform& transform, const reHyperplaneQuery& query) const;
+  virtual re::PlaneQuery::FastResult fastPlaneIntersect(const re::vec3& normal, const re::vec3& center) const;
   
 protected:
   reAABB _aabb;

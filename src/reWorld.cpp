@@ -118,7 +118,7 @@ void reWorld::advance(reFloat dt) {
  * @return A list of reEnt
  */
 
-reEntList& reWorld::entities() const {
+const reLinkedList<reEnt*>& reWorld::entities() const {
   return _broadPhase->entities();
 }
 

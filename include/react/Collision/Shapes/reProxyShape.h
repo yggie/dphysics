@@ -51,7 +51,7 @@ public:
   
   bool intersectsRay(const reRayQuery& query, reRayQueryResult& result) const override;
   
-  bool intersectsHyperplane(const reTransform& transform, const reHyperplaneQuery& query) const override;
+  re::PlaneQuery::FastResult fastPlaneIntersect(const re::vec3& normal, const re::vec3& center) const override;
   
 private:
   reTransform _transform;
@@ -133,8 +133,10 @@ inline const re::vec3 reProxyShape::randomPoint() const {
   return _transform.multPoint(_shape->randomPoint());
 }
 
-inline bool reProxyShape::intersectsHyperplane(const reTransform& transform, const reHyperplaneQuery& query) const {
-  return reShape::intersectsHyperplane(transform * _transform, query);
+
+inline re::PlaneQuery::FastResult reProxyShape::fastPlaneIntersect(const re::vec3& normal, const re::vec3& center) const {
+  reTransform inv = re::inverse(_transform);
+  return _shape->fastPlaneIntersect(inv.multDir(normal), inv.multPoint(center));
 }
 
 #endif

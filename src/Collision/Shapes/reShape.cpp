@@ -3,8 +3,6 @@
 #include "react/math.h"
 #include "react/Collision/reAABB.h"
 
-using namespace re;
-
 void reShape::updateAABB(const re::mat3& parentRotation) {
   _aabb.dimens().setZero();
   for (reUInt i = 0; i < numVerts(); i++) {
@@ -41,18 +39,37 @@ bool reShape::intersectsRay(const reTransform& transform, const reRayQuery& quer
   return false;
 }
 
-bool reShape::intersectsHyperplane(const reTransform& transform, const reHyperplaneQuery& query) const {
+re::PlaneQuery::FastResult reShape::fastPlaneIntersect(const re::vec3& normal, const re::vec3& center) const {
   const reUInt N = numVerts();
-  const reTransform inv = transform.inverse();
-  const re::vec3 nPoint = inv.multPoint(query.point);
-  const re::vec3 nDir = inv.multDir(query.dir);
+  reFloat maxV = 0.0;
+  reFloat minV = 0.0;
   
   for (reUInt i = 0; i < N; i++) {
-    if (dot(vert(i) - nPoint, nDir) + shell() > 0.0) {
-      return true;
+    const reFloat dat = re::dot(vert(i) - center, normal);
+    const reFloat mx = dat + shell();
+    const reFloat mn = dat - shell();
+    if (mx > maxV) {
+      maxV = mx;
+    }
+    if (mn < minV) {
+      minV = mn;
+    }
+    if (maxV > RE_FP_TOLERANCE) {
+      if (minV > RE_FP_TOLERANCE) {
+        return re::PlaneQuery::FRONT;
+      } else if (minV < RE_FP_TOLERANCE) {
+        return re::PlaneQuery::INTERSECTS;
+      }
+    } else if (maxV < RE_FP_TOLERANCE) {
+      if (minV > RE_FP_TOLERANCE) {
+        return re::PlaneQuery::INTERSECTS;
+      } else if (minV < RE_FP_TOLERANCE) {
+        return re::PlaneQuery::BEHIND;
+      }
     }
   }
   
-  return false;
+  RE_IMPOSSIBLE
+  throw 0;
 }
 

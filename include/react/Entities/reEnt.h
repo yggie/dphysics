@@ -87,8 +87,7 @@ public:
   // collision queries
   bool intersectsRay(const reRayQuery& query, reRayQueryResult& result) const;
   
-  bool intersectsHyperplane(const reHyperplaneQuery& query) const;
-  bool intersectsHyperplane(const re::vec3& point, const re::vec3& dir) const;
+  re::PlaneQuery::FastResult fastPlaneIntersect(const re::vec3& normal, const re::vec3& center) const;
   
   /** a pointer to arbitrary data, defined by the user */
   void* userdata;
@@ -249,23 +248,9 @@ inline bool reEnt::intersectsRay(const reRayQuery& query, reRayQueryResult& resu
   return false;
 }
 
-inline bool reEnt::intersectsHyperplane(const reHyperplaneQuery& query) const {
-  if (_shape != nullptr) {
-    return _shape->intersectsHyperplane(transform(), query);
-  } else {
-    return re::dot(_pos - query.point, query.dir) > 0.0;
-  }
-}
-
-inline bool reEnt::intersectsHyperplane(const re::vec3& point, const re::vec3& dir) const {
-  if (_shape != nullptr) {
-    reHyperplaneQuery query;
-    query.point = point;
-    query.dir = dir;
-    return _shape->intersectsHyperplane(transform(), query);
-  } else {
-    return re::dot(_pos - point, dir) > 0.0;
-  }
+inline re::PlaneQuery::FastResult reEnt::fastPlaneIntersect(const re::vec3& normal, const re::vec3& center) const {
+  reTransform inv = re::inverse(transform());
+  return _shape->fastPlaneIntersect(inv.multDir(normal), inv.multPoint(center));
 }
 
 /**
