@@ -41,18 +41,13 @@ void reBSPNode::rebalanceNode(reTreeBalanceStrategy& strategy) {
   if (hasChildren()) {
     if (strategy.shouldMerge(*this)) {
       merge();
-      RE_DEBUG("MERGE\n")
     } else {
       _children[0]->rebalanceNode(strategy);
       _children[1]->rebalanceNode(strategy);
-      RE_DEBUG("PROPAGATE\n")
     }
   } else {
     if (strategy.shouldSplit(*this)) {
       split(strategy);
-      RE_DEBUG("SPLIT\n")
-    } else {
-      RE_DEBUG("NO SPLIT\n")
     }
   }
 }
@@ -193,12 +188,12 @@ void reBSPNode::merge() {
   }
 }
 
-const reLinkedList<const reEnt*> reBSPNode::sample(reUInt size) const {
-  reLinkedList<const reEnt*> list(allocator());
+const reLinkedList<reEnt*> reBSPNode::sample(reUInt num) const {
+  reLinkedList<reEnt*> list(allocator());
   
-  if (size < _markers.size()) {
-    reUInt* indices = new reUInt(size);
-    re::generateSortedUInts(indices, size, _markers.size());
+  if (num < _markers.size()) {
+    reUInt* indices = new reUInt[num];
+    re::generateSortedUInts(indices, num, _markers.size());
     
     reUInt index = 0;
     reUInt counter = 0;
@@ -207,10 +202,12 @@ const reLinkedList<const reEnt*> reBSPNode::sample(reUInt size) const {
         list.add(&marker->entity);
         index++;
       }
-      if (index == size) {
+      if (index == num) {
         break;
       }
     }
+    
+    delete[] indices;
   } else {
     for (Marker* marker : _markers) {
       list.add(&marker->entity);
@@ -237,8 +234,13 @@ reBSPNode* reBSPNode::place(Marker& marker) {
     }
   }
   
-  marker.node = this;
-  _markers.add(&marker);
+  if (marker.node != this) {
+    if (marker.node != nullptr) {
+      marker.node->remove(marker);
+    }
+    marker.node = this;
+    _markers.add(&marker);
+  }
   
   return this;
 }
@@ -322,8 +324,8 @@ bool reBSPTree::remove(reEnt& ent) {
 }
 
 bool reBSPTree::contains(const reEnt& ent) const {
-  return true; // TODO fix this bug!!!
-//  return _masterEntityList.contains(&ent);
+  // TODO very hacky way, must be a better method
+  return _masterEntityList.contains(const_cast<reEnt*>(&ent));
 }
 
 void reBSPTree::rebalance(reTreeBalanceStrategy* strategy) {
@@ -354,14 +356,5 @@ void reBSPTree::advance(reIntegrator& integrator, reFloat dt) {
 
 void reBSPTree::addInteraction(reInteraction& action, reEnt& A, reEnt& B) {
   _contacts.addInteraction(action, A, B);
-}
-
-reBSPNode* reBSPTree::place(Marker& marker) {
-  if (marker.node != nullptr) {
-    marker.node->remove(marker);
-  }
-  
-  marker.node = reBSPNode::place(marker);
-  return marker.node;
 }
 

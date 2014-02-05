@@ -43,9 +43,8 @@ TEST_F(reBSPTreeTest, AddContainRemoveActions) {
   generateFixtures(1000);
   reRigidBody& body = *fixtures.at(0);
   
-  // TODO proper TEAR-DOWN, for some reason failing here wont remove fixtures
-//  ASSERT_FALSE(tree.contains(body)) <<
-//    "should return false for an entity which has not been added";
+  ASSERT_FALSE(tree.contains(body)) <<
+    "should return false for an entity which has not been added";
   
   ASSERT_TRUE(tree.add(body)) <<
     "should be able to add entities";
@@ -87,6 +86,27 @@ TEST_F(reBSPTreeTest, AddContainRemoveActions) {
   tree.clear();
   ASSERT_EQ(tree.size(), 0) <<
     "should be able to clear all entities";
+  
+  ASSERT_NO_MEM_LEAKS();
+}
+
+TEST_F(reBSPTreeTest, Sampling) {
+  generateFixtures(1000);
+  
+  for (reRigidBody* body : fixtures) {
+    ASSERT_TRUE(tree.add(*body)) <<
+      "should be able to add unique entities";
+  }
+  
+  auto list = tree.sample(300);
+  
+  for (reEnt* body : list) {
+    ASSERT_TRUE(tree.contains(*body)) <<
+      "should contain the body from the sample";
+  }
+  
+  tree.clear();
+  list.clear();
   
   ASSERT_NO_MEM_LEAKS();
 }

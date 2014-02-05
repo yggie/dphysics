@@ -87,15 +87,15 @@ void PlanetaryMotionDemo::prepareWorld() {
   build.GravAction(body, B);
   build.GravAction(body, A);
   
-  for (reEnt& ent : _world.entities()) {
-    _canvas.bind(ent).withColor(re::normalize(re::vec3::rand(0.0, 1.0))).withAlpha(0.8f);
+  for (reEnt* ent : _world.entities()) {
+    _canvas.bind(*ent).withColor(re::normalize(re::vec3::rand(0.0, 1.0))).withAlpha(0.8f);
   }
   
   _canvas.addPlane(re::vec3(0, -1, 0), re::vec3(0, 0, 1), re::vec3(0, -1, 0), 10.0f).material.diffuse = re::vec3(1.0, 0.3, 0.5);
   
   _world.broadPhase().rebalance();
-  ((reBSPTree&)_world.broadPhase()).execute([](reBSPTreeNode& node) {
-    printf("DEPTH: %d\n", node.depth);
+  ((reBSPTree&)_world.broadPhase()).execute([](reBSPNode& node) {
+    printf("DEPTH: %d\n", node.depth());
     return false;
   });
 }

@@ -25,7 +25,7 @@ public:
   bool shouldMerge(const reBSPNode& node);
   bool shouldSplit(const reBSPNode& node);
   
-  re::SplitPlane computeSplitPlane(const re::vec3& parentDir, const reLinkedList<const reEnt*>& sample);
+  re::SplitPlane computeSplitPlane(const re::vec3& parentDir, const reLinkedList<reEnt*>& sample);
 };
 
 inline reTreeBalanceStrategy::reTreeBalanceStrategy() {

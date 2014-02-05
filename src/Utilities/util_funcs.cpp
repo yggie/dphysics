@@ -3,6 +3,7 @@
 #include "react/math.h"
 
 void re::generateSortedUInts(reUInt* array, reUInt size, reUInt maxValue) {
+  RE_ASSERT(size > 0)
   if (size == 1) {
     array[0] = re::randi() % maxValue;
     return;

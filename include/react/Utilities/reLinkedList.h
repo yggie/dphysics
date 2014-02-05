@@ -1,40 +1,12 @@
 /**
  * @file
- * Contains the definition of the reLinkedNode, reIterator and reLinkedList class
+ * Contains the definition of the reLinkedList class
  */
 #ifndef RE_LINKEDLIST_H
 #define RE_LINKEDLIST_H
 
 #include "react/common.h"
 #include "react/Memory/reAllocator.h"
-
-/**
- * @ingroup utilities
- * Represents a single node in the linked list
- */
-
-template<class T>
-struct reLinkedNode {
-  reLinkedNode() : value(), next(nullptr) { }
-  
-  T value;
-  reLinkedNode<T>* next;
-};
-
-/**
- * @ingroup utilities
- * An iterator to iterate over elements in the list
- */
-
-template <class T>
-class reIterator {
-public:
-  reIterator(reLinkedNode<T>* start);
-  bool operator!=(const reIterator& iter) const;
-  T& operator*() const;
-  const reIterator& operator++();
-  reLinkedNode<T>* node;
-};
 
 /**
  * @ingroup utilities
@@ -48,6 +20,22 @@ public:
   reLinkedList(const reLinkedList& list);
   ~reLinkedList();
   
+  reLinkedList& operator=(const reLinkedList& list);
+  
+  struct Node {
+    Node(const T& v) : value(v), next(nullptr) { }
+    T value;
+    Node* next;
+  };
+
+  struct iterator {
+    iterator(Node* start);
+    bool operator!=(const iterator& iter) const;
+    T& operator*() const;
+    const iterator& operator++();
+    Node* node;
+  };
+  
   void add(T value);
   bool remove(T value);
   bool contains(const T& value) const;
@@ -56,13 +44,13 @@ public:
   bool empty() const;
   reUInt size() const;
   
-  reIterator<T> begin() const;
-  reIterator<T> end() const;
+  iterator begin() const;
+  iterator end() const;
   
 private:
   reAllocator& _allocator;
-  reLinkedNode<T>* _first;
-  reLinkedNode<T>* _last;
+  Node* _first;
+  Node* _last;
   reUInt _size;
 };
 
@@ -72,7 +60,7 @@ reLinkedList<T>::reLinkedList(reAllocator& allocator) : _allocator(allocator), _
 }
 
 template <class T>
-reLinkedList<T>::reLinkedList(const reLinkedList<T>& list) : _allocator(list._allocator), _first(nullptr), _last(nullptr) {
+reLinkedList<T>::reLinkedList(const reLinkedList<T>& list) : reLinkedList(list._allocator) {
   append(list);
 }
 
@@ -82,9 +70,8 @@ reLinkedList<T>::~reLinkedList() {
 }
 
 template <class T>
-inline void reLinkedList<T>::add(T t) {
-  reLinkedNode<T>* node = _allocator.alloc_new<reLinkedNode<T>>();
-  node->value = t;
+void reLinkedList<T>::add(T t) {
+  Node* node = _allocator.alloc_new<Node>(t);
   if (_first == nullptr) {
     _first = node;
     _last = node;
@@ -96,9 +83,15 @@ inline void reLinkedList<T>::add(T t) {
 }
 
 template <class T>
-inline bool reLinkedList<T>::remove(T t) {
-  reLinkedNode<T>* node = _first;
-  reLinkedNode<T>* prevNode = nullptr;
+reLinkedList<T>& reLinkedList<T>::operator=(const reLinkedList<T>& list) {
+  clear();
+  append(list);
+}
+
+template <class T>
+bool reLinkedList<T>::remove(T t) {
+  Node* node = _first;
+  Node* prevNode = nullptr;
   while (node != nullptr) {
     if (node->value == t) {
       if (prevNode == nullptr) {
@@ -109,7 +102,7 @@ inline bool reLinkedList<T>::remove(T t) {
           _last = prevNode;
         }
       }
-      _allocator.alloc_delete<reLinkedNode<T>>(node);
+      _allocator.alloc_delete<Node>(node);
       
       _size--;
       return true;
@@ -122,8 +115,8 @@ inline bool reLinkedList<T>::remove(T t) {
 }
 
 template <class T>
-inline bool reLinkedList<T>::contains(const T& t) const {
-  const reLinkedNode<T>* node = _first;
+bool reLinkedList<T>::contains(const T& t) const {
+  const Node* node = _first;
   while (node != nullptr) {
     if (node->value == t) {
       return true;
@@ -135,7 +128,7 @@ inline bool reLinkedList<T>::contains(const T& t) const {
 }
 
 template <class T>
-inline void reLinkedList<T>::append(const reLinkedList<T>& list) {
+void reLinkedList<T>::append(const reLinkedList<T>& list) {
   for (T t : list) {
     add(t);
   }
@@ -152,10 +145,10 @@ inline reUInt reLinkedList<T>::size() const {
 }
 
 template <class T>
-inline void reLinkedList<T>::clear() {
-  reLinkedNode<T>* node = _first;
+void reLinkedList<T>::clear() {
+  Node* node = _first;
   while (node != nullptr) {
-    reLinkedNode<T>*tmp = node->next;
+    Node* tmp = node->next;
     _allocator.alloc_delete(node);
     node = tmp;
   }
@@ -164,34 +157,34 @@ inline void reLinkedList<T>::clear() {
 }
 
 template <class T>
-reIterator<T>::reIterator(reLinkedNode<T>* start) : node(start) {
+reLinkedList<T>::iterator::iterator(Node* start) : node(start) {
   // do nothing
 }
 
 template <class T>
-bool reIterator<T>::operator!=(const reIterator<T>& iter) const {
+inline bool reLinkedList<T>::iterator::operator!=(const iterator& iter) const {
   return node != iter.node;
 }
 
 template <class T>
-T& reIterator<T>::operator*() const {
+inline T& reLinkedList<T>::iterator::operator*() const {
   return node->value;
 }
 
 template <class T>
-const reIterator<T>& reIterator<T>::operator++() {
+inline const typename reLinkedList<T>::iterator& reLinkedList<T>::iterator::operator++() {
   node = node->next;
   return *this;
 }
 
 template <class T>
-reIterator<T> reLinkedList<T>::begin() const {
-  return reIterator<T>(_first);
+inline typename reLinkedList<T>::iterator reLinkedList<T>::begin() const {
+  return iterator(_first);
 }
 
 template <class T>
-reIterator<T> reLinkedList<T>::end() const {
-  return reIterator<T>(nullptr);
+inline typename reLinkedList<T>::iterator reLinkedList<T>::end() const {
+  return iterator(nullptr);
 }
 
 

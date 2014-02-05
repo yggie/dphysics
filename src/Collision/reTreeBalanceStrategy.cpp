@@ -35,7 +35,7 @@ bool reTreeBalanceStrategy::shouldSplit(const reBSPNode& node) {
  * @param sample A sample of the entities contained in the parent
  */
 
-re::SplitPlane reTreeBalanceStrategy::computeSplitPlane(const re::vec3& parentDir, const reLinkedList<const reEnt*>& sample) {
+re::SplitPlane reTreeBalanceStrategy::computeSplitPlane(const re::vec3& parentDir, const reLinkedList<reEnt*>& sample) {
   re::SplitPlane split;
   split.center.set(0.0, 0.0, 0.0);
   

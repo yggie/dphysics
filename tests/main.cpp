@@ -5,6 +5,7 @@
 
 //// utility module unit tests
 //#include "reEntList.h"
+#include "reLinkedList.h"
 
 // collision module unit tests
 #include "reBSPTree.h"

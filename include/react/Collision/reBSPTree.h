@@ -55,14 +55,14 @@ public:
   void split(reTreeBalanceStrategy& strategy);
   void merge();
   
-  const reLinkedList<const reEnt*> sample(reUInt size) const;
+  const reLinkedList<reEnt*> sample(reUInt size) const;
   
   // spatial queries
 //  reEnt* queryWithRay(const reRayQuery& query, reRayQueryResult& result) const;
-  
-protected:
+
   reBSPNode* place(Marker& marker);
   
+protected:
   /** The allocator object used for allocating memory */
   reAllocator& _allocator;
   /** The list of entities contained in this structure */
@@ -105,8 +105,6 @@ public:
   
   // measurement
   reBPMeasure measure() const override;
-  
-  reBSPNode* place(Marker& m);
   
 protected:
   

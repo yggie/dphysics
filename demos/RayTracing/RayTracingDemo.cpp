@@ -86,10 +86,10 @@ void RayTracingDemo::restart() {
 }
 
 void RayTracingDemo::release() {
-  for (reEnt& ent : _world.entities()) {
-    if (ent.userdata != nullptr) {
-      delete (RayObject*)(ent.userdata);
-      ent.userdata = nullptr;
+  for (reEnt* ent : _world.entities()) {
+    if (ent->userdata != nullptr) {
+      delete (RayObject*)(ent->userdata);
+      ent->userdata = nullptr;
     }
   }
   
@@ -297,7 +297,7 @@ void RayTracingDemo::renderScene(GLsizei w, GLsizei h) {
   
   _world.broadPhase().rebalance();
   reBPMeasure m = _world.broadPhase().measure();
-  printf("[INFO]   B-Phase: (refRatio=%.2f, child=%d, leafs=%d, meanDepth=%.1f)\n", m.references/(float)m.entities, m.children, m.leafs, m.meanDepth);
+  printf("[INFO]   B-Phase: (refRatio=%.2f, child=%d, leafs=%d, meanDepth=%.1f)\n", m.references/(float)m.entities, m.children, m.leafs, m.meanLeafDepth);
   
   printf("[INFO]   Image size: %d x %d\n", _renderWidth, _renderHeight);
   printf("%12s%12s%12s\n", "% complete", "Queries", "Time");

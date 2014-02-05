@@ -54,22 +54,18 @@ re::PlaneQuery::FastResult reShape::fastPlaneIntersect(const re::vec3& normal, c
     if (mn < minV) {
       minV = mn;
     }
-    if (maxV > RE_FP_TOLERANCE) {
-      if (minV > RE_FP_TOLERANCE) {
-        return re::PlaneQuery::FRONT;
-      } else if (minV < RE_FP_TOLERANCE) {
-        return re::PlaneQuery::INTERSECTS;
-      }
-    } else if (maxV < RE_FP_TOLERANCE) {
-      if (minV > RE_FP_TOLERANCE) {
-        return re::PlaneQuery::INTERSECTS;
-      } else if (minV < RE_FP_TOLERANCE) {
-        return re::PlaneQuery::BEHIND;
-      }
+    if ((maxV > RE_FP_TOLERANCE && minV < RE_FP_TOLERANCE) ||
+        (maxV < RE_FP_TOLERANCE && minV > RE_FP_TOLERANCE)) {
+      return re::PlaneQuery::INTERSECTS;
     }
   }
   
-  RE_IMPOSSIBLE
-  throw 0;
+  if (minV > RE_FP_TOLERANCE && maxV > RE_FP_TOLERANCE) {
+    return re::PlaneQuery::FRONT;
+  } else if (minV < RE_FP_TOLERANCE && maxV < RE_FP_TOLERANCE) {
+    return re::PlaneQuery::BEHIND;
+  }
+  
+  return re::PlaneQuery::INTERSECTS;
 }
 

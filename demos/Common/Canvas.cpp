@@ -11,7 +11,7 @@
 using namespace re::demo;
 
 Canvas::Canvas() : _programID(0), _shaders(), _projMat(1.0f),
-_viewMat(1.0f), _modelMatStack(), _sceneReady(false) {
+_viewMat(1.0f), _modelMatStack(), _sphere(nullptr), _plane(nullptr), _VAOs(nullptr), _VBOs(nullptr), _numVAO(0), _numVBO(0), _sceneReady(false) {
   _sphere = new Sphere();
   add(_sphere);
   _plane = new Plane();
