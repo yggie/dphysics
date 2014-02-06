@@ -60,6 +60,7 @@ namespace re {
       
       std::string _sceneFile;
       unsigned int _lightNo;
+      reUInt _raysSent;
     };
 
     inline re::demo::App::Options RayTracingDemo::options() const {

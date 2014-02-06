@@ -41,8 +41,8 @@ bool reShape::intersectsRay(const reTransform& transform, const reRayQuery& quer
 
 re::PlaneQuery::FastResult reShape::fastPlaneIntersect(const re::vec3& normal, const re::vec3& center) const {
   const reUInt N = numVerts();
-  reFloat maxV = 0.0;
-  reFloat minV = 0.0;
+  reFloat maxV = RE_NEGATIVE_INFINITY;
+  reFloat minV = RE_INFINITY;
   
   for (reUInt i = 0; i < N; i++) {
     const reFloat dat = re::dot(vert(i) - center, normal);

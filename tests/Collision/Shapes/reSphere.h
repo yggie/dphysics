@@ -70,3 +70,26 @@ TEST(SphereTest, RayIntersectionSadPaths) {
   }
 }
 
+TEST(SphereTest, FastPlaneIntersection) {
+  reSphere s(1.0);
+  
+  for (reUInt i = 0; i < NUM_SAMPLES; i++) {
+    const re::vec3 origin = re::vec3::rand(1000.0);
+    const re::vec3 normal = re::normalize(re::vec3::rand());
+    
+    const reFloat d = re::dot(origin, normal);
+    re::PlaneQuery::FastResult r = s.fastPlaneIntersect(normal, origin);
+    
+    if (re::abs(d) < 1.0 + RE_FP_TOLERANCE) {
+      ASSERT_TRUE(r == re::PlaneQuery::INTERSECTS) <<
+        "should intersect when the dot product is less than the radius loop@" << i;
+    } else if (d > 0.0) {
+      ASSERT_TRUE(r == re::PlaneQuery::BEHIND) <<
+        "should be behind the plane loop@" << i;
+    } else {
+      ASSERT_TRUE(r == re::PlaneQuery::FRONT) <<
+        "should be in front of the plane loop@" << i;
+    }
+  }
+}
+

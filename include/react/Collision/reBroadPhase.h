@@ -42,7 +42,7 @@ public:
   virtual const reLinkedList<reEnt*>& entities() const = 0;
   
   // spatial queries
-  virtual reEnt* queryWithRay(const reRayQuery& query, reRayQueryResult& result) const = 0;
+  virtual re::RayResult queryWithRay(const reRayQuery& query) const = 0;
   
   // measurement functions
   virtual reBPMeasure measure() const = 0;

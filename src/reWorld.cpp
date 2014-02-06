@@ -137,18 +137,17 @@ reEnt* reWorld::queryWithRay(const re::vec3& origin, const re::vec3& dir, re::ve
   reRayQuery query;
   query.origin = origin;
   query.dir = dir;
-  reRayQueryResult result;
   
-  reEnt* ent = _broadPhase->queryWithRay(query, result);
+  re::RayResult res = _broadPhase->queryWithRay(query);
   
-  if (ent != nullptr) {
+  if (res.entity != nullptr) {
     if (intersect != nullptr) {
-      *intersect = result.intersect;
+      *intersect = res.surfaceIntersect;
     }
     if (normal != nullptr) {
-      *normal = result.normal;
+      *normal = res.surfaceNormal;
     }
-    return ent;
+    return res.entity;
   }
   
   return nullptr;

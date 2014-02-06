@@ -55,6 +55,20 @@ namespace re {
       BEHIND
     };
   };
+  
+  struct RayResult {
+    RayResult() : distSq(RE_INFINITY), entity(nullptr), surfaceIntersect(), surfaceNormal() { }
+    reFloat distSq;
+    reEnt* entity;
+    re::vec3 surfaceIntersect;
+    re::vec3 surfaceNormal;
+  };
+  
+  struct SingleResult {
+    SingleResult() : distSq(RE_INFINITY), entity(nullptr) { }
+    reFloat distSq;
+    reEnt* entity;
+  };
 }
 
 #endif

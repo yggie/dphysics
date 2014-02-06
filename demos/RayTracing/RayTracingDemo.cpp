@@ -5,6 +5,7 @@
 #include "react/Entities/reEnt.h"
 #include "react/Entities/reRigidBody.h"
 #include "react/Collision/reBroadPhase.h"
+#include "react/Collision/reBSPTree.h"
 
 #define GLM_FORCE_RADIANS
 #include <glm/gtc/matrix_transform.hpp>
@@ -41,8 +42,8 @@ namespace {
   }
 }
 
-RayTracingDemo::RayTracingDemo() : re::demo::App(), _world(), _maxDepth(5), _imageWidth(1), _imageHeight(1), _outputFile(), _fovy(45.0), _viewMat(1.0), _ambient(0.2f, 0.2f, 0.2f), _attenuation(1.0f, 0.0f, 0.0f), _lights(), _pixels(nullptr), _renderWidth(128), _renderHeight(96), _infinityColor(0.0, 0.0, 0.0), _sceneFile(), _lightNo(0) {
-  _sceneFile = "resources/ray/samples/scene6.test";
+RayTracingDemo::RayTracingDemo() : re::demo::App(), _world(), _maxDepth(5), _imageWidth(1), _imageHeight(1), _outputFile(), _fovy(45.0), _viewMat(1.0), _ambient(0.2f, 0.2f, 0.2f), _attenuation(1.0f, 0.0f, 0.0f), _lights(), _pixels(nullptr), _renderWidth(128), _renderHeight(96), _infinityColor(0.0, 0.0, 0.0), _sceneFile(), _lightNo(0), _raysSent(0) {
+  _sceneFile = "resources/ray/samples/scene5.test";
 }
 
 RayTracingDemo::~RayTracingDemo() {
@@ -113,6 +114,7 @@ void RayTracingDemo::draw() {
   }
   
   glFlush();
+  glutSwapBuffers();
 }
 
 void RayTracingDemo::onResize(unsigned int w, unsigned int h) {
@@ -187,6 +189,7 @@ const re::vec RayTracingDemo::shootRay(unsigned int depth, const re::vec& origin
   
   re::vec intersect, norm;
   // primary ray
+  _raysSent++;
   const reEnt* ent = _world.queryWithRay(origin, dir, &intersect, &norm);
   
   // no more objects in this direction
@@ -214,6 +217,7 @@ const re::vec RayTracingDemo::shootRay(unsigned int depth, const re::vec& origin
     
     // trace shadow rays to light sources
     re::vec objIntersect;
+    _raysSent++;
     reEnt* other = _world.queryWithRay(intersect, ray, &objIntersect);
     
     // if query is successful
@@ -270,6 +274,7 @@ void RayTracingDemo::resizeImage(GLsizei w, GLsizei h) {
 
 void RayTracingDemo::renderScene(GLsizei w, GLsizei h) {
   resizeImage(w, h);
+  _raysSent = 0;
   const float aspectRatio = w / float(h);
   const float fovy = glm::radians(_fovy / 2.0);
   const float fovx = aspectRatio * fovy;
@@ -296,6 +301,10 @@ void RayTracingDemo::renderScene(GLsizei w, GLsizei h) {
   const re::vec eye = _inverseViewMat.mult(re::vec(0,0,0), 1.0);
   
   _world.broadPhase().rebalance();
+  ((reBSPTree&)_world.broadPhase()).execute([](reBSPNode& node) {
+    printf("%d-%d\n", node.depth(), node.placements());
+    return false;
+  });
   reBPMeasure m = _world.broadPhase().measure();
   printf("[INFO]   B-Phase: (refRatio=%.2f, child=%d, leafs=%d, meanDepth=%.1f)\n", m.references/(float)m.entities, m.children, m.leafs, m.meanLeafDepth);
   
@@ -339,6 +348,7 @@ void RayTracingDemo::renderScene(GLsizei w, GLsizei h) {
   statusUpdate(100.0, timeBetween(start, now));
   gettimeofday(&lastChecked, nullptr);
   printf("---------------------------------------\n");
+  printf("Query Efficiency: %.1f%%\n", 100.0 * (_world.entities().size() * _raysSent) / double(re::queriesMade));
   
   re::queriesMade = 0;
   

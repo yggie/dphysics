@@ -6,7 +6,7 @@
 #include "react/Utilities/util_funcs.h"
 #include "react/Collision/Shapes/reProxyShape.h"
 
-reBSPNode::reBSPNode(reAllocator& allocator, reUInt depth) : _allocator(allocator), _markers(allocator), _children{nullptr}, _normal(), _center(), _depth(depth) {
+reBSPNode::reBSPNode(reAllocator& allocator, reUInt depth) : _allocator(allocator), _markers(allocator), _children{nullptr}, _splitNormal(1.0, 0.0, 0.0), _splitCenter(), _depth(depth) {
   // do nothing
 }
 
@@ -62,7 +62,7 @@ void reBSPNode::rebalanceNode(reTreeBalanceStrategy& strategy) {
 void reBSPNode::updateContacts(reContactGraph& contacts, reEnt& entity) const {
   if (hasChildren()) {
     // propagate call to children
-    switch (entity.fastPlaneIntersect(_normal, _center)) {
+    switch (entity.fastPlaneIntersect(_splitNormal, _splitCenter)) {
       case re::PlaneQuery::FRONT:
         _children[0]->updateContacts(contacts, entity);
         return;
@@ -100,71 +100,61 @@ bool reBSPNode::execute(reBSPTreeCallback callback) {
   return false;
 }
 
-//reEnt* reBSPNode::queryWithRay(const reRayQuery& query, reRayQueryResult& result) const {
-//  
-//  if (!_entities.empty() && !isRoot()) {
-//    // this must be a leaf node, proceed to entity query
-//    reRayQueryResult res;
-//    reFloat maxDistSq = RE_INFINITY;
-//    reEnt* resultEnt = nullptr;
-//    
-//    auto end = _entities.qEnd();
-//    for (auto iter = _entities.qBegin(); iter != end; ++iter) {
-//      reQueryable& q = *iter;
-//      if (q.queryID == query.ID) {
-//        continue;
-//      }
-//      re::queriesMade++;
-//      q.queryID = query.ID;
-//      if (q.ent.intersectsRay(query, res)) {
-//        if (res.distSq < maxDistSq) {
-//          resultEnt = &q.ent;
-//          maxDistSq = res.distSq;
-//          result = res;
-//        }
-//      }
-//    }
-//    
-//    return resultEnt;
-//  } else {
-//    reRayQueryResult res[2];
-//    reEnt* ent[2] = { nullptr };
-//    
-//    for (reUInt i = 0; i < 2; i++) {
-//      // check if the hyperplane contains the ray
-//      if (re::dot(query.dir, _child[i]->dir) > 0.0 || re::dot(query.origin - _child[i]->anchor, _child[i]->dir) > 0.0) {
-//        ent[i] = _child[i]->queryWithRay(query, res[i]);
-//      }
-//    }
-//    
-//    if (res[0].distSq < res[1].distSq) {
-//      result = res[0];
-//      return ent[0];
-//    } else {
-//      result = res[1];
-//      return ent[1];
-//    }
-//    
-//    return nullptr;
-//  }
-//}
+void reBSPNode::queryWithRay(const reRayQuery& query, re::RayResult& result) const {
+  if (hasChildren()) {
+    const reFloat a = re::dot(query.dir, _splitNormal);
+    const reFloat b = re::dot(_splitNormal, query.origin - _splitCenter);
+    if (a > RE_FP_TOLERANCE && b > RE_FP_TOLERANCE) {
+      _children[0]->queryWithRay(query, result);
+      return;
+    } else if (a < RE_FP_TOLERANCE && b < RE_FP_TOLERANCE) {
+      _children[1]->queryWithRay(query, result);
+      return;
+    }
+    
+    _children[0]->queryWithRay(query, result);
+    _children[1]->queryWithRay(query, result);
+  }
+  
+  reRayQueryResult res;
+  for (Marker* marker : _markers) {
+    re::queriesMade++;
+    if (marker->entity.intersectsRay(query, res)) {
+      if (res.distSq < result.distSq) {
+        result.surfaceIntersect = res.intersect;
+        result.surfaceNormal = res.normal;
+        result.distSq = res.distSq;
+        result.entity = &marker->entity;
+      }
+    }
+  }
+}
 
 /**
  * Called when the tree requires branching out
  */
 
 void reBSPNode::split(reTreeBalanceStrategy& strategy) {
-  SplitPlane splitPlane = strategy.computeSplitPlane(_normal, sample(8));
+  // use parent split normal to determine optimal split plane
+  SplitPlane splitPlane = strategy.computeSplitPlane(_splitNormal, sample(8));
   
   // setup each _child node
   for (reUInt i = 0; i < 2; i++) {
     _children[i] = _allocator.alloc_new<reBSPNode>(_allocator, _depth + 1);
-    _children[i]->_normal = splitPlane.normal * ((i % 2 == 0) ? 1 : -1);
-    _children[i]->_center = splitPlane.center;
+    // keep a reference to the parent split plane for later
+    _children[i]->_splitNormal = splitPlane.normal;
+    _children[i]->_splitCenter = splitPlane.center;
   }
   
-  for (Marker* marker : _markers) {
-    marker->node = place(*marker);
+  // apply the computed information current node
+  _splitNormal = splitPlane.normal;
+  _splitCenter = splitPlane.center;
+  
+  auto end = _markers.end();
+  for (auto it = _markers.begin(); it != end;) {
+    Marker* marker = *it;
+    ++it;
+    place(*marker);
   }
   
   _children[0]->rebalanceNode(strategy);
@@ -219,7 +209,7 @@ const reLinkedList<reEnt*> reBSPNode::sample(reUInt num) const {
 
 reBSPNode* reBSPNode::place(Marker& marker) {
   if (hasChildren()) {
-    switch (marker.entity.fastPlaneIntersect(_normal, _center)) {
+    switch (marker.entity.fastPlaneIntersect(_splitNormal, _splitCenter)) {
       case re::PlaneQuery::FRONT:
         return _children[0]->place(marker);
       
@@ -338,8 +328,11 @@ void reBSPTree::rebalance(reTreeBalanceStrategy* strategy) {
 
 void reBSPTree::advance(reIntegrator& integrator, reFloat dt) {
   // advance each entity forward in time and relocates them on the tree
-  for (Marker* marker : _markers) {
+  auto end = _markers.end();
+  for (auto it = _markers.begin(); it != end;) {
+    Marker* marker = *it;
     marker->entity.advance(integrator, dt);
+    ++it;
     place(*marker);
   }
   

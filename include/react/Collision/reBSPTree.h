@@ -58,7 +58,7 @@ public:
   const reLinkedList<reEnt*> sample(reUInt size) const;
   
   // spatial queries
-//  reEnt* queryWithRay(const reRayQuery& query, reRayQueryResult& result) const;
+  void queryWithRay(const reRayQuery& query, re::RayResult& result) const;
 
   reBSPNode* place(Marker& marker);
   
@@ -70,9 +70,9 @@ protected:
   /** The direct descendents of this node */
   reBSPNode* _children[2];
   /** The split direction of the node */
-  re::vec3 _normal;
+  re::vec3 _splitNormal;
   /** A point along the split plane */
-  re::vec3 _center;
+  re::vec3 _splitCenter;
   /** The current depth */
   const reUInt _depth;
 };
@@ -101,7 +101,7 @@ public:
   const reLinkedList<reEnt*>& entities() const override;
   
   // spatial queries
-  reEnt* queryWithRay(const reRayQuery&, reRayQueryResult&) const override { return nullptr; }
+  re::RayResult queryWithRay(const reRayQuery& query) const override;
   
   // measurement
   reBPMeasure measure() const override;
@@ -150,6 +150,12 @@ inline const reLinkedList<reEnt*>& reBSPTree::entities() const {
 
 inline reUInt reBSPTree::size() const {
   return _masterEntityList.size();
+}
+
+inline re::RayResult reBSPTree::queryWithRay(const reRayQuery& query) const {
+  re::RayResult result;
+  reBSPNode::queryWithRay(query, result);
+  return result;
 }
 
 inline reBPMeasure reBSPTree::measure() const {

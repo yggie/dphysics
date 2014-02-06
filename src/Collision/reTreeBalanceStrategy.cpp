@@ -11,7 +11,7 @@
  */
 
 bool reTreeBalanceStrategy::shouldMerge(const reBSPNode& node) {
-  return (node.hasChildren() && 
+  return (node.hasChildren() && !node.child(0).hasChildren() &&
             (node.placements() +
              node.child(0).placements() +
              node.child(1).placements() < 15));

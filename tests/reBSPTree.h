@@ -111,6 +111,14 @@ TEST_F(reBSPTreeTest, Sampling) {
   ASSERT_NO_MEM_LEAKS();
 }
 
+namespace {
+  unsigned int placements;
+  bool countPlacements(reBSPNode& node) {
+    placements += node.placements();
+    return false;
+  }
+}
+
 TEST_F(reBSPTreeTest, TreeBalancing) {
   generateFixtures(1000);
   
@@ -126,6 +134,14 @@ TEST_F(reBSPTreeTest, TreeBalancing) {
   
   ASSERT_FALSE(tree.isLeaf()) <<
     "should branch off when containing a large number of entities";
+  
+  ASSERT_LT(tree.placements(), fixtures.size()/3) <<
+    "should have dispersed the elements throughout the tree";
+  
+  placements = 0;
+  tree.execute(countPlacements);
+  ASSERT_EQ(placements, fixtures.size()) <<
+    "should not lose references in the structure";
   
   reBPMeasure m = tree.measure();
   ASSERT_EQ(m.references, m.entities) <<
@@ -151,5 +167,48 @@ TEST_F(reBSPTreeTest, TreeBalancing) {
     "should be able to remove all entities in the structure";
   
   ASSERT_NO_MEM_LEAKS();
+}
+
+TEST_F(reBSPTreeTest, RayQueries) {
+  const int N = 20; // too high will make it slow
+  generateFixtures(N*N);
+  
+  for (int i = 0; i < N; i++) {
+    for (int j = 0; j < N; j++) {
+      reRigidBody* body = fixtures.at(N*i + j);
+      body->setPos(3.0 * re::vec3(i - N/2, j - N/2, 0.0));
+      ASSERT_TRUE(tree.add(*body)) <<
+        "should be able to add new entities";
+    }
+  }
+  
+  reRayQuery query;
+  query.origin = re::vec3(0.0, 0.0, 100.0);
+  unsigned int II = 0;
+  for (reRigidBody* body : fixtures) {
+    query.dir = re::normalize(body->center() - query.origin);
+    re::RayResult res = tree.queryWithRay(query);
+    ASSERT_TRUE(body == res.entity) <<
+      "should return the correct entity";
+  }
+  
+  tree.rebalance();
+  ASSERT_EQ(tree.size(), fixtures.size()) <<
+    "should not lose elements when rebalancing";
+  
+  placements = 0;
+  tree.execute(countPlacements);
+  ASSERT_EQ(placements, fixtures.size()) <<
+    "should not lose references in the structure";
+  
+  query.origin = re::vec3(0.0, 0.0, 1000.0);
+  II = 0;
+  for (reRigidBody* body : fixtures) {
+    query.dir = re::normalize(body->center() - query.origin);
+    re::RayResult res = tree.queryWithRay(query);
+    ASSERT_TRUE(body == res.entity) <<
+      "should still work after rebalancing loop@" << II;
+    II++;
+  }
 }
 
