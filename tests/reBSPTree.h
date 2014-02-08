@@ -187,6 +187,7 @@ TEST_F(reBSPTreeTest, RayQueries) {
   unsigned int II = 0;
   for (reRigidBody* body : fixtures) {
     query.dir = re::normalize(body->center() - query.origin);
+//    re::SingleResult res = tree.query().withRay(start, direction);
     re::RayResult res = tree.queryWithRay(query);
     ASSERT_TRUE(body == res.entity) <<
       "should return the correct entity";

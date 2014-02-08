@@ -15,6 +15,10 @@
 # Gedit backup files
 *~
 
+# ignore VIM backup files
+*.swo
+*.swp
+
 # Ignore cmake build files
 CMakeCache.txt*
 CMakeFiles
@@ -26,8 +30,11 @@ Makefile*
 /ray
 /tests/tests
 /legacy
+/tests/Math/math_tests
+/tests/Collision/Shapes/shapes_tests
 
 # Ignore generated Makefiles
 *.d
 
 *.user
+

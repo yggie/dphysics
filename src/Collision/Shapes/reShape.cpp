@@ -3,20 +3,6 @@
 #include "react/math.h"
 #include "react/Collision/reAABB.h"
 
-void reShape::updateAABB(const re::mat3& parentRotation) {
-  _aabb.dimens().setZero();
-  for (reUInt i = 0; i < numVerts(); i++) {
-    const re::vec3 v = parentRotation * vert(i);
-    
-    for (reUInt j = 0; j < 3; j++) {
-      const reFloat d = re::abs(v[j]) + shell();
-      if (d > _aabb.dimens()[j]) {
-        _aabb.dimens()[j] = d;
-      }
-    }
-  }
-}
-
 bool reShape::containsPoint(const reTransform& transform, const re::vec3& point) const {
   return containsPoint(transform.multPoint(point));
 }

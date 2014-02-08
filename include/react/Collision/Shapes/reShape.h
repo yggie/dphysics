@@ -12,7 +12,7 @@
 
 /**
  * @ingroup shapes
- * Represents an shape with defined geometric qualities
+ * Represents a shape primitive for collision detection
  */
 
 class reShape {
@@ -29,7 +29,11 @@ public:
     /** A planar triangle @see reTriangle */
     TRIANGLE,
     /** A wrapper around shapes allow arbitrary transforms @see reProxyShape */
-    PROXY
+    PROXY,
+    /** A plane primitive @see re::Plane */
+    PLANE,
+    /** A line segment primitive @see re::Segment */
+    SEGMENT
   };
   
   reShape();
@@ -38,16 +42,13 @@ public:
   // shape representation
   virtual Type type() const = 0;
   virtual reUInt numVerts() const = 0;
-  virtual const re::vec vert(reUInt i) const = 0;
+  virtual const re::vec3 vert(reUInt i) const = 0;
   virtual reFloat shell() const;
   
   // physical metrics
   virtual reFloat volume() const = 0;
   virtual const re::mat3 computeInertia() const = 0;
-  virtual const re::vec offset() const;
-  
-  const reAABB& aabb() const;
-  virtual void updateAABB(const re::mat3& parentRot);
+  virtual const re::vec3 offset() const;
   
   // utility methods
   virtual const re::vec3 randomPoint() const = 0;
@@ -64,7 +65,6 @@ public:
   virtual re::PlaneQuery::FastResult fastPlaneIntersect(const re::vec3& normal, const re::vec3& center) const;
   
 protected:
-  reAABB _aabb;
   reFloat _shell;
 };
 
@@ -126,17 +126,13 @@ inline reFloat reShape::shell() const {
   return _shell;
 }
 
-inline const reAABB& reShape::aabb() const {
-  return _aabb;
-}
-
 /**
  * Returns the offset required from the reEnt position to reach the centroid
  * 
  * @return The position of the centroid in model space
  */
 
-inline const re::vec reShape::offset() const {
+inline const re::vec3 reShape::offset() const {
   return re::vec(0.0, 0.0, 0.0);
 }
 

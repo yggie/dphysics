@@ -19,6 +19,15 @@ TEST(SphereTest, ChangingRadius) {
   ASSERT_FLOAT_EQ(s.radius(), 15.0) << "can change the radius with a setter";
 }
 
+TEST(SphereTest, Volume) {
+  for (unsigned int i = 0; i < NUM_SAMPLES; i++) {
+    const float r = re::randf(1.0, 100.0);
+    const reSphere s(r);
+    ASSERT_LE(re::abs(s.volume() - RE_PI*4.0*r*r*r/3.0), 0.001*s.volume()) <<
+      "should return the volume within tolerance";
+  }
+}
+
 TEST(SphereTest, VertexData) {
   reSphere s(33.3);
   
@@ -82,13 +91,13 @@ TEST(SphereTest, FastPlaneIntersection) {
     
     if (re::abs(d) < 1.0 + RE_FP_TOLERANCE) {
       ASSERT_TRUE(r == re::PlaneQuery::INTERSECTS) <<
-        "should intersect when the dot product is less than the radius loop@" << i;
+        "should intersect when the dot product is less than the radius";
     } else if (d > 0.0) {
       ASSERT_TRUE(r == re::PlaneQuery::BEHIND) <<
-        "should be behind the plane loop@" << i;
+        "should be behind the plane";
     } else {
       ASSERT_TRUE(r == re::PlaneQuery::FRONT) <<
-        "should be in front of the plane loop@" << i;
+        "should be in front of the plane";
     }
   }
 }

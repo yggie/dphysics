@@ -112,7 +112,7 @@ protected:
   reContactGraph _contacts;
   /** The strategy used to balance the tree */
   reTreeBalanceStrategy _strategy;
-  reLinkedList<Marker*> _masterMarkersList;
+  reLinkedList<Marker*> _allMarkers;
   reLinkedList<reEnt*> _masterEntityList;
 };
 

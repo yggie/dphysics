@@ -255,7 +255,7 @@ void reBSPNode::measureRecursive(reBPMeasure& m) const {
   m.references += _markers.size();
 }
 
-reBSPTree::reBSPTree(reAllocator& allocator) : reBroadPhase(), reBSPNode(allocator, 0), _contacts(allocator), _strategy(), _masterMarkersList(allocator), _masterEntityList(allocator) {
+reBSPTree::reBSPTree(reAllocator& allocator) : reBroadPhase(), reBSPNode(allocator, 0), _contacts(allocator), _strategy(), _allMarkers(allocator), _masterEntityList(allocator) {
   // do nothing
 }
 
@@ -265,7 +265,7 @@ reBSPTree::~reBSPTree() {
 
 void reBSPTree::clear() {
   // clear all entities
-  for (Marker* marker : _masterMarkersList) {
+  for (Marker* marker : _allMarkers) {
     RE_EXPECT(marker->entity.userdata == nullptr)
     if (marker->entity.shape()->type() == reShape::PROXY) {
       allocator().alloc_delete(
@@ -278,7 +278,7 @@ void reBSPTree::clear() {
   }
   
   // clear all broken references
-  _masterMarkersList.clear();
+  _allMarkers.clear();
   _masterEntityList.clear();
   
   reBSPNode::clear();
@@ -287,7 +287,7 @@ void reBSPTree::clear() {
 bool reBSPTree::add(reEnt& ent) {
   if (!_masterEntityList.contains(&ent)) {
     Marker* marker = allocator().alloc_new<Marker>(ent);
-    _masterMarkersList.add(marker);
+    _allMarkers.add(marker);
     _masterEntityList.add(&ent);
     place(*marker);
     return true;
@@ -297,13 +297,13 @@ bool reBSPTree::add(reEnt& ent) {
 }
 
 bool reBSPTree::remove(reEnt& ent) {
-  for (Marker* marker : _masterMarkersList) {
+  for (Marker* marker : _allMarkers) {
     if (marker->entity.id() == ent.id()) {
       if (marker->node != nullptr) {
         marker->node->remove(*marker);
       }
       
-      _masterMarkersList.remove(marker);
+      _allMarkers.remove(marker);
       _masterEntityList.remove(&ent);
       allocator().alloc_delete(marker);
       return true;
@@ -328,8 +328,8 @@ void reBSPTree::rebalance(reTreeBalanceStrategy* strategy) {
 
 void reBSPTree::advance(reIntegrator& integrator, reFloat dt) {
   // advance each entity forward in time and relocates them on the tree
-  auto end = _markers.end();
-  for (auto it = _markers.begin(); it != end;) {
+  auto end = _allMarkers.end();
+  for (auto it = _allMarkers.begin(); it != end;) {
     Marker* marker = *it;
     marker->entity.advance(integrator, dt);
     ++it;
@@ -337,7 +337,7 @@ void reBSPTree::advance(reIntegrator& integrator, reFloat dt) {
   }
   
   // update the contacts for each entity
-  for (Marker* marker : _markers) {
+  for (Marker* marker : _allMarkers) {
     marker->node->updateContacts(_contacts, marker->entity);
   }
   

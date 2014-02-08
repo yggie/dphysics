@@ -68,7 +68,7 @@ void PlanetaryMotionDemo::prepareWorld() {
   
   reBuilder build = _world.build();
   
-  reRigidBody& body = build.RigidBody(sphere).withMass(5.0).at(0, 0, -2).rotatingWith(0.0, 0.00, 0.01);
+  reRigidBody& body = build.RigidBody(sphere).withMass(5.0).at(0, -5, -5).rotatingWith(0.0, 0.00, 0.01);
   
   for (int i = 0; i < 15; i++) {
     reRigidBody& b = build.RigidBody(sphere.withRadius(1))
@@ -80,8 +80,8 @@ void PlanetaryMotionDemo::prepareWorld() {
     build.GravAction(body, b);
   }
   
-  reRigidBody& A = build.RigidBody(sphere).withMass(2.0).at(-3, -1, -5).movingAt(re::vec3(0.01, 0.0, 0.0));
-  reRigidBody& B = build.RigidBody(sphere).withMass(2.0).at(3, 3, -5);
+  reRigidBody& A = build.RigidBody(sphere).withMass(2.0).at(-6, -1, -5).movingAt(re::vec3(0.01, 0.0, 0.0));
+  reRigidBody& B = build.RigidBody(sphere).withMass(2.0).at(6, 3, -5);
   
   build.GravAction(A, B);
   build.GravAction(body, B);
