@@ -21,6 +21,8 @@ namespace re{
     mat3x3(const mat3x3& m);
     /** Creates a diagonal matrix from the input scalar */
     mat3x3(reFloat s);
+    /** Creates a matrix from the given vectors, treating each as a column in the new matrix */
+    mat3x3(const re::vec3& a, const re::vec3& b, const re::vec3& c);
     /** Creates a diagonal matrix from the input scalars */
     mat3x3(reFloat m11, reFloat m22, reFloat m33);
     /** Creates the matrix defined element by element from scalar inputs */
@@ -64,9 +66,31 @@ namespace re{
   
   typedef mat3x3 mat3;
 
-  inline mat3x3::mat3x3() : mat3x3(1.0) { }
-  inline mat3x3::mat3x3(const mat3x3& m) { *this = m; }
-  inline mat3x3::mat3x3(reFloat s) : mat3x3(s, s, s) { }
+  inline mat3x3::mat3x3() : mat3x3(1.0) {
+    // do nothing
+  }
+
+  inline mat3x3::mat3x3(const mat3x3& m) {
+    *this = m;
+  }
+
+  inline mat3x3::mat3x3(reFloat s) : mat3x3(s, s, s) {
+    // do nothing
+  }
+
+  inline mat3x3::mat3x3(const re::vec3& a, const re::vec3& b, const re::vec3& c) {
+    e[0] = a[0];
+    e[1] = a[1];
+    e[2] = a[2];
+
+    e[3] = b[0];
+    e[4] = b[1];
+    e[5] = b[2];
+
+    e[6] = c[0];
+    e[7] = c[1];
+    e[8] = c[2];
+  }
 
   inline mat3x3::mat3x3(reFloat m11, reFloat m22, reFloat m33) : e{0.0} {
     e[0] = m11;

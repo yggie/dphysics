@@ -48,7 +48,7 @@ public:
   // physical metrics
   virtual reFloat volume() const = 0;
   virtual const re::mat3 computeInertia() const = 0;
-  virtual const re::vec3 offset() const;
+  virtual const re::vec3 center() const;
   
   // utility methods
   virtual const re::vec3 randomPoint() const = 0;
@@ -127,12 +127,13 @@ inline reFloat reShape::shell() const {
 }
 
 /**
- * Returns the offset required from the reEnt position to reach the centroid
+ * Returns the offset required from the entity center of mass to reach 
+ * the shape centroid
  * 
  * @return The position of the centroid in model space
  */
 
-inline const re::vec3 reShape::offset() const {
+inline const re::vec3 reShape::center() const {
   return re::vec(0.0, 0.0, 0.0);
 }
 

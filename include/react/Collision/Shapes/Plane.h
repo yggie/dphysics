@@ -4,6 +4,12 @@
 #include "react/Collision/Shapes/reShape.h"
 
 namespace re {
+
+  /**
+   * @ingroup shapes
+   * Represents an infinite plane
+   */
+
   class Plane : public reShape {
   public:
     Plane(const re::vec3& normal, const re::vec3& point);
@@ -18,7 +24,9 @@ namespace re {
     // physical metrics
     reFloat volume() const override;
     const re::mat3 computeInertia() const override;
-    const re::vec3 offset() const override;
+    const re::vec3 center() const override;
+    reFloat offset() const;
+    const re::vec3& normal() const;
 
     // utility methods
     const re::vec3 randomPoint() const override;
@@ -41,7 +49,7 @@ namespace re {
    * point on the plane.
    */
 
-  inline Plane::Plane(const re::vec3& normal, const re::vec3& point) : _normal(normal), _offset(re::dot(normal, point)) {
+  inline Plane::Plane(const re::vec3& normal, const re::vec3& point) : _normal(re::normalize(normal)), _offset(re::dot(_normal, point)) {
     // do nothing
   }
 
@@ -74,12 +82,24 @@ namespace re {
     return re::mat3(1.0);
   }
 
-  inline const re::vec3 Plane::offset() const {
+  inline const re::vec3 Plane::center() const {
     return _offset * _normal;
+  }
+
+  inline reFloat Plane::offset() const {
+    return _offset;
+  }
+
+  inline const re::vec3& Plane::normal() const {
+    return _normal;
   }
 
   inline const re::vec3 Plane::randomPoint() const {
     return _normal * _offset + re::cross(_normal, re::vec3::rand(1000.0));
+  }
+
+  inline bool Plane::containsPoint(const re::vec3& point) const {
+    return re::abs(re::dot(point, _normal) - _offset) < RE_FP_TOLERANCE;
   }
 }
 

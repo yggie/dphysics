@@ -173,7 +173,7 @@ inline const reTransform reEnt::transform() const {
 
 inline const re::vec3 reEnt::center() const {
   if (shape() != nullptr) {
-    return _pos + shape()->offset();
+    return _pos + shape()->center();
   } else {
     return _pos;
   }

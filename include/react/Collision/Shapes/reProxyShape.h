@@ -35,9 +35,9 @@ public:
   // shape representation
   reShape::Type type() const override;
   reUInt numVerts() const override;
-  const re::vec vert(reUInt i) const override;
+  const re::vec3 vert(reUInt i) const override;
   reFloat shell() const override;
-  const re::vec offset() const override;
+  const re::vec3 center() const override;
   
   // physical metrics
   reFloat volume() const override;
@@ -91,7 +91,7 @@ inline reUInt reProxyShape::numVerts() const {
   }
 }
 
-inline const re::vec reProxyShape::vert(reUInt i) const {
+inline const re::vec3 reProxyShape::vert(reUInt i) const {
   if (_shape != nullptr) {
     return _shape->vert(i);
   } else {
@@ -107,9 +107,9 @@ inline reFloat reProxyShape::shell() const {
   }
 }
 
-inline const re::vec reProxyShape::offset() const {
+inline const re::vec3 reProxyShape::center() const {
   if (_shape != nullptr) {
-    return _shape->offset() + _transform.v;
+    return _shape->center() + _transform.v;
   } else {
     return _transform.v;
   }

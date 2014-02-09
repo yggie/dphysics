@@ -1,6 +1,7 @@
 #include "helpers.h"
 
 // shape module unit tests
+#include "Plane.h"
 #include "reSphere.h"
 #include "reProxyShape.h"
 

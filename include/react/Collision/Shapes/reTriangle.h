@@ -26,14 +26,14 @@ public:
   // shape representation
   reShape::Type type() const override;
   reUInt numVerts() const override;
-  const re::vec vert(reUInt i) const override;
-  const re::vec offset() const override;
+  const re::vec3 vert(reUInt i) const override;
+  const re::vec3 center() const override;
   
   // physical metrics
   reFloat volume() const override;
   const re::mat3 computeInertia() const;
   
-  const re::vec faceNorm() const;
+  const re::vec3 faceNorm() const;
   
   // utility methods
   const re::vec3 randomPoint() const override;
@@ -43,7 +43,7 @@ public:
   bool intersectsRay(const reRayQuery& query, reRayQueryResult& result) const override;
   
 private:
-  re::vec _verts[3];
+  re::vec3 _verts[3];
 };
 
 inline reTriangle::reTriangle() : _verts() {
@@ -84,11 +84,11 @@ inline reUInt reTriangle::numVerts() const {
   return 3;
 }
 
-inline const re::vec reTriangle::vert(reUInt i) const {
+inline const re::vec3 reTriangle::vert(reUInt i) const {
   return _verts[i];
 }
 
-inline const re::vec reTriangle::offset() const {
+inline const re::vec3 reTriangle::center() const {
   return (_verts[0] + _verts[1] + _verts[2]) / 3.0;
 }
 
@@ -130,7 +130,7 @@ inline const re::mat3 reTriangle::computeInertia() const {
   return re::mat3(1.0f);
 }
 
-inline const re::vec reTriangle::faceNorm() const {
+inline const re::vec3 reTriangle::faceNorm() const {
   return re::normalize(re::cross(_verts[0] - _verts[1], _verts[2] - _verts[1]));
 }
 
