@@ -2,7 +2,7 @@
 
 #include "react/Collision/Shapes/Ray.h"
 
-TEST(RayTest, Construction) {
+TEST(Ray, Constructor_test) {
   const re::vec3 origin = re::vec3(1.0, 0.3, -3.0);
   const Ray ray(origin, re::vec3(100.0, 0.0, 0.0));
 

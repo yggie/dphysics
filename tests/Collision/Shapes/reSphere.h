@@ -2,7 +2,7 @@
 
 #include "react/Collision/Shapes/reSphere.h"
 
-TEST(SphereTest, Creation) {
+TEST(Sphere, Constructor_test) {
   reSphere s(3.0);
   
   ASSERT_FLOAT_EQ(s.radius(), 3.0) << "should create a sphere with given radius";
@@ -10,17 +10,21 @@ TEST(SphereTest, Creation) {
   ASSERT_TRUE(s.type() == reShape::SPHERE) << "should have the correct type";
 }
 
-TEST(SphereTest, ChangingRadius) {
+TEST(Sphere, withRadius_test) {
   reSphere s(1.0);
   
   ASSERT_FLOAT_EQ(s.withRadius(50.0).radius(), 50.0) << "can change the radius with a chainable method";
-  
+}
+
+TEST(Sphere, setRadius_test) {
+  reSphere s(1.0);
+
   s.setRadius(15.0);
   ASSERT_FLOAT_EQ(s.radius(), 15.0) << "can change the radius with a setter";
 }
 
-TEST(SphereTest, Volume) {
-  for (unsigned int i = 0; i < NUM_SAMPLES; i++) {
+TEST(Sphere, volume_test) {
+  for (unsigned int i = 0; i < NUM_REPEATS; i++) {
     const float r = re::randf(1.0, 100.0);
     const reSphere s(r);
     ASSERT_LE(re::abs(s.volume() - RE_PI*4.0*r*r*r/3.0), 0.001*s.volume()) <<
@@ -28,7 +32,7 @@ TEST(SphereTest, Volume) {
   }
 }
 
-TEST(SphereTest, VertexData) {
+TEST(Sphere, VertexData_test) {
   reSphere s(33.3);
   
   ASSERT_FLOAT_EQ(s.shell(), 33.3) << "shell thickness and radius should be equivalent";
@@ -39,7 +43,7 @@ TEST(SphereTest, VertexData) {
     "should have its only vertex at the origin";
 }
 
-TEST(SphereTest, QueryTest) {
+TEST(Sphere, Something_test) {
   reSphere s(5.0);
   reRayQueryResult res;
   for (reUInt i = 0; i < NUM_SAMPLES; i++) {
@@ -62,7 +66,7 @@ TEST(SphereTest, QueryTest) {
   }
 }
 
-TEST(SphereTest, RayIntersectionSadPaths) {
+TEST(Sphere, SomeOtherThing_test) {
   reSphere s(2.0);
   
   reRayQueryResult res;
@@ -79,7 +83,7 @@ TEST(SphereTest, RayIntersectionSadPaths) {
   }
 }
 
-TEST(SphereTest, FastPlaneIntersection) {
+TEST(Sphere, fastPlaneIntersect_test) {
   reSphere s(1.0);
   
   for (reUInt i = 0; i < NUM_SAMPLES; i++) {

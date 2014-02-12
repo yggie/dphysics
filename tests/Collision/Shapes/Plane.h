@@ -2,7 +2,7 @@
 
 #include "react/Collision/Shapes/Plane.h"
 
-TEST(rePlaneTest, Constructor) {
+TEST(Plane, Constructor_test) {
   const re::Plane plane(re::vec3(1000.0, 0.0, 0.0), re::vec3(50.0, 130.0, -540.0));
 
   ASSERT_FLOAT_EQ(re::length(plane.normal()), 1.0) <<
