@@ -9,6 +9,9 @@
 #include "react/math.h"
 #include "react/Collision/reAABB.h"
 #include "react/Collision/reSpatialQueries.h"
+#include "react/Collision/Shapes/Ray.h"
+#include "react/Collision/Shapes/Plane.h"
+#include "react/Collision/Shapes/Segment.h"
 
 /**
  * @ingroup shapes
@@ -29,11 +32,7 @@ public:
     /** A planar triangle @see reTriangle */
     TRIANGLE,
     /** A wrapper around shapes allow arbitrary transforms @see reProxyShape */
-    PROXY,
-    /** A plane primitive @see re::Plane */
-    PLANE,
-    /** A line segment primitive @see re::Segment */
-    SEGMENT
+    PROXY
   };
   
   reShape();
@@ -64,6 +63,7 @@ public:
   
   virtual re::PlaneQuery::FastResult fastPlaneIntersect(const re::vec3& normal, const re::vec3& center) const;
   
+  virtual re::Plane::Location locationInPlane(const re::Plane& plane) const;
 protected:
   reFloat _shell;
 };

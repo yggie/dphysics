@@ -151,8 +151,8 @@ void Canvas::renderScene() {
   }
 }
 
-Plane::Instance& Canvas::addPlane(const re::vec3& normal, const re::vec3& side, const re::vec3& center, float width) {
-  Plane::Instance* plane = new Plane::Instance(normal, side, center, width, width);
+re::demo::Plane::Instance& Canvas::addPlane(const re::vec3& normal, const re::vec3& side, const re::vec3& center, float width) {
+  re::demo::Plane::Instance* plane = new re::demo::Plane::Instance(normal, side, center, width, width);
   add(plane);
   return *plane;
 }

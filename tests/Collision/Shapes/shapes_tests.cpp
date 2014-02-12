@@ -1,7 +1,10 @@
 #include "helpers.h"
 
-// shape module unit tests
+// volume-less shape types
+#include "Ray.h"
 #include "Plane.h"
+
+// complex shape types
 #include "reSphere.h"
 #include "reProxyShape.h"
 

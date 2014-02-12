@@ -54,4 +54,32 @@ re::PlaneQuery::FastResult reShape::fastPlaneIntersect(const re::vec3& normal, c
   
   return re::PlaneQuery::INTERSECTS;
 }
-
+re::Plane::Location reShape::locationInPlane(const re::Plane& plane) const {
+  const reUInt N = numVerts();
+  reFloat maxV = RE_NEGATIVE_INFINITY;
+  reFloat minV = RE_INFINITY;
+  
+  for (reUInt i = 0; i < N; i++) {
+    const reFloat dat = re::dot(vert(i), plane.normal()) - plane.offset();
+    const reFloat mx = dat + shell();
+    const reFloat mn = dat - shell();
+    if (mx > maxV) {
+      maxV = mx;
+    }
+    if (mn < minV) {
+      minV = mn;
+    }
+    if ((maxV > RE_FP_TOLERANCE && minV < RE_FP_TOLERANCE) ||
+        (maxV < RE_FP_TOLERANCE && minV > RE_FP_TOLERANCE)) {
+      return re::Plane::ON_PLANE;
+    }
+  }
+  
+  if (minV > RE_FP_TOLERANCE && maxV > RE_FP_TOLERANCE) {
+    return re::Plane::FRONT_OF_PLANE;
+  } else if (minV < RE_FP_TOLERANCE && maxV < RE_FP_TOLERANCE) {
+    return re::Plane::BACK_OF_PLANE;
+  }
+  
+  return re::Plane::ON_PLANE;
+}
