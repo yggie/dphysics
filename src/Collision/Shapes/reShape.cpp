@@ -25,35 +25,6 @@ bool reShape::intersectsRay(const reTransform& transform, const reRayQuery& quer
   return false;
 }
 
-re::PlaneQuery::FastResult reShape::fastPlaneIntersect(const re::vec3& normal, const re::vec3& center) const {
-  const reUInt N = numVerts();
-  reFloat maxV = RE_NEGATIVE_INFINITY;
-  reFloat minV = RE_INFINITY;
-  
-  for (reUInt i = 0; i < N; i++) {
-    const reFloat dat = re::dot(vert(i) - center, normal);
-    const reFloat mx = dat + shell();
-    const reFloat mn = dat - shell();
-    if (mx > maxV) {
-      maxV = mx;
-    }
-    if (mn < minV) {
-      minV = mn;
-    }
-    if ((maxV > RE_FP_TOLERANCE && minV < RE_FP_TOLERANCE) ||
-        (maxV < RE_FP_TOLERANCE && minV > RE_FP_TOLERANCE)) {
-      return re::PlaneQuery::INTERSECTS;
-    }
-  }
-  
-  if (minV > RE_FP_TOLERANCE && maxV > RE_FP_TOLERANCE) {
-    return re::PlaneQuery::FRONT;
-  } else if (minV < RE_FP_TOLERANCE && maxV < RE_FP_TOLERANCE) {
-    return re::PlaneQuery::BEHIND;
-  }
-  
-  return re::PlaneQuery::INTERSECTS;
-}
 re::Plane::Location reShape::locationInPlane(const re::Plane& plane) const {
   const reUInt N = numVerts();
   reFloat maxV = RE_NEGATIVE_INFINITY;
@@ -83,3 +54,4 @@ re::Plane::Location reShape::locationInPlane(const re::Plane& plane) const {
   
   return re::Plane::ON_PLANE;
 }
+

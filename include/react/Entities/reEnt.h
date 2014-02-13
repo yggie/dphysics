@@ -87,7 +87,7 @@ public:
   // collision queries
   bool intersectsRay(const reRayQuery& query, reRayQueryResult& result) const;
   
-  re::PlaneQuery::FastResult fastPlaneIntersect(const re::vec3& normal, const re::vec3& center) const;
+  re::Plane::Location locationInPlane(const re::Plane& plane);
   
   /** a pointer to arbitrary data, defined by the user */
   void* userdata;
@@ -248,9 +248,9 @@ inline bool reEnt::intersectsRay(const reRayQuery& query, reRayQueryResult& resu
   return false;
 }
 
-inline re::PlaneQuery::FastResult reEnt::fastPlaneIntersect(const re::vec3& normal, const re::vec3& center) const {
+inline re::Plane::Location reEnt::locationInPlane(const re::Plane& plane) {
   reTransform inv = re::inverse(transform());
-  return _shape->fastPlaneIntersect(inv.multDir(normal), inv.multPoint(center));
+  return _shape->locationInPlane(re::Plane::apply(inv, plane));
 }
 
 /**

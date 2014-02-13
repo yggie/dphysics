@@ -113,8 +113,21 @@ TEST_F(reBSPTreeTest, Sampling) {
 
 namespace {
   unsigned int placements;
+  unsigned int maxPlacements;
+  unsigned int minPlacements;
+  void prep(unsigned int total) {
+    placements = 0;
+    maxPlacements = 0;
+    minPlacements = total;
+  }
   bool countPlacements(reBSPNode& node) {
     placements += node.placements();
+    if (node.placements() < minPlacements) {
+      minPlacements = node.placements();
+    }
+    if (node.placements() > maxPlacements) {
+      maxPlacements = node.placements();
+    }
     return false;
   }
 }
@@ -138,11 +151,14 @@ TEST_F(reBSPTreeTest, TreeBalancing) {
   ASSERT_LT(tree.placements(), fixtures.size()/3) <<
     "should have dispersed the elements throughout the tree";
   
-  placements = 0;
+  prep(fixtures.size());
   tree.execute(countPlacements);
   ASSERT_EQ(placements, fixtures.size()) <<
     "should not lose references in the structure";
   
+  ASSERT_LE(maxPlacements, fixtures.size()/10) <<
+    "should have a reasonably balanced tree";
+
   reBPMeasure m = tree.measure();
   ASSERT_EQ(m.references, m.entities) <<
     "should contain an equal number of references and entities";
@@ -151,9 +167,14 @@ TEST_F(reBSPTreeTest, TreeBalancing) {
     ent->setPos(re::vec3::rand(250.0));
   }
   tree.rebalance();
-  
+
   ASSERT_FALSE(tree.isLeaf()) <<
     "should not lose all its nodes after rebalancing";
+
+  prep(fixtures.size());
+  tree.execute(countPlacements);
+  ASSERT_LE(maxPlacements, fixtures.size()/10) <<
+    "should still have a reasonably balanced tree";
   
   m = tree.measure();
   ASSERT_EQ(m.references, m.entities) <<

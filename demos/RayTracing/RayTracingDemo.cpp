@@ -348,7 +348,7 @@ void RayTracingDemo::renderScene(GLsizei w, GLsizei h) {
   statusUpdate(100.0, timeBetween(start, now));
   gettimeofday(&lastChecked, nullptr);
   printf("---------------------------------------\n");
-  printf("Query Efficiency: %.1f%%\n", 100.0 * (_world.entities().size() * _raysSent) / double(re::queriesMade));
+  printf("Query Efficiency Increase: %.1f%%\n", 100.0 * (_world.entities().size() * _raysSent) / double(re::queriesMade) - 100.0);
   
   re::queriesMade = 0;
   

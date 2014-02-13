@@ -14,6 +14,7 @@ namespace re {
   public:
     Plane(const re::vec3& normal, const re::vec3& point);
     Plane(const re::vec3& normal, reFloat offset);
+    Plane(const re::Plane& plane);
 
     enum Location {
       FRONT_OF_PLANE,
@@ -24,7 +25,10 @@ namespace re {
     const re::vec3& normal() const;
     reFloat offset() const;
 
-  private:
+    Plane& operator=(const Plane& plane);
+
+    static const Plane apply(const reTransform& transform, const Plane& plane);
+  protected:
     re::vec3 _normal;
     reFloat _offset;
   };
@@ -37,12 +41,26 @@ namespace re {
     // do nothing
   }
 
+  inline Plane::Plane(const Plane& plane) : _normal(plane._normal), _offset(plane._offset) {
+    // do nothing
+  }
+
   inline const re::vec3& Plane::normal() const {
     return _normal;
   }
 
   inline reFloat Plane::offset() const {
     return _offset;
+  }
+
+  inline Plane& Plane::operator=(const Plane& plane) {
+    _normal = plane._normal;
+    _offset = plane._offset;
+    return *this;
+  }
+
+  inline const Plane Plane::apply(const reTransform& transform, const Plane& plane) {
+    return Plane(transform.multDir(plane.normal()), transform.multPoint(plane.normal() * plane.offset()));
   }
 }
 

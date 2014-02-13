@@ -83,25 +83,25 @@ TEST(Sphere, SomeOtherThing_test) {
   }
 }
 
-TEST(Sphere, fastPlaneIntersect_test) {
+TEST(Sphere, locationInPlane_test) {
   reSphere s(1.0);
   
   for (reUInt i = 0; i < NUM_SAMPLES; i++) {
-    const re::vec3 origin = re::vec3::rand(1000.0);
+    const re::vec3 origin = re::vec3::rand(5.0);
     const re::vec3 normal = re::normalize(re::vec3::rand());
     
     const reFloat d = re::dot(origin, normal);
-    re::PlaneQuery::FastResult r = s.fastPlaneIntersect(normal, origin);
+    re::Plane::Location loc = s.locationInPlane(re::Plane(normal, origin));
     
     if (re::abs(d) < 1.0 + RE_FP_TOLERANCE) {
-      ASSERT_TRUE(r == re::PlaneQuery::INTERSECTS) <<
-        "should intersect when the dot product is less than the radius";
+      ASSERT_TRUE(loc == re::Plane::ON_PLANE || (re::abs(re::abs(d) - 1.0) < RE_FP_TOLERANCE)) <<
+        "should detect when the object intersects the plane within a tolerance";
     } else if (d > 0.0) {
-      ASSERT_TRUE(r == re::PlaneQuery::BEHIND) <<
-        "should be behind the plane";
+      ASSERT_TRUE(loc == re::Plane::BACK_OF_PLANE) <<
+        "should detect when the object is at the back of the plane";
     } else {
-      ASSERT_TRUE(r == re::PlaneQuery::FRONT) <<
-        "should be in front of the plane";
+      ASSERT_TRUE(loc == re::Plane::FRONT_OF_PLANE) <<
+        "should detect when the object is at the front of the plane";
     }
   }
 }

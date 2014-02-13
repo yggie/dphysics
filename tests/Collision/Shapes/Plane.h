@@ -20,3 +20,22 @@ TEST(Plane, Constructor_test) {
     "should have the correct offset";
 }
 
+TEST(Plane, Copying_test) {
+  const re::Plane plane(re::vec3(0.3, -1.0, 1.0), 33.0);
+  const re::Plane cplane(plane);
+
+  ASSERT_FLOAT_EQ(re::length(plane.normal() - cplane.normal()), 0.0) <<
+    "should have negligible difference in normal direction";
+
+  ASSERT_FLOAT_EQ(plane.offset(), cplane.offset()) <<
+    "should copy the offset correctly";
+
+  const re::Plane coplane = plane;
+
+  ASSERT_FLOAT_EQ(re::length(coplane.normal() - plane.normal()), 0.0) <<
+    "should have negligible difference in normal direction";
+
+  ASSERT_FLOAT_EQ(plane.offset(), coplane.offset()) <<
+    "should copy the offset correctly";
+}
+

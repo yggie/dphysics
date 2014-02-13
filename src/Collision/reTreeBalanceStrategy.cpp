@@ -35,30 +35,28 @@ bool reTreeBalanceStrategy::shouldSplit(const reBSPNode& node) {
  * @param sample A sample of the entities contained in the parent
  */
 
-re::SplitPlane reTreeBalanceStrategy::computeSplitPlane(const re::vec3& parentDir, const reLinkedList<reEnt*>& sample) {
-  re::SplitPlane split;
-  split.center.set(0.0, 0.0, 0.0);
-  
-  re::vec3 guess[3] = {
-    re::normalize(re::cross(parentDir, re::vec3::rand())),
-    re::normalize(re::cross(parentDir, re::vec3::rand())),
-    re::normalize(re::cross(parentDir, re::vec3::rand()))
+re::Plane reTreeBalanceStrategy::computeSplitPlane(const re::vec3& axis, const reLinkedList<reEnt*>& sample) {
+  re::vec3 split(0.0, 0.0, 0.0);
+
+  const re::vec3 guess[3] = {
+    re::normalize(re::cross(axis, re::vec3::rand())),
+    re::normalize(re::cross(axis, re::vec3::rand())),
+    re::normalize(re::cross(axis, re::vec3::rand()))
   };
   
   const reUInt NUM_GUESSES = sizeof(guess) / sizeof(re::vec3);
   
   reFloat score[NUM_GUESSES] = { 0.0 };
   reUInt index = 0;
-  
-  // TODO merge the two loops? (Principle of Superposition)
+
   for (const reEnt* entity : sample) {
-    split.center += entity->center();
+    split += entity->center();
   }
-  split.center /= sample.size();
+  split /= sample.size();
   
   for (const reEnt* entity : sample) {
     for (reUInt i = 0; i < NUM_GUESSES; i++) {
-      score[i] += re::dot(guess[i], split.center - entity->center());
+      score[i] += re::dot(guess[i], - split + entity->center());
     }
   }
   
@@ -68,6 +66,5 @@ re::SplitPlane reTreeBalanceStrategy::computeSplitPlane(const re::vec3& parentDi
     }
   }
   
-  split.normal = guess[index];
-  return split;
+  return re::Plane(guess[index], split);
 }

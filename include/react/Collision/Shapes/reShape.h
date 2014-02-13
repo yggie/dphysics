@@ -61,8 +61,6 @@ public:
   
   virtual bool intersectsRay(const reRayQuery& query, reRayQueryResult& result) const = 0;
   
-  virtual re::PlaneQuery::FastResult fastPlaneIntersect(const re::vec3& normal, const re::vec3& center) const;
-  
   virtual re::Plane::Location locationInPlane(const re::Plane& plane) const;
 protected:
   reFloat _shell;

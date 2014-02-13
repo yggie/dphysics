@@ -69,10 +69,8 @@ protected:
   reLinkedList<Marker*> _markers;
   /** The direct descendents of this node */
   reBSPNode* _children[2];
-  /** The split direction of the node */
-  re::vec3 _splitNormal;
-  /** A point along the split plane */
-  re::vec3 _splitCenter;
+  /** The split plane of the node */
+  re::Plane _splitPlane;
   /** The current depth */
   const reUInt _depth;
 };

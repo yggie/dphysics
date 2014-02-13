@@ -51,7 +51,7 @@ public:
   
   bool intersectsRay(const reRayQuery& query, reRayQueryResult& result) const override;
   
-  re::PlaneQuery::FastResult fastPlaneIntersect(const re::vec3& normal, const re::vec3& center) const override;
+  re::Plane::Location locationInPlane(const re::Plane& plane) const override;
   
 private:
   reTransform _transform;
@@ -133,10 +133,9 @@ inline const re::vec3 reProxyShape::randomPoint() const {
   return _transform.multPoint(_shape->randomPoint());
 }
 
-
-inline re::PlaneQuery::FastResult reProxyShape::fastPlaneIntersect(const re::vec3& normal, const re::vec3& center) const {
+inline re::Plane::Location reProxyShape::locationInPlane(const re::Plane& plane) const {
   reTransform inv = re::inverse(_transform);
-  return _shape->fastPlaneIntersect(inv.multDir(normal), inv.multPoint(center));
+  return _shape->locationInPlane(re::Plane::apply(inv, plane));
 }
 
 #endif
