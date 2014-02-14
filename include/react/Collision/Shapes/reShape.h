@@ -32,7 +32,9 @@ public:
     /** A planar triangle @see reTriangle */
     TRIANGLE,
     /** A wrapper around shapes allow arbitrary transforms @see reProxyShape */
-    PROXY
+    PROXY,
+    /** A wrapper around a plane object, can only be used by re::StaticBody objects @see re::PlaneShape */
+    PLANE_SHAPE
   };
   
   reShape();
