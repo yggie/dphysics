@@ -55,6 +55,10 @@ namespace re {
     return (upper - lower) * randf() + lower;
   }
   
+  inline reFloat randf(reFloat bound) {
+    return randf(bound, bound);
+  }
+ 
   inline reInt randi() {
     return std::rand();
   }

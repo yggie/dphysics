@@ -321,7 +321,7 @@ void reBSPTree::rebalance(reTreeBalanceStrategy* strategy) {
   reBSPNode::rebalanceNode(*strategy);
 }
 
-void reBSPTree::advance(reIntegrator& integrator, reFloat dt) {
+void reBSPTree::advance(re::Integrator& integrator, reFloat dt) {
   // advance each entity forward in time and relocates them on the tree
   auto end = _allMarkers.end();
   for (auto it = _allMarkers.begin(); it != end;) {

@@ -13,7 +13,7 @@
 #include <sstream>
 #include <vector>
 
-using namespace re::demo;
+using namespace demo;
 
 //#define RAY_PRINTF(...)   printf(__VA_ARGS__);
 #define RAY_PRINTF(...)   
@@ -82,7 +82,7 @@ void RayTracingDemo::createSceneFromFile(const char* filename) {
   // UNKNOWN COUNT
   unsigned int unknowns = 0;
   
-  re::demo::MatrixStack stack;
+  MatrixStack stack;
   
   for (std::string line; std::getline(file, line); ) {
     if (!(line.find_first_not_of(" \t\r\n") != std::string::npos) ||
@@ -146,7 +146,7 @@ void RayTracingDemo::createSceneFromFile(const char* filename) {
       
       re::mat4 m = stack.mat();
       reTransform tm = re::toMat3x4(m);
-      reRigidBody& body = _world.build().RigidBody(reSphere(v[3]), tm).at(v[0], v[1], v[2]);
+      reRigidBody& body = _world.build().RigidBody(re::Sphere(v[3]), tm).at(v[0], v[1], v[2]);
       RayObject* obj = new RayObject();
       body.userdata = obj;
 //        printf("DIFFUSE: (%.2f, %.2f, %.2f)\n", specular[0], specular[1], specular[2]);

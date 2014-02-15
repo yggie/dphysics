@@ -7,14 +7,14 @@
 #include "demos/PlanetaryMotion/PlanetaryMotionDemo.h"
 
 namespace {
-  re::demo::App* demos[] = {
-    new re::demo::RayTracingDemo(),
-    new re::demo::PlanetaryMotionDemo()
+  demo::App* demos[] = {
+    new demo::RayTracingDemo(),
+    new demo::PlanetaryMotionDemo()
   };
   
-  re::demo::App::Options options;
+  demo::App::Options options;
 
-  const unsigned int NUM_DEMOS = sizeof(demos) / sizeof(re::demo::App*);
+  const unsigned int NUM_DEMOS = sizeof(demos) / sizeof(demo::App*);
   
   unsigned int currentDemo = 0;
   unsigned int winWidth = 0;
@@ -27,7 +27,7 @@ namespace {
    * Convenient function to reference the current demo
    */
   
-  re::demo::App& demo() {
+  demo::App& demo() {
     return *demos[currentDemo];
   }
   

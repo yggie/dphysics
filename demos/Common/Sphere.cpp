@@ -5,7 +5,7 @@
 #include <glm/vec4.hpp>
 #include <cmath>
 
-using namespace re::demo;
+using namespace demo;
 
 GLuint Sphere::_globalVAO = 0;
 GLuint Sphere::_globalVBO = 0;

@@ -3,6 +3,8 @@
 
 #include "react/math.h"
 
+class reEnt;
+
 namespace re {
 
   /**

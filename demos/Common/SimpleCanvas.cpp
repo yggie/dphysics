@@ -5,7 +5,7 @@
 #include <algorithm>
 #include <cstdio>
 
-using namespace re::demo;
+using namespace demo;
 
 SimpleCanvas::SimpleCanvas() : Canvas() {
   _shaders.push_back(new Shader("demos/Shaders/shader.vert", GL_VERTEX_SHADER));

@@ -6,7 +6,7 @@
 #include "quat.h"
 #include "reTransform.h"
 #include "mat4x4.h"
-#include "reIntegrator.h"
+#include "Integrator.h"
 
 int main(int argc, char** argv) {
   testing::InitGoogleTest(&argc, argv);

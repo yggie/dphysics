@@ -1,28 +1,30 @@
-#include "react/Collision/Shapes/reSphere.h"
+#include "react/Collision/Shapes/Sphere.h"
 
 #include "react/Entities/reEnt.h"
 
-reSphere::reSphere(reFloat radius) : reShape() {
+using namespace re;
+
+Sphere::Sphere(reFloat radius) : reShape() {
   _shell = radius;
 }
 
-reSphere::reSphere(const reSphere& sphere) : reShape() {
+Sphere::Sphere(const Sphere& sphere) : reShape() {
   _shell = sphere.radius();
 }
 
-reSphere::~reSphere() {
+Sphere::~Sphere() {
   // do nothing
 }
 
-const re::vec3 reSphere::randomPoint() const {
+const re::vec3 Sphere::randomPoint() const {
   return re::normalize(re::vec3::rand()) * re::randf(0.0, 0.99) * radius();
 }
 
-bool reSphere::containsPoint(const re::vec3& point) const {
+bool Sphere::containsPoint(const re::vec3& point) const {
   return lengthSq(point) < radius()*radius();
 }
 
-bool reSphere::intersectsRay(const reRayQuery& query, reRayQueryResult& result) const {
+bool Sphere::intersectsRay(const reRayQuery& query, reRayQueryResult& result) const {
   // solve for the points of intersection
   const reFloat a = re::lengthSq(query.dir);
   const reFloat b = 2 * re::dot(query.origin, query.dir);

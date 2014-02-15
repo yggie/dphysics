@@ -4,7 +4,7 @@
 #include "react/Collision/Shapes/shapes.h"
 
 struct reRigidBodyTest : public testing::Test {
-  reRigidBodyTest() : world(), body(world.build().RigidBody(reSphere(1.0))) { }
+  reRigidBodyTest() : world(), body(world.build().RigidBody(re::Sphere(1.0))) { }
   
 protected:
   reWorld world;

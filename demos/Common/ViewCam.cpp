@@ -2,7 +2,7 @@
 
 #include "glsetup.h"
 
-using namespace re::demo;
+using namespace demo;
 
 namespace {
   const float step = 1.0f;

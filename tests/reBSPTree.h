@@ -15,7 +15,7 @@ protected:
 
 void reBSPTreeTest::generateFixtures(unsigned int n) {
   for (unsigned int i = 0; i < n; i++) {
-    reSphere* s = SHARED_ALLOCATOR.alloc_new<reSphere>(1.0);
+    re::Sphere* s = SHARED_ALLOCATOR.alloc_new<re::Sphere>(1.0);
     reRigidBody* body = SHARED_ALLOCATOR.alloc_new<reRigidBody>(s);
     body->setPos(re::vec3::rand(100.0));
     fixtures.push_back(body);

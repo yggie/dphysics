@@ -18,7 +18,7 @@ namespace re {
 
     Type type() const override;
 
-    void advance(reIntegrator& integrator, reFloat dt) override;
+    void advance(re::Integrator& integrator, reFloat dt) override;
     void addImpulse(const re::vec3& impulse) override;
 
     reFloat mass() const override;
@@ -47,7 +47,7 @@ namespace re {
     return STATIC;
   }
 
-  inline void StaticBody::advance(reIntegrator&, reFloat) {
+  inline void StaticBody::advance(re::Integrator&, reFloat) {
     // do nothing
   }
 

@@ -4,7 +4,7 @@
 
 #include "demos/Common/math_ext.h"
 
-using namespace re::demo;
+using namespace demo;
 
 GLuint Plane::_globalVAO = 0;
 GLuint Plane::_globalVBO = 0;

@@ -3,8 +3,6 @@
 
 #include "react/Utilities/reTransform.h"
 
-using namespace re; // just for Doxygen
-
 namespace re {
   
   inline reFloat det(const re::mat3x4& tm) {

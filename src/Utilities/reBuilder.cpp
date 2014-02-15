@@ -45,7 +45,7 @@ reGravAction& reBuilder::GravAction(reEnt& A, reEnt& B) {
 reShape* reBuilder::copyOf(const reShape& shape) {
   switch (shape.type()) {
     case reShape::SPHERE:
-      return _world.allocator().alloc_new<reSphere>((const reSphere&)shape);
+      return _world.allocator().alloc_new<re::Sphere>((const re::Sphere&)shape);
     
     case reShape::RECTANGLE:
       RE_NOT_IMPLEMENTED

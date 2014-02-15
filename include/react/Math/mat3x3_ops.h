@@ -7,8 +7,6 @@
 
 #include "react/Math/mat3x3.h"
 
-using namespace re; // sadly, Doxygen is not smart enought
-
 namespace re {
   
   /**
@@ -19,8 +17,8 @@ namespace re {
    * @return The resulting matrix
    */
   
-  inline const mat3x3 transpose(const mat3x3& m) {
-    return mat3x3(
+  inline const re::mat3x3 transpose(const re::mat3x3& m) {
+    return re::mat3x3(
       m[0][0], m[1][0], m[2][0],
       m[0][1], m[1][1], m[2][1],
       m[0][2], m[1][2], m[2][2]
@@ -35,7 +33,7 @@ namespace re {
    * @return The resulting scalar
    */
   
-  inline reFloat determinant(const mat3x3& m) {
+  inline reFloat determinant(const re::mat3x3& m) {
     return m[0][0]*(m[1][1]*m[2][2] - m[1][2]*m[2][1]) -
            m[0][1]*(m[1][0]*m[2][2] - m[1][2]*m[2][0]) +
            m[0][2]*(m[1][0]*m[2][1] - m[1][1]*m[2][0]);
@@ -49,8 +47,8 @@ namespace re {
    * @return The resulting matrix
    */
   
-  inline const mat3x3 inverse(const mat3x3& m) {
-    return mat3x3(
+  inline const re::mat3x3 inverse(const re::mat3x3& m) {
+    return re::mat3x3(
       m[1][1]*m[2][2] - m[1][2]*m[2][1],
       m[0][2]*m[2][1] - m[0][1]*m[2][2],
       m[0][1]*m[1][2] - m[0][2]*m[1][1],
@@ -73,7 +71,7 @@ namespace re {
    * @return The resulting scalar
    */
   
-  inline reFloat trace(const mat3x3& m) {
+  inline reFloat trace(const re::mat3x3& m) {
     return m[0][0] + m[1][1] + m[2][2];
   }
   
@@ -87,7 +85,7 @@ namespace re {
    * @return True if the maximum ??? distance is within tolerance
    */
   
-  inline bool similar(const mat3x3& a, const mat3x3& b) {
+  inline bool similar(const re::mat3x3& a, const re::mat3x3& b) {
     for (reUInt i = 0; i < 3; i++) {
       for (reUInt j = 0; j < 3; j++) {
         if (re::abs(a[i][j] - b[i][j]) > RE_FP_TOLERANCE) {
@@ -98,7 +96,7 @@ namespace re {
     return true;
   }
   
-  inline const mat3x3 facing(const vec3& dir, const vec3& up) {
+  inline const re::mat3x3 facing(const re::vec3& dir, const re::vec3& up) {
     const re::vec3& w = re::normalize(-dir);
     const re::vec3& u = re::normalize(re::cross(up, w));
     const re::vec3& v = re::normalize(re::cross(w, u));
@@ -118,7 +116,7 @@ namespace re {
    * @return The 3x3 rotation matrix
    */
 
-  inline const mat3x3 mat3x3::rotation(reFloat angle, reFloat x, reFloat y, reFloat z) {
+  inline const re::mat3x3 re::mat3x3::rotation(reFloat angle, reFloat x, reFloat y, reFloat z) {
     return re::mat3x3::rotation(angle, re::vec3(x, y, z));
   }
 }

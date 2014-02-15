@@ -7,8 +7,6 @@
 
 #include "react/Math/vec3.h"
 
-using namespace re; // sadly, Doxygen is not smart enough
-
 namespace re {
   
   /**
@@ -20,8 +18,8 @@ namespace re {
    * @return The resulting vector
    */
    
-  inline const vec3 cross(const vec3& a, const vec3& b) {
-    return vec3(a.y*b.z - a.z*b.y, a.z*b.x - a.x*b.z, a.x*b.y - a.y*b.x);
+  inline const re::vec3 cross(const re::vec3& a, const re::vec3& b) {
+    return re::vec3(a.y*b.z - a.z*b.y, a.z*b.x - a.x*b.z, a.x*b.y - a.y*b.x);
   }
   
   /**
@@ -33,7 +31,7 @@ namespace re {
    * @return The resulting scalar
    */
   
-  inline reFloat dot(const vec3& a, const vec3& b) {
+  inline reFloat dot(const re::vec3& a, const re::vec3& b) {
     return a.x*b.x + a.y*b.y + a.z*b.z;
   }
   
@@ -46,8 +44,8 @@ namespace re {
    * @return The resulting scalar
    */
   
-  inline reFloat inner(const vec3& a, const vec3& b) {
-    return dot(a, b);
+  inline reFloat inner(const re::vec3& a, const re::vec3& b) {
+    return re::dot(a, b);
   }
   
   /**
@@ -59,8 +57,8 @@ namespace re {
    * @return The resulting scalar
    */
   
-  inline reFloat lengthSq(const vec3& a) {
-    return dot(a, a);
+  inline reFloat lengthSq(const re::vec3& a) {
+    return re::dot(a, a);
   }
   
   /**
@@ -71,7 +69,7 @@ namespace re {
    * @return The resulting scalar
    */
   
-  inline reFloat length(const vec3& a) {
+  inline reFloat length(const re::vec3& a) {
     return re::sqrt(lengthSq(a));
   }
   
@@ -83,8 +81,8 @@ namespace re {
    * @return The resulting vector
    */
   
-  inline vec3 normalize(const vec3& a) {
-    return vec3(a) /= length(a);
+  inline re::vec3 normalize(const re::vec3& a) {
+    return re::vec3(a) /= re::length(a);
   }
   
   /**
@@ -93,8 +91,8 @@ namespace re {
    * @return A random unit vector
    */
   
-  inline const vec3 vec3::unit() {
-    return re::normalize(vec3::rand());
+  inline const re::vec3 re::vec3::unit() {
+    return re::normalize(re::vec3::rand());
   }
   
   /**
@@ -108,7 +106,7 @@ namespace re {
    * negligible
    */
   
-  inline bool similar(const vec3& a, const vec3& b) {
+  inline bool similar(const re::vec3& a, const re::vec3& b) {
     return re::lengthSq(a - b) < re::sq(RE_FP_TOLERANCE);
   }
 }

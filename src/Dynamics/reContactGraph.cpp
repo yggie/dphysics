@@ -6,17 +6,19 @@ namespace {
   const reUInt LIMIT = 10;
 }
 
+/// NOT TESTED
 reContactEdge::reContactEdge(reAllocator& allocator, reEnt& a, reEnt& b) : A(a), B(b), contact(false), contactPoint(), contactNormal(), timeLimit(0), interactions(allocator) {
   check();
 }
 
+/// NOT TESTED
 void reContactEdge::check() {
   if (timeLimit++ == 0) {
     timeLimit = LIMIT;
   }
   // TODO TEMPORARY
-  const reSphere& sA = (const reSphere&)(*A.shape());
-  const reSphere& sB = (const reSphere&)(*B.shape());
+  const re::Sphere& sA = (const re::Sphere&)(*A.shape());
+  const re::Sphere& sB = (const re::Sphere&)(*B.shape());
   
   const re::vec3 cA = A.center();
   const re::vec3 cB = B.center();
@@ -28,18 +30,12 @@ void reContactEdge::check() {
   }
 }
 
-/**
- * Creates a new contact graph
- */
-
+/// NOT TESTED
 reContactGraph::reContactGraph(reAllocator& allocator) : _allocator(allocator), _edges(allocator) {
   // do nothing
 }
 
-/**
- * Destructor releases resources used by all contact edges in the graph
- */
-
+/// NOT TESTED
 reContactGraph::~reContactGraph() {
   for (reContactEdge* edge : _edges) {
     for (reInteraction* action : edge->interactions) {
@@ -50,10 +46,7 @@ reContactGraph::~reContactGraph() {
   _edges.clear();
 }
 
-/**
- * Takes each contact edge and solves for the reaction impulses for the contacts
- */
-
+/// NOT TESTED
 void reContactGraph::solve() {
   const reFloat epsilon = 0.9;
   // TODO TEMPORARY
@@ -94,13 +87,7 @@ void reContactGraph::solve() {
   }
 }
 
-/**
- * Checks the contact between the two entities and updates the contact graph
- * 
- * @param A The first entity
- * @param B The second entity
- */
-
+/// NOT TESTED
 void reContactGraph::check(reEnt& A, reEnt& B) {
   // sanity check
   RE_ASSERT(A.id() < B.id());
@@ -119,11 +106,7 @@ void reContactGraph::check(reEnt& A, reEnt& B) {
   _edges.add(edge);
 }
 
-/**
- * Advances the collision graph forward in time. For the collision graph, this
- * only means rejecting contact edges which have expired.
- */
-
+/// NOT TESTED
 void reContactGraph::advance() {
   reLinkedList<reContactEdge*> toRemove(_allocator);
   // checks for rejected edges
@@ -141,6 +124,7 @@ void reContactGraph::advance() {
   }
 }
 
+/// NOT TESTED
 void reContactGraph::addInteraction(reInteraction& action, reEnt& A, reEnt& B) {
   if (A.id() > B.id()) {
     addInteraction(action, B, A);

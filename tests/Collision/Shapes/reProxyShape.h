@@ -3,7 +3,7 @@
 #include "react/Collision/Shapes/shapes.h"
 
 TEST(ProxyShapeTest, Creation) {
-  reSphere s(0.1);
+  re::Sphere s(0.1);
   reProxyShape ps(&s);
   
   ASSERT_TRUE(ps.type() == reShape::PROXY) << "should have the correct type";
@@ -12,7 +12,7 @@ TEST(ProxyShapeTest, Creation) {
 }
 
 TEST(ProxyShapeTest, QueryTest) {
-  reSphere s(5.0);
+  re::Sphere s(5.0);
   reTransform m;
   m.scale(1, 2, 3);
   m.rotate(re::randf(0.0, 50.0*RE_PI), re::vec3::rand());

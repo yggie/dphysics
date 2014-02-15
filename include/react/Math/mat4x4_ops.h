@@ -3,14 +3,12 @@
 
 #include "react/Math/mat4x4.h"
 
-using namespace re; // for Doxygen
-
 namespace re {
-  inline const mat4x4 facing4(const vec3& dir, const vec3& up) {
+  inline const re::mat4x4 facing4(const re::vec3& dir, const re::vec3& up) {
     return re::mat4x4(re::facing(dir, up));
   }
   
-  inline const mat4x4 lookat(const vec3& eye, const vec3& center, const vec3& up) {
+  inline const re::mat4x4 lookat(const re::vec3& eye, const re::vec3& center, const vec3& up) {
     const re::vec3 w = re::normalize(eye - center);
     const re::vec3 u = re::normalize(re::cross(up, w));
     const re::vec3 v = re::normalize(re::cross(w, u));
@@ -23,7 +21,7 @@ namespace re {
     );
   }
   
-  inline reFloat det(const mat4x4& m) {
+  inline reFloat det(const re::mat4x4& m) {
     const reFloat m0 = m.v[5]  * m.v[10] * m.v[15] - 
                        m.v[5]  * m.v[11] * m.v[14] - 
                        m.v[9]  * m.v[6]  * m.v[15] + 
@@ -56,7 +54,7 @@ namespace re {
     return m.v[0] * m0 + m.v[1] * m1 + m.v[2] * m2 + m.v[3] * m3;
   }
   
-  inline const mat4x4 inverse(const mat4x4& m) {
+  inline const re::mat4x4 inverse(const re::mat4x4& m) {
     reFloat inv[16];
 
     inv[0] = m.v[5]  * m.v[10] * m.v[15] - 
@@ -180,7 +178,7 @@ namespace re {
     return re::mat4x4(&inv[0]);
   }
   
-  inline bool similar(const mat4x4& a, const mat4x4& b) {
+  inline bool similar(const re::mat4x4& a, const re::mat4x4& b) {
     for (reUInt i = 0; i < 4; i++) {
       for (reUInt j = 0; j < 4; j++) {
         if (re::abs(a[i][j] - b[i][j]) > RE_FP_TOLERANCE) {
@@ -191,7 +189,7 @@ namespace re {
     return true;
   }
   
-  inline const mat4x4 transpose(const mat4x4& m) {
+  inline const re::mat4x4 transpose(const re::mat4x4& m) {
     return re::mat4x4(
       m[0][0], m[1][0], m[2][0], m[3][0],
       m[0][1], m[1][1], m[2][1], m[3][1],

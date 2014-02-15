@@ -2,7 +2,7 @@
 
 #include <fstream>
 
-using namespace re::demo;
+using namespace demo;
 
 Shader::Shader(const char* filename, int type) : _type(type), _id(0),
 _src(), _filename(filename) {

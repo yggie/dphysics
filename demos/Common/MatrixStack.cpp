@@ -2,7 +2,7 @@
 
 #include <cassert>
 
-using namespace re::demo;
+using namespace demo;
 
 MatrixStack::MatrixStack(int initialCapacity) : _head(0),
 _cacheHead(-1), _capacity(initialCapacity), _heap(nullptr),

@@ -24,7 +24,7 @@ public:
   
   reEnt::Type type() const;
   
-  void advance(reIntegrator& integrator, reFloat dt) override;
+  void advance(re::Integrator& integrator, reFloat dt) override;
   
   void addImpulse(const re::vec3& impulse) override;
   
@@ -63,7 +63,7 @@ inline reEnt::Type reRigidBody::type() const {
   return RIGID;
 }
 
-inline void reRigidBody::advance(reIntegrator& op, reFloat dt) {
+inline void reRigidBody::advance(re::Integrator& op, reFloat dt) {
   _vel += _linearImpulse;
   op.integrate(_pos, _vel, dt);
   op.integrate(_quat, _angVel, dt);

@@ -8,7 +8,7 @@
 #include "react/Entities/reEnt.h"
 #include "react/Collision/Shapes/shapes.h"
 
-using namespace re::demo;
+using namespace demo;
 
 Canvas::Canvas() : _programID(0), _shaders(), _projMat(1.0f),
 _viewMat(1.0f), _modelMatStack(), _sphere(nullptr), _plane(nullptr), _VAOs(nullptr), _VBOs(nullptr), _numVAO(0), _numVBO(0), _sceneReady(false) {
@@ -151,8 +151,8 @@ void Canvas::renderScene() {
   }
 }
 
-re::demo::Plane::Instance& Canvas::addPlane(const re::vec3& normal, const re::vec3& side, const re::vec3& center, float width) {
-  re::demo::Plane::Instance* plane = new re::demo::Plane::Instance(normal, side, center, width, width);
+Plane::Instance& Canvas::addPlane(const re::vec3& normal, const re::vec3& side, const re::vec3& center, float width) {
+  Plane::Instance* plane = new Plane::Instance(normal, side, center, width, width);
   add(plane);
   return *plane;
 }

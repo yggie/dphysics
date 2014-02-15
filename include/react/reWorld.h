@@ -15,7 +15,10 @@
 class reBroadPhase;
 class reEnt;
 class reShape;
-class reIntegrator;
+
+namespace re {
+  class Integrator;
+}
 
 /**
  * Encapsulates the entire implementation of a physics engine
@@ -41,7 +44,7 @@ public:
   const reLinkedList<reEnt*>& entities() const;
   reAllocator& allocator() const;
   reBroadPhase& broadPhase() const;
-  reIntegrator& integrator() const;
+  re::Integrator& integrator() const;
   reBuilder build();
   
   // spatial queries
@@ -53,7 +56,7 @@ private:
   /** The general purpose reAllocator used in this reWorld */
   reAllocator* _allocator;
   /** The integrator used to integrate the time step for all dynamic objects */
-  reIntegrator* _integrator;
+  re::Integrator* _integrator;
 };
 
 /**
@@ -77,7 +80,7 @@ inline reBroadPhase& reWorld::broadPhase() const {
   return *_broadPhase;
 }
 
-inline reIntegrator& reWorld::integrator() const {
+inline re::Integrator& reWorld::integrator() const {
   return *_integrator;
 }
 

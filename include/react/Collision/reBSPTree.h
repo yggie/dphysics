@@ -92,7 +92,7 @@ public:
   bool contains(const reEnt& ent) const override;
   reUInt size() const override;
   void rebalance(reTreeBalanceStrategy* strategy = nullptr) override;
-  void advance(reIntegrator& integrator, reFloat dt) override;
+  void advance(re::Integrator& integrator, reFloat dt) override;
   
   void addInteraction(reInteraction& action, reEnt& A, reEnt& B) override;
   

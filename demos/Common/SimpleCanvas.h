@@ -3,25 +3,23 @@
 
 #include "demos/Common/Canvas.h"
 
-namespace re {  
-  namespace demo {
+namespace demo {
+  
+  /**
+   * @ingroup demo
+   * A specialized Canvas class
+   */
+  
+  class SimpleCanvas : public Canvas {
+  public:
+    SimpleCanvas();
+    ~SimpleCanvas();
     
-    /**
-     * @ingroup demo
-     * A specialized Canvas class
-     */
+    void applyModelView() override;
     
-    class SimpleCanvas : public Canvas {
-    public:
-      SimpleCanvas();
-      ~SimpleCanvas();
-      
-      void applyModelView() override;
-      
-    private:
-      void postInit() override;
-    };
-  }
+  private:
+    void postInit() override;
+  };
 }
 
 #endif

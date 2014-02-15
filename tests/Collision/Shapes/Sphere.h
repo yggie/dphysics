@@ -1,9 +1,9 @@
 #include "helpers.h"
 
-#include "react/Collision/Shapes/reSphere.h"
+#include "react/Collision/Shapes/Sphere.h"
 
 TEST(Sphere, Constructor_test) {
-  reSphere s(3.0);
+  re::Sphere s(3.0);
   
   ASSERT_FLOAT_EQ(s.radius(), 3.0) << "should create a sphere with given radius";
   
@@ -11,13 +11,13 @@ TEST(Sphere, Constructor_test) {
 }
 
 TEST(Sphere, withRadius_test) {
-  reSphere s(1.0);
+  re::Sphere s(1.0);
   
   ASSERT_FLOAT_EQ(s.withRadius(50.0).radius(), 50.0) << "can change the radius with a chainable method";
 }
 
 TEST(Sphere, setRadius_test) {
-  reSphere s(1.0);
+  re::Sphere s(1.0);
 
   s.setRadius(15.0);
   ASSERT_FLOAT_EQ(s.radius(), 15.0) << "can change the radius with a setter";
@@ -26,14 +26,14 @@ TEST(Sphere, setRadius_test) {
 TEST(Sphere, volume_test) {
   for (unsigned int i = 0; i < NUM_REPEATS; i++) {
     const float r = re::randf(1.0, 100.0);
-    const reSphere s(r);
+    const re::Sphere s(r);
     ASSERT_LE(re::abs(s.volume() - RE_PI*4.0*r*r*r/3.0), 0.001*s.volume()) <<
       "should return the volume within tolerance";
   }
 }
 
 TEST(Sphere, VertexData_test) {
-  reSphere s(33.3);
+  re::Sphere s(33.3);
   
   ASSERT_FLOAT_EQ(s.shell(), 33.3) << "shell thickness and radius should be equivalent";
   
@@ -44,7 +44,7 @@ TEST(Sphere, VertexData_test) {
 }
 
 TEST(Sphere, Something_test) {
-  reSphere s(5.0);
+  re::Sphere s(5.0);
   reRayQueryResult res;
   for (reUInt i = 0; i < NUM_SAMPLES; i++) {
     const re::vec3 pt = s.randomPoint();
@@ -67,7 +67,7 @@ TEST(Sphere, Something_test) {
 }
 
 TEST(Sphere, SomeOtherThing_test) {
-  reSphere s(2.0);
+  re::Sphere s(2.0);
   
   reRayQueryResult res;
   for (reUInt i = 0; i < NUM_SAMPLES; i++) {
@@ -84,7 +84,7 @@ TEST(Sphere, SomeOtherThing_test) {
 }
 
 TEST(Sphere, locationInPlane_test) {
-  reSphere s(1.0);
+  re::Sphere s(1.0);
   
   for (reUInt i = 0; i < NUM_SAMPLES; i++) {
     const re::vec3 origin = re::vec3::rand(5.0);

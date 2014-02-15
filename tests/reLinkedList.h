@@ -1,10 +1,10 @@
 #include "helpers.h"
 
-#include "react/Collision/Shapes/reSphere.h"
+#include "react/Collision/Shapes/Sphere.h"
 #include "react/Utilities/reLinkedList.h"
 
 namespace {
-  reSphere s(1.0);
+  re::Sphere s(1.0);
   
   template <class T>
   T copyOf(T v) {

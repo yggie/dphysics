@@ -1,4 +1,4 @@
-#include "react/Utilities/reIntegrator.h"
+#include "react/Math/Integrator.h"
 #include <gtest/gtest.h>
 
 #include <cstdio>
@@ -11,7 +11,7 @@ TEST(IntegratorTest, ConstantVelocity) {
   const reUInt steps = 1000;
   const reFloat dt = 1.0 / steps;
   
-  reIntegrator ign;
+  re::Integrator ign;
   for (reUInt i = 0; i < steps; i++) {
     ign.integrate(p, v, dt);
   }
@@ -31,7 +31,7 @@ TEST(IntegratorTest, ConstantRotation) {
   quat q = re::quat::rotation(ir, ax);
   quat p = re::quat::rotation(tr, ax);
   
-  reIntegrator ign;
+  re::Integrator ign;
   for (reUInt i = 0; i < steps; i++) {
     ign.integrate(q, w, dt);
   }

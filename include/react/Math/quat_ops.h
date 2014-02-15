@@ -7,8 +7,6 @@
 
 #include "react/Math/quat.h"
 
-using namespace re;
-
 namespace re {
   
   /**
@@ -20,7 +18,7 @@ namespace re {
    * @return The squared length of the quaternion
    */
 
-  inline reFloat lengthSq(const quat& q) {
+  inline reFloat lengthSq(const re::quat& q) {
     return q.r*q.r + q.i*q.i + q.j*q.j + q.k*q.k;
   }
   
@@ -32,8 +30,8 @@ namespace re {
    * @return The length of the quaternion
    */
 
-  inline reFloat length(const quat& q) {
-    return re::sqrt(lengthSq(q));
+  inline reFloat length(const re::quat& q) {
+    return re::sqrt(re::lengthSq(q));
   }
   
   /**
@@ -44,8 +42,8 @@ namespace re {
    * @return The normalized quaternion
    */
 
-  inline const quat normalize(const quat& q) {
-    return quat(q) /= length(q);
+  inline const re::quat normalize(const re::quat& q) {
+    return re::quat(q) /= re::length(q);
   }
   
   /**
@@ -54,8 +52,8 @@ namespace re {
    * @return A random unit quaternion
    */
   
-  inline const quat quat::unit() {
-    return re::normalize(quat::rand());
+  inline const re::quat re::quat::unit() {
+    return re::normalize(re::quat::rand());
   }
   
   /**
@@ -69,7 +67,7 @@ namespace re {
    * tolerance
    */
   
-  inline bool similar(const quat& a, const quat& b) {
+  inline bool similar(const re::quat& a, const re::quat& b) {
     return re::lengthSq(a - b) < re::sq(RE_FP_TOLERANCE);
   }
   
@@ -82,8 +80,8 @@ namespace re {
    * @return The resulting quaternion
    */
   
-  inline const quat quat::rotation(reFloat angle, const vec3& axis) {
-    quat q;
+  inline const re::quat re::quat::rotation(reFloat angle, const vec3& axis) {
+    re::quat q;
     q.r = re::cos(angle / 2.0);
     const reFloat s = re::sin(angle / 2.0);
     const reFloat L = re::length(axis);

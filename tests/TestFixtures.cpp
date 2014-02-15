@@ -5,7 +5,7 @@
 #include "react/Entities/reRigidBody.h"
 
 namespace {
-  reSphere s(1.0);
+  re::Sphere s(1.0);
 }
 
 TestFixtures::TestFixtures() : fixtures(), _internalAllocator() {

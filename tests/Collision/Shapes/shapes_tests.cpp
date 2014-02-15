@@ -3,9 +3,10 @@
 // volume-less shape types
 #include "Ray.h"
 #include "Plane.h"
+#include "PlaneShape.h"
 
 // complex shape types
-#include "reSphere.h"
+#include "Sphere.h"
 #include "reProxyShape.h"
 
 int main(int argc, char** argv) {

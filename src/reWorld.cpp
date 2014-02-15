@@ -1,6 +1,6 @@
 #include "react/reWorld.h"
 
-#include "react/Utilities/reIntegrator.h"
+#include "react/Math/Integrator.h"
 #include "react/Entities/reRigidBody.h"
 #include "react/Collision/Shapes/shapes.h"
 
@@ -40,7 +40,7 @@ reWorld::reWorld() : _broadPhase(nullptr), _allocator(nullptr), _integrator(null
   SimpleAllocator* tmp = new SimpleAllocator();
   _allocator = new reProxyAllocator(tmp);
   _broadPhase = allocator().alloc_new<reBSPTree>(allocator());
-  _integrator = allocator().alloc_new<reIntegrator>();
+  _integrator = allocator().alloc_new<re::Integrator>();
 }
 
 /**

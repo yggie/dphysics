@@ -35,7 +35,7 @@ public:
   virtual bool contains(const reEnt& ent) const = 0;
   virtual reUInt size() const = 0;
   virtual void rebalance(reTreeBalanceStrategy* strategy = nullptr) = 0;
-  virtual void advance(reIntegrator& integrator, reFloat dt) = 0;
+  virtual void advance(re::Integrator& integrator, reFloat dt) = 0;
   
   virtual void addInteraction(reInteraction& action, reEnt& A, reEnt& B) = 0;
   

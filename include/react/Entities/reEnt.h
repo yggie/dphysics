@@ -7,7 +7,7 @@
 
 #include "react/math.h"
 #include "react/Collision/reAABB.h"
-#include "react/Utilities/reIntegrator.h"
+#include "react/Math/Integrator.h"
 #include "react/Collision/Shapes/reShape.h"
 #include "react/Collision/reSpatialQueries.h"
 
@@ -45,7 +45,7 @@ public:
   // must be implemented by the subclass
   virtual Type type() const = 0;
   
-  virtual void advance(reIntegrator& integrator, reFloat dt) = 0;
+  virtual void advance(re::Integrator& integrator, reFloat dt) = 0;
   
   // getter methods
   reShape* shape();

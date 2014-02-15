@@ -3,7 +3,7 @@
 #include "react/Entities/StaticBody.h"
 
 TEST(StaticBody, Constructor) {
-  reSphere s(1.0);
+  re::Sphere s(1.0);
   re::StaticBody body(&s);
 
   ASSERT_FLOAT_EQ(body.massInv(), 0.0) <<

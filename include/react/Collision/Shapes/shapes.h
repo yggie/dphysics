@@ -6,7 +6,7 @@
 #define RE_SHAPES_H
 
 #include "react/Collision/Shapes/reShape.h"
-#include "react/Collision/Shapes/reSphere.h"
+#include "react/Collision/Shapes/Sphere.h"
 #include "react/Collision/Shapes/reTriangle.h"
 #include "react/Collision/Shapes/reProxyShape.h"
 

@@ -4,7 +4,7 @@
 
 #include <algorithm>
 
-using namespace re::demo;
+using namespace demo;
 
 StaticObject::StaticObject() : _vaoDefs(), _pos(0.0f) {
   // do nothing

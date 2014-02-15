@@ -9,7 +9,7 @@
 #include "demos/Common/Sphere.h"
 #include "demos/Common/StaticObject.h"
 
-using namespace re::demo;
+using namespace demo;
 
 PlanetaryMotionDemo::PlanetaryMotionDemo() : _world(), _cam(), _canvas() {
   // do nothing
@@ -64,7 +64,7 @@ void PlanetaryMotionDemo::restart() {
 }
 
 void PlanetaryMotionDemo::prepareWorld() {
-  reSphere sphere(1.0);
+  re::Sphere sphere(1.0);
   
   reBuilder build = _world.build();
   
