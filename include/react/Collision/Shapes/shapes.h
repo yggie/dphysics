@@ -9,5 +9,6 @@
 #include "react/Collision/Shapes/Sphere.h"
 #include "react/Collision/Shapes/reTriangle.h"
 #include "react/Collision/Shapes/reProxyShape.h"
+#include "react/Collision/Shapes/shape_queries.h"
 
 #endif

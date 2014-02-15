@@ -13,7 +13,7 @@ TEST(ProxyShapeTest, Creation) {
 
 TEST(ProxyShapeTest, QueryTest) {
   re::Sphere s(5.0);
-  reTransform m;
+  re::Transform m;
   m.scale(1, 2, 3);
   m.rotate(re::randf(0.0, 50.0*RE_PI), re::vec3::rand());
   reProxyShape ps(&s, m);

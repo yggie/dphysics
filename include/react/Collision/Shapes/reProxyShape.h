@@ -17,7 +17,7 @@
 class reProxyShape : public reShape {
 public:
   reProxyShape(reShape* shape);
-  reProxyShape(reShape* shape, const reTransform& transform);
+  reProxyShape(reShape* shape, const re::Transform& transform);
   reProxyShape(const reProxyShape&) = delete;
   ~reProxyShape();
   
@@ -28,9 +28,9 @@ public:
   void setShape(const reShape& base);
   reProxyShape& withShape(const reShape& base);
   
-  const reTransform& transform() const;
-  void setTransform(const reTransform& transform);
-  reProxyShape& withTransform(const reTransform& transform);
+  const re::Transform& transform() const;
+  void setTransform(const re::Transform& transform);
+  reProxyShape& withTransform(const re::Transform& transform);
   
   // shape representation
   reShape::Type type() const override;
@@ -54,15 +54,15 @@ public:
   re::Plane::Location locationInPlane(const re::Plane& plane) const override;
   
 private:
-  reTransform _transform;
+  re::Transform _transform;
   reShape* const _shape;
 };
 
-inline void reProxyShape::setTransform(const reTransform& transform) {
+inline void reProxyShape::setTransform(const re::Transform& transform) {
   _transform = transform;
 }
 
-inline reProxyShape& reProxyShape::withTransform(const reTransform& transform) {
+inline reProxyShape& reProxyShape::withTransform(const re::Transform& transform) {
   setTransform(transform);
   return *this;
 }
@@ -75,7 +75,7 @@ inline const reShape* reProxyShape::shape() const {
   return _shape;
 }
 
-inline const reTransform& reProxyShape::transform() const {
+inline const re::Transform& reProxyShape::transform() const {
   return _transform;
 }
 
@@ -130,12 +130,11 @@ inline const re::mat3 reProxyShape::computeInertia() const {
 }
 
 inline const re::vec3 reProxyShape::randomPoint() const {
-  return _transform.multPoint(_shape->randomPoint());
+  return _transform.applyToPoint(_shape->randomPoint());
 }
 
 inline re::Plane::Location reProxyShape::locationInPlane(const re::Plane& plane) const {
-  reTransform inv = re::inverse(_transform);
-  return _shape->locationInPlane(re::Plane::apply(inv, plane));
+  return _shape->locationInPlane(re::Plane(plane, re::inverse(_transform)));
 }
 
 #endif

@@ -1,7 +1,7 @@
 #include "helpers.h"
 
-TEST(reTransformTest, IsIdentityOnInit) {
-  reTransform transform;
+TEST(TransformTest, IsIdentityOnInit) {
+  re::Transform transform;
   
   ASSERT_TRUE(re::similar(transform.m, re::mat3(1.0))) <<
     "should have no initial rotation or scaling";
@@ -10,9 +10,9 @@ TEST(reTransformTest, IsIdentityOnInit) {
     "should have no initial translation";
 }
 
-TEST(reTransformTest, Scaling) {
+TEST(TransformTest, Scaling) {
   for (reUInt i = 0; i < NUM_REPEATS; i++) {
-    reTransform transform;
+    re::Transform transform;
     const re::vec3 v = re::vec3::rand(30.0);
     transform.scale(v.x, v.y, v.z);
     
@@ -25,17 +25,17 @@ TEST(reTransformTest, Scaling) {
     const re::vec3 v2 = re::vec3::rand(10.0);
     const re::vec3 vv2(v.x*v2.x, v.y*v2.y, v.z*v2.z);
     
-    ASSERT_TRUE(re::similar(transform.multPoint(v2), vv2)) <<
+    ASSERT_TRUE(re::similar(transform.applyToPoint(v2), vv2)) <<
       "should scale a point by the correct amount";
     
-    ASSERT_TRUE(re::similar(transform.multDir(v2), vv2)) <<
+    ASSERT_TRUE(re::similar(transform.applyToDir(v2), vv2)) <<
       "should scale a direction by the correct amount";
   }
 }
 
-TEST(reTransformTest, Translating) {
+TEST(TransformTest, Translating) {
   for (reUInt i = 0; i < NUM_REPEATS; i++) {
-    reTransform transform;
+    re::Transform transform;
     const re::vec3 v = re::vec3::rand(30.0);
     transform.translate(v);
     
@@ -47,32 +47,32 @@ TEST(reTransformTest, Translating) {
     
     const re::vec3 v2 = re::vec3::rand(25.0);
     
-    ASSERT_TRUE(re::similar(v2 + v, transform.multPoint(v2))) <<
+    ASSERT_TRUE(re::similar(v2 + v, transform.applyToPoint(v2))) <<
       "should translate a point";
     
-    ASSERT_TRUE(re::similar(v2, transform.multDir(v2))) <<
+    ASSERT_TRUE(re::similar(v2, transform.applyToDir(v2))) <<
       "should leave directions unchanged";
   }
 }
 
-TEST(reTransformTest, Rotation) {
+TEST(TransformTest, Rotation) {
   for (reUInt i = 0; i < NUM_REPEATS; i++) {
-    reTransform transform1, transform2;
+    re::Transform transform1, transform2;
     const re::vec3 axis = re::vec3::rand();
     const reFloat rad = re::randf(-1e5, 1e5);
     transform1.rotate(rad, axis);
     transform2.rotate(rad, re::normalize(axis));
     
-    ASSERT_TRUE(re::similar(transform1.multDir(axis), axis)) <<
+    ASSERT_TRUE(re::similar(transform1.applyToDir(axis), axis)) <<
       "should leave the axis unchanged when applied";
     
-    ASSERT_TRUE(re::similar(axis, transform1.multPoint(axis))) <<
+    ASSERT_TRUE(re::similar(axis, transform1.applyToPoint(axis))) <<
       "should not have a translational component";
     
     ASSERT_TRUE(re::similar(transform1, transform2)) <<
       "should give the same result with an un-normalized axis";
     
-    ASSERT_TRUE(re::similar(re::inverse(transform1), re::mat3x4(re::transpose(transform1.m), re::vec3()))) <<
+    ASSERT_TRUE(re::similar(re::inverse(transform1), re::Transform(re::transpose(transform1.m), re::vec3()))) <<
       "the inverse and transpose should be equivalent";
     
     ASSERT_LE(re::abs(re::det(transform1) - 1.0), RE_FP_TOLERANCE) <<
@@ -80,14 +80,14 @@ TEST(reTransformTest, Rotation) {
   }
 }
 
-TEST(reTransformTest, Concatenation) {
+TEST(TransformTest, Concatenation) {
   for (reUInt i = 0; i < NUM_REPEATS; i++) {
     const re::vec3 translation = re::vec3::rand(15.0);
     const re::vec3 scaling = re::vec3::rand(5.0);
     const re::vec3 axis = re::vec3::unit();
     const reFloat rad = re::randf(-1e5, 1e5);
     
-    reTransform T, S, R, X, Y, Z;
+    re::Transform T, S, R, X, Y, Z;
     T.translate(translation);
     S.scale(scaling.x, scaling.y, scaling.z);
     R.rotate(rad, axis);
@@ -106,9 +106,9 @@ TEST(reTransformTest, Concatenation) {
   }
 }
 
-TEST(reTransformTest, Inverse) {
+TEST(TransformTest, Inverse) {
   for (reUInt i = 0; i < NUM_REPEATS; i++) {
-    reTransform transform = reTransform().translate(re::vec3::rand(50.0)).scale(re::vec3::rand(13.0)).rotate(re::randf(-1e5, 1e5), re::vec3::rand());
+    re::Transform transform = re::Transform().translate(re::vec3::rand(50.0)).scale(re::vec3::rand(13.0)).rotate(re::randf(-1e5, 1e5), re::vec3::rand());
     
     ASSERT_TRUE(re::similar(re::inverse(transform) * transform, IDEN_MAT3x4)) <<
       "multiplication with inverse should return the identity matrix";

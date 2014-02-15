@@ -7,7 +7,7 @@ reProxyShape::reProxyShape(reShape* shape) : _transform(), _shape(shape) {
   // do nothing
 }
 
-reProxyShape::reProxyShape(reShape* shape, const reTransform& transform) : _transform(transform), _shape(shape) {
+reProxyShape::reProxyShape(reShape* shape, const re::Transform& transform) : _transform(transform), _shape(shape) {
   // do nothing
 }
 

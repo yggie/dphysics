@@ -28,7 +28,7 @@ reRigidBody& reBuilder::RigidBody(const reShape& shape) {
  * @return The attached reRigidBody entity
  */
 
-reRigidBody& reBuilder::RigidBody(const reShape& shape, const reTransform& transform) {
+reRigidBody& reBuilder::RigidBody(const reShape& shape, const re::Transform& transform) {
   reShape* base = copyOf(shape);
   reShape* newShape = _world.allocator().alloc_new<reProxyShape>(base, transform);
   reRigidBody* body = _world.allocator().alloc_new<reRigidBody>(newShape);

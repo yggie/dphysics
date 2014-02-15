@@ -55,11 +55,11 @@ public:
   virtual const re::vec3 randomPoint() const = 0;
   
   // collision queries
-  bool containsPoint(const reTransform& transform, const re::vec3& point) const;
+  bool containsPoint(const re::Transform& transform, const re::vec3& point) const;
   
   virtual bool containsPoint(const re::vec3& point) const = 0;
   
-  bool intersectsRay(const reTransform& transform, const reRayQuery& query, reRayQueryResult& result) const;
+  bool intersectsRay(const re::Transform& transform, const reRayQuery& query, reRayQueryResult& result) const;
   
   virtual bool intersectsRay(const reRayQuery& query, reRayQueryResult& result) const = 0;
   

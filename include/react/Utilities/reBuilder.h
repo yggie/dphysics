@@ -10,8 +10,9 @@ class reEnt;
 class reRigidBody;
 class reShape;
 class reGravAction;
+
 namespace re {
-  class mat3x4;
+  class Transform;
 }
 
 /**
@@ -24,7 +25,7 @@ struct reBuilder {
   
   // factory methods for entities
   reRigidBody& RigidBody(const reShape& shape);
-  reRigidBody& RigidBody(const reShape& shape, const re::mat3x4& transform);
+  reRigidBody& RigidBody(const reShape& shape, const re::Transform& transform);
   
   // factory methods for interactions
   reGravAction& GravAction(reEnt& A, reEnt& B);

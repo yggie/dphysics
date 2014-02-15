@@ -145,7 +145,7 @@ void RayTracingDemo::createSceneFromFile(const char* filename) {
       readFloats(4, &v[0]);
       
       re::mat4 m = stack.mat();
-      reTransform tm = re::toMat3x4(m);
+      re::Transform tm = re::toTransform(m);
       reRigidBody& body = _world.build().RigidBody(re::Sphere(v[3]), tm).at(v[0], v[1], v[2]);
       RayObject* obj = new RayObject();
       body.userdata = obj;

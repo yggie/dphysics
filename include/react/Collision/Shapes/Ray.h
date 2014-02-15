@@ -15,6 +15,8 @@ namespace re {
   class Ray {
   public:
     Ray(const re::vec3& origin, const re::vec3& dir);
+    Ray(const re::Ray& ray);
+    Ray(const re::Ray& ray, const re::Transform& transform);
 
     const re::vec3& origin() const;
     const re::vec3& dir() const;
@@ -25,6 +27,14 @@ namespace re {
   };
 
   inline Ray::Ray(const re::vec3& origin, const re::vec3& dir) : _origin(origin), _dir(re::normalize(dir)) {
+    // do nothing
+  }
+
+  inline Ray::Ray(const re::Ray& ray) : _origin(ray._origin), _dir(ray._dir) {
+    // do nothing
+  }
+
+  inline Ray::Ray(const re::Ray& ray, const re::Transform& transform) : _origin(transform.applyToPoint(ray._origin)), _dir(re::normalize(transform.applyToDir(_dir))) {
     // do nothing
   }
 

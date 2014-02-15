@@ -55,7 +55,7 @@ public:
   virtual const re::quat& quat() const = 0;
   const re::vec3& vel() const;
   virtual const re::vec3& angVel() const = 0;
-  virtual const reTransform transform() const;
+  virtual const re::Transform transform() const;
   const re::vec3 center() const;
   reUInt id() const;
   virtual reFloat mass() const = 0;
@@ -155,13 +155,13 @@ inline const re::vec3& reEnt::vel() const {
 }
 
 /**
- * Returns the reEnt's reTransform
+ * Returns the entity's transformation matrix
  * 
  * @return The transformation in matrix form
  */
 
-inline const reTransform reEnt::transform() const {
-  return reTransform(rot(), _pos);
+inline const re::Transform reEnt::transform() const {
+  return re::Transform(rot(), _pos);
 }
 
 /**
@@ -249,8 +249,7 @@ inline bool reEnt::intersectsRay(const reRayQuery& query, reRayQueryResult& resu
 }
 
 inline re::Plane::Location reEnt::locationInPlane(const re::Plane& plane) {
-  reTransform inv = re::inverse(transform());
-  return _shape->locationInPlane(re::Plane::apply(inv, plane));
+  return _shape->locationInPlane(re::Plane(plane, re::inverse(transform())));
 }
 
 /**

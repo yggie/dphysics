@@ -7,6 +7,8 @@
 
 #include "react/math.h"
 
+class reShape;
+
 namespace re {
 
   class Ray;
@@ -14,17 +16,23 @@ namespace re {
   class Segment;
 
   struct Intersect {
-    Intersect() : point(), normal() { }
+    Intersect() : depth(RE_INFINITY), point(), normal() { }
     reFloat depth;
     re::vec3 point;
     re::vec3 normal;
   };
+
+  enum Location {
+    FRONT,
+    INTERSECT,
+    BACK
+  };
   
-  bool contains(const reShape& shape, const reTransform& transform, const re::vec3& point);
+  bool intersects(const reShape& shape, const re::Transform& transform, const re::Ray& ray, Intersect& intersect);
 
-  bool intersects(const reShape& shape, const reTransform& transform, const re::Ray& ray, Intersect& intersect);
+  Location relativeToPlane(const reShape& shape, const re::Transform& transform, const re::Plane& plane);
 
-  bool intersects(const reShape& A, const reTransform& tA, const reShape& B, const reTransform& tB, Intersect& intersect);
+  bool intersects(const reShape& A, const re::Transform& tA, const reShape& B, const re::Transform& tB, Intersect& intersect);
 }
 
 #endif

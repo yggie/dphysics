@@ -1,11 +1,11 @@
 #ifndef RE_MAT3X4_OPS_H
 #define RE_MAT3X4_OPS_H
 
-#include "react/Utilities/reTransform.h"
+#include "react/Math/Transform.h"
 
 namespace re {
   
-  inline reFloat det(const re::mat3x4& tm) {
+  inline reFloat det(const re::Transform& tm) {
     const reFloat m0 = tm.m[1][1]*tm.m[2][2] - tm.m[1][2]*tm.m[2][1];
     const reFloat m1 = tm.m[1][2]*tm.m[2][0] - tm.m[1][0]*tm.m[2][2];
     const reFloat m2 = tm.m[1][0]*tm.m[2][1] - tm.m[1][1]*tm.m[2][0];
@@ -21,8 +21,8 @@ namespace re {
    * @return The inverse of the input matrix
    */
   
-  inline const re::mat3x4 inverse(const re::mat3x4& tm) {
-    mat3x4 tmp(tm);
+  inline const re::Transform inverse(const re::Transform& tm) {
+    Transform tmp(tm);
     
     const reFloat a = tm.v[1]*tm.m[2][2] - tm.v[2]*tm.m[1][2];
     const reFloat b = tm.v[1]*tm.m[2][1] - tm.v[2]*tm.m[1][1];
@@ -61,7 +61,7 @@ namespace re {
    * @return True if the two matrices are similar
    */
   
-  inline bool similar(const mat3x4& a, const mat3x4& b) {
+  inline bool similar(const Transform& a, const Transform& b) {
     return re::similar(a.v, b.v) && re::similar(a.m, b.m);
   }
 }

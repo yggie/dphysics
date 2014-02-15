@@ -9,7 +9,7 @@
 #include "react/Math/vec3.h"
 #include "react/Math/mat3x3.h"
 #include "react/Math/mat4x4.h"
-#include "react/Utilities/reTransform.h"
+#include "react/Math/Transform.h"
 #include "react/Math/quat.h"
 #include "react/Math/math_ops.h"
 
