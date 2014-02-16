@@ -8,6 +8,9 @@
 #include "Sphere.h"
 #include "ProxyShape.h"
 
+// includes tests between individual shape objects
+#include "IntersectionTests.h"
+
 int main(int argc, char** argv) {
   testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();

@@ -27,9 +27,9 @@ private:
 
 static SimpleAllocator SHARED_ALLOCATOR;
 
-const reUInt NUM_REPEATS = 50;
-const reUInt NUM_SAMPLES = 1e4;
-const reUInt NUM_SAMPLE_ERRORS = 10;
+const int NUM_REPEATS = 50;
+const int NUM_SAMPLES = 3333;
+const int NUM_SAMPLE_ERRORS = NUM_SAMPLES/1000;
 
 const re::vec3 ZERO_VEC = re::vec3(0.0, 0.0, 0.0);
 const re::mat3 IDEN_MAT = re::mat3(1.0);

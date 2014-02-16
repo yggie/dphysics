@@ -141,11 +141,43 @@ bool intersects3(const re::Sphere& A, const re::Transform& tA, const re::Sphere&
   return contact;
 }
 
+bool intersects3(const re::Plane& A, const re::Transform& tA, const re::Sphere& B, const re::Transform& tB, re::Intersect& intersect) {
+  const re::vec3 norm = tA.applyToDir(A.normal());
+  const reFloat dist = re::dot(norm, tB.v) - re::dot(norm, tA.v) - A.offset();
+  if (re::abs(dist) < B.shell() + A.shell()) {
+    intersect.point = norm * re::sign(dist) * (re::abs(dist) + B.shell() + A.shell()) / 2.0 + tA.v;
+    intersect.normal = -norm;
+    intersect.depth = re::abs(dist);
+
+    return true;
+  }
+
+  return false;
+}
+
+bool intersects3(const re::Sphere& A, const re::Transform& tA, const re::Plane& B, const re::Transform& tB, re::Intersect& intersect) {
+  const bool contact = intersects3(B, tB, A, tA, intersect);
+  if (contact) {
+    intersect.normal *= -1;
+  }
+  return contact;
+}
+
+/// TODO how to handle plane-plane collisions?
+bool intersects3(const re::Plane& A, const re::Transform& tA, const re::Plane& B, const re::Transform& tB, re::Intersect& intersect) {
+  RE_NOT_IMPLEMENTED
+  return false;
+}
+
 template <class S>
 bool intersects2(const S& A, const re::Transform& tA, const reShape& B, const re::Transform& tB, re::Intersect& intersect) {
   switch (B.type()) {
     case reShape::SPHERE:
       return intersects3(A, tA, (const re::Sphere&)B, tB, intersect);
+      break;
+
+    case reShape::PLANE:
+      return intersects3(A, tA, (const re::Plane&)B, tB, intersect);
       break;
 
     default:
@@ -158,6 +190,10 @@ bool re::intersects(const reShape& A, const re::Transform& tA, const reShape& B,
   switch (A.type()) {
     case reShape::SPHERE:
       return intersects2((const re::Sphere&)A, tA, B, tB, intersect);
+      break;
+
+    case reShape::PLANE:
+      return intersects2((const re::Plane&)A, tA, B, tB, intersect);
       break;
 
     default:
