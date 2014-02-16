@@ -33,7 +33,7 @@ const reUInt NUM_SAMPLE_ERRORS = 10;
 
 const re::vec3 ZERO_VEC = re::vec3(0.0, 0.0, 0.0);
 const re::mat3 IDEN_MAT = re::mat3(1.0);
-const re::Transform IDEN_MAT3x4 = re::Transform(IDEN_MAT, ZERO_VEC);
+const re::Transform IDEN_TRANS = re::Transform(IDEN_MAT, ZERO_VEC);
 const re::mat4 IDEN_MAT4x4 = re::mat4(1.0);
 
 #define ASSERT_NO_MEM_LEAKS()  ASSERT_EQ(SHARED_ALLOCATOR.numAllocs(), 0) << "should have no memory leaks"

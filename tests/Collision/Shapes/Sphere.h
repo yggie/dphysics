@@ -1,6 +1,6 @@
 #include "helpers.h"
 
-#include "react/Collision/Shapes/Sphere.h"
+#include "react/Collision/Shapes/shapes.h"
 
 TEST(Sphere, Constructor_test) {
   re::Sphere s(3.0);
@@ -8,6 +8,17 @@ TEST(Sphere, Constructor_test) {
   ASSERT_FLOAT_EQ(s.radius(), 3.0) << "should create a sphere with given radius";
   
   ASSERT_TRUE(s.type() == reShape::SPHERE) << "should have the correct type";
+
+  ASSERT_FLOAT_EQ(s.shell(), 3.0) << "shell thickness and radius should be equivalent";
+  
+  ASSERT_EQ(s.numVerts(), 1) << "should only have one vertex";
+  
+  ASSERT_TRUE(re::similar(s.vert(0), re::vec3(0.0, 0.0, 0.0))) <<
+    "should have its only vertex at the origin";
+
+  re::Sphere s2(s);
+  ASSERT_FLOAT_EQ(s2.radius(), s.radius()) <<
+    "should copy the radius";
 }
 
 TEST(Sphere, withRadius_test) {
@@ -32,55 +43,56 @@ TEST(Sphere, volume_test) {
   }
 }
 
-TEST(Sphere, VertexData_test) {
-  re::Sphere s(33.3);
-  
-  ASSERT_FLOAT_EQ(s.shell(), 33.3) << "shell thickness and radius should be equivalent";
-  
-  ASSERT_EQ(s.numVerts(), 1) << "should only have one vertex";
-  
-  ASSERT_TRUE(re::similar(s.vert(0), re::vec3(0.0, 0.0, 0.0))) <<
-    "should have its only vertex at the origin";
+TEST(Sphere, randomPoint_test) {
+  re::Sphere s(3.0);
+
+  for (unsigned int i = 0; i < NUM_SAMPLES; i++) {
+    ASSERT_LE(re::lengthSq(s.randomPoint()), 9.0) <<
+      "should generate random points inside the sphere";
+  }
 }
 
-/**
-TEST(Sphere, Something_test) {
+TEST(Sphere, containsPoint_test) {
   re::Sphere s(5.0);
-  reRayQueryResult res;
+
   for (reUInt i = 0; i < NUM_SAMPLES; i++) {
     const re::vec3 pt = s.randomPoint();
-    ASSERT_LE(re::lengthSq(pt), 25.0) <<
-      "should generate random points inside the sphere";
     
     ASSERT_TRUE(s.containsPoint(pt)) <<
-      "should be true for any generated point";
+      "should be true for any generated random point";
     
     const re::vec3 ptOutside = re::normalize(pt) * re::randf(5.1, 100.0);
     ASSERT_FALSE(s.containsPoint(ptOutside)) <<
       "should be false for any generated points outside the sphere";
-    
-    reRayQuery query;
-    query.origin = ptOutside;
-    query.dir = (pt - ptOutside);
-    ASSERT_TRUE(s.intersectsRay(query, res)) <<
-      "should intersect segments built from a point outside to a point inside the sphere";
   }
 }
 
-TEST(Sphere, SomeOtherThing_test) {
+TEST(Sphere, intersects_test) {
   re::Sphere s(2.0);
   
-  reRayQueryResult res;
+  re::RayQuery result;
   for (reUInt i = 0; i < NUM_SAMPLES; i++) {
-    const re::vec3 ptOutside = re::vec3::unit() * re::randf(2.1, 1111.1);
+    const re::vec3 pt = s.randomPoint();
+    const re::vec3 ptOutside = re::normalize(s.randomPoint()) * re::randf(s.radius() * 1.1, 10.0 * s.radius());
+    const re::Ray ray(ptOutside, pt - ptOutside);
+
+    ASSERT_TRUE(re::intersects(s, IDEN_TRANS, ray, result)) <<
+      "should return true";
+
+    ASSERT_FLOAT_EQ(re::length(result.normal), 1.0) <<
+      "should have the normal vector normalized";
+
+    ASSERT_LE(re::abs(re::length(result.point) - s.radius()), 2*RE_FP_TOLERANCE) <<
+      "should have the intersection point at the sphere surface";
+
+    ASSERT_LE(re::length(ptOutside) - result.depth, s.radius() + RE_FP_TOLERANCE) <<
+      "should have the depth within a valid range";
     
-    reRayQuery query;
-    const re::vec3 edge = re::normalize(re::cross(ptOutside, re::vec3::rand()));
-    query.origin = ptOutside - edge * re::randf(1e2, 1e3);
-    query.dir = edge;
-    
-    ASSERT_FALSE(s.intersectsRay(query, res)) <<
-      "should not intersect with rays outside the sphere";
+    const re::vec3 perp = re::normalize(re::cross(ptOutside, re::vec3::rand()));
+    const re::Ray ray2(ptOutside - re::randf(1.0, 100.0)*perp, perp);
+
+    ASSERT_FALSE(re::intersects(s, IDEN_TRANS, ray2, result)) <<
+      "should return false";
   }
 }
 

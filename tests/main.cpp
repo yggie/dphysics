@@ -4,9 +4,6 @@
 //#include "reEntList.h"
 #include "reLinkedList.h"
 
-// collision module unit tests
-#include "reBSPTree.h"
-
 // integration tests
 #include "defaultWorld.h"
 

@@ -1,6 +1,6 @@
 #include "helpers.h"
 
-TEST(TransformTest, IsIdentityOnInit) {
+TEST(Transform, Constructor_test) {
   re::Transform transform;
   
   ASSERT_TRUE(re::similar(transform.m, re::mat3(1.0))) <<
@@ -110,7 +110,7 @@ TEST(TransformTest, Inverse) {
   for (reUInt i = 0; i < NUM_REPEATS; i++) {
     re::Transform transform = re::Transform().translate(re::vec3::rand(50.0)).scale(re::vec3::rand(13.0)).rotate(re::randf(-1e5, 1e5), re::vec3::rand());
     
-    ASSERT_TRUE(re::similar(re::inverse(transform) * transform, IDEN_MAT3x4)) <<
+    ASSERT_TRUE(re::similar(re::inverse(transform) * transform, IDEN_TRANS)) <<
       "multiplication with inverse should return the identity matrix";
   }
 }
