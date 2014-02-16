@@ -4,7 +4,7 @@
 
 #include "react/debug.h"
 
-bool sphereIntersect(const re::Sphere& sphere, const re::Ray& ray, re::Intersect& intersect) {
+bool sphereRayIntersect(const re::Sphere& sphere, const re::Ray& ray, re::Intersect& intersect) {
   const reFloat a = re::lengthSq(ray.dir());
   const reFloat b = 2 * re::dot(ray.origin(), ray.dir());
   const reFloat c = re::lengthSq(ray.origin()) - re::sq(sphere.radius());
@@ -43,7 +43,7 @@ bool re::intersects(const reShape& shape, const re::Transform& transform, const 
   // TODO convert back to virtual methods, faster than switch
   switch (shape.type()) {
     case reShape::SPHERE:
-      if (sphereIntersect((const re::Sphere&)shape, re::Ray(ray, re::inverse(transform)), intersect)) {
+      if (sphereRayIntersect((const re::Sphere&)shape, re::Ray(ray, re::inverse(transform)), intersect)) {
         intersect.point = transform.applyToPoint(intersect.point);
         intersect.normal = re::normalize(transform.applyToDir(intersect.normal));
         intersect.depth = re::length(ray.origin() - intersect.point);
@@ -129,5 +129,40 @@ re::Location re::relativeToPlane(const reShape& shape, const re::Transform& tran
   }
 }
 
-bool re::intersects(const reShape& A, const re::Transform& tA, const reShape& B, const re::Transform& tB, re::Intersect& intersect) {
+bool intersects3(const re::Sphere& A, const re::Transform& tA, const re::Sphere& B, const re::Transform& tB, re::Intersect& intersect) {
+  const reFloat minDist = A.radius() + B.radius();
+  bool contact = (re::lengthSq(tA.v - tB.v) < re::sq(minDist));
+  if (contact) {
+    intersect.point = (tA.v + tB.v) / 2.0;
+    intersect.normal = re::normalize(tA.v - tB.v);
+    intersect.depth = re::length(tA.v - intersect.point);
+  }
+  
+  return contact;
 }
+
+template <class S>
+bool intersects2(const S& A, const re::Transform& tA, const reShape& B, const re::Transform& tB, re::Intersect& intersect) {
+  switch (B.type()) {
+    case reShape::SPHERE:
+      return intersects3(A, tA, (const re::Sphere&)B, tB, intersect);
+      break;
+
+    default:
+      RE_NOT_IMPLEMENTED
+      throw 0;
+  }
+}
+
+bool re::intersects(const reShape& A, const re::Transform& tA, const reShape& B, const re::Transform& tB, re::Intersect& intersect) {
+  switch (A.type()) {
+    case reShape::SPHERE:
+      return intersects2((const re::Sphere&)A, tA, B, tB, intersect);
+      break;
+
+    default:
+      RE_NOT_IMPLEMENTED
+      throw 0;
+  }
+}
+

@@ -59,7 +59,7 @@ void reBSPNode::rebalanceNode(reTreeBalanceStrategy& strategy) {
  * @param collisions The collision collection object
  */
 
-void reBSPNode::updateContacts(reContactGraph& contacts, reEnt& entity) const {
+void reBSPNode::updateContacts(re::ContactGraph& contacts, reEnt& entity) const {
   if (hasChildren()) {
     // propagate call to children
     switch (entity.relativeToPlane(_splitPlane)) {

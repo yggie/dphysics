@@ -8,7 +8,7 @@
 #include "react/common.h"
 #include "react/Utilities/reEntList.h"
 #include "react/Dynamics/reInteraction.h"
-#include "react/Dynamics/reContactGraph.h"
+#include "react/Dynamics/ContactGraph.h"
 #include "react/Collision/reSpatialQueries.h"
 #include "react/Collision/reTreeBalanceStrategy.h"
 

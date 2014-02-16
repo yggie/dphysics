@@ -47,7 +47,7 @@ public:
   reUInt placements() const;
   
   void rebalanceNode(reTreeBalanceStrategy& strategy);
-  void updateContacts(reContactGraph& collisions, reEnt& entity) const;
+  void updateContacts(re::ContactGraph& collisions, reEnt& entity) const;
   
   void measureRecursive(reBPMeasure& m) const;
   
@@ -107,7 +107,7 @@ public:
 protected:
   
   /** The structure maintaining collision interactions between entities */
-  reContactGraph _contacts;
+  re::ContactGraph _contacts;
   /** The strategy used to balance the tree */
   reTreeBalanceStrategy _strategy;
   reLinkedList<Marker*> _allMarkers;

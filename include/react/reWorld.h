@@ -8,7 +8,7 @@
 #include "react/common.h"
 #include "react/math.h"
 #include "react/Memory/reAllocator.h"
-#include "react/Utilities/reBuilder.h"
+#include "react/Utilities/Builder.h"
 #include "react/Collision/reSpatialQueries.h"
 #include "react/Utilities/reLinkedList.h"
 
@@ -45,7 +45,7 @@ public:
   reAllocator& allocator() const;
   reBroadPhase& broadPhase() const;
   re::Integrator& integrator() const;
-  reBuilder build();
+  re::Builder build();
   
   // spatial queries
   reEnt* queryWithRay(const re::vec3& from, const re::vec3& direction, re::vec3* intersect = nullptr, re::vec3* normal = nullptr);
@@ -84,8 +84,8 @@ inline re::Integrator& reWorld::integrator() const {
   return *_integrator;
 }
 
-inline reBuilder reWorld::build() {
-  return reBuilder(*this);
+inline re::Builder reWorld::build() {
+  return re::Builder(*this);
 }
 
 #endif

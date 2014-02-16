@@ -66,7 +66,7 @@ void PlanetaryMotionDemo::restart() {
 void PlanetaryMotionDemo::prepareWorld() {
   re::Sphere sphere(1.0);
   
-  reBuilder build = _world.build();
+  re::Builder build = _world.build();
   
   reRigidBody& body = build.RigidBody(sphere).withMass(5.0).at(0, -5, -5).rotatingWith(0.0, 0.00, 0.01);
   
