@@ -3,7 +3,6 @@
 // volume-less shape types
 #include "Ray.h"
 #include "Plane.h"
-#include "PlaneShape.h"
 
 // complex shape types
 #include "Sphere.h"

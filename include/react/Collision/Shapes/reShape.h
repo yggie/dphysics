@@ -10,7 +10,6 @@
 #include "react/Collision/reAABB.h"
 #include "react/Collision/reSpatialQueries.h"
 #include "react/Collision/Shapes/Ray.h"
-#include "react/Collision/Shapes/Plane.h"
 #include "react/Collision/Shapes/Segment.h"
 
 /**
@@ -33,8 +32,8 @@ public:
     TRIANGLE,
     /** A wrapper around shapes allow arbitrary transforms @see reProxyShape */
     PROXY,
-    /** A wrapper around a plane object, can only be used by re::StaticBody objects @see re::PlaneShape */
-    PLANE_SHAPE
+    /** An infinite plane @see re::Plane */
+    PLANE
   };
   
   reShape();
