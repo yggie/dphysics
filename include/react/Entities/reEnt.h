@@ -11,6 +11,11 @@
 #include "react/Collision/Shapes/reShape.h"
 #include "react/Collision/reSpatialQueries.h"
 
+namespace re {
+  class Plane;
+  enum Location;
+}
+
 /**
  * @ingroup entities
  * Represents a physical entity, which exists and interacts in the reWorld.
@@ -85,9 +90,9 @@ public:
   virtual reEnt& withDensity(reFloat mass) = 0;
   
   // collision queries
-  bool intersectsRay(const reRayQuery& query, reRayQueryResult& result) const;
+  bool intersects(const re::Ray& ray, re::Intersect& intersect) const;
   
-  re::Plane::Location locationInPlane(const re::Plane& plane);
+  re::Location relativeToPlane(const re::Plane& plane);
   
   /** a pointer to arbitrary data, defined by the user */
   void* userdata;
@@ -231,25 +236,6 @@ inline void reEnt::setVel(const re::vec3& velocity) {
 
 inline void reEnt::setVel(reFloat x, reFloat y, reFloat z) {
   _vel.set(x, y, z);
-}
-
-/**
- * Returns true if the reEnt intersects the ray specified
- * 
- * @param query The ray query struct
- * @param result The ray query result struct
- * @return True if the ray intersects
- */
-
-inline bool reEnt::intersectsRay(const reRayQuery& query, reRayQueryResult& result) const {
-  if (_shape != nullptr) {
-    return _shape->intersectsRay(transform(), query, result);
-  }
-  return false;
-}
-
-inline re::Plane::Location reEnt::locationInPlane(const re::Plane& plane) {
-  return _shape->locationInPlane(re::Plane(plane, re::inverse(transform())));
 }
 
 /**

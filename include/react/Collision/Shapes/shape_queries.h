@@ -14,21 +14,11 @@ namespace re {
   class Ray;
   class Plane;
   class Segment;
+  class Intersect;
 
-  struct Intersect {
-    Intersect() : depth(RE_INFINITY), point(), normal() { }
-    reFloat depth;
-    re::vec3 point;
-    re::vec3 normal;
-  };
-
-  enum Location {
-    FRONT,
-    INTERSECT,
-    BACK
-  };
-  
   bool intersects(const reShape& shape, const re::Transform& transform, const re::Ray& ray, Intersect& intersect);
+
+  Location relativeToPlane(const reShape& shape, const re::Plane& plane);
 
   Location relativeToPlane(const reShape& shape, const re::Transform& transform, const re::Plane& plane);
 

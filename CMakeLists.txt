@@ -19,10 +19,10 @@ include_directories(
 )
 
 add_subdirectory(src)
-if(DEMOS)
-  add_subdirectory(demos)
-endif(DEMOS)
 if(TESTS)
   add_subdirectory(tests)
 endif(TESTS)
+if(DEMOS)
+  add_subdirectory(demos)
+endif(DEMOS)
 

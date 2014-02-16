@@ -58,7 +58,7 @@ public:
   const reLinkedList<reEnt*> sample(reUInt size) const;
   
   // spatial queries
-  void queryWithRay(const reRayQuery& query, re::RayResult& result) const;
+  void queryWithRay(const re::Ray& ray, re::RayQuery& result) const;
 
   reBSPNode* place(Marker& marker);
   
@@ -99,7 +99,7 @@ public:
   const reLinkedList<reEnt*>& entities() const override;
   
   // spatial queries
-  re::RayResult queryWithRay(const reRayQuery& query) const override;
+  re::RayQuery queryWithRay(const re::Ray& ray) const override;
   
   // measurement
   reBPMeasure measure() const override;
@@ -150,9 +150,9 @@ inline reUInt reBSPTree::size() const {
   return _masterEntityList.size();
 }
 
-inline re::RayResult reBSPTree::queryWithRay(const reRayQuery& query) const {
-  re::RayResult result;
-  reBSPNode::queryWithRay(query, result);
+inline re::RayQuery reBSPTree::queryWithRay(const re::Ray& ray) const {
+  re::RayQuery result;
+  reBSPNode::queryWithRay(ray, result);
   return result;
 }
 

@@ -24,6 +24,7 @@ bool Sphere::containsPoint(const re::vec3& point) const {
   return lengthSq(point) < radius()*radius();
 }
 
+/**
 bool Sphere::intersectsRay(const reRayQuery& query, reRayQueryResult& result) const {
   // solve for the points of intersection
   const reFloat a = re::lengthSq(query.dir);
@@ -49,4 +50,4 @@ bool Sphere::intersectsRay(const reRayQuery& query, reRayQueryResult& result) co
   
   return true;
 }
-
+*/

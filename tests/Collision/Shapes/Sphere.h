@@ -43,6 +43,7 @@ TEST(Sphere, VertexData_test) {
     "should have its only vertex at the origin";
 }
 
+/**
 TEST(Sphere, Something_test) {
   re::Sphere s(5.0);
   reRayQueryResult res;
@@ -83,6 +84,7 @@ TEST(Sphere, SomeOtherThing_test) {
   }
 }
 
+/**
 TEST(Sphere, locationInPlane_test) {
   re::Sphere s(1.0);
   
@@ -105,4 +107,4 @@ TEST(Sphere, locationInPlane_test) {
     }
   }
 }
-
+*/

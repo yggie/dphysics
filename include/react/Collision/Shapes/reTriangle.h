@@ -40,7 +40,6 @@ public:
   
   // collision queries
   bool containsPoint(const re::vec3& point) const override;
-  bool intersectsRay(const reRayQuery& query, reRayQueryResult& result) const override;
   
 private:
   re::vec3 _verts[3];

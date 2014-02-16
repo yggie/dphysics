@@ -13,7 +13,7 @@
 #include "react/Collision/reTreeBalanceStrategy.h"
 
 class reEnt;
-struct reBPMeasure;
+class reBPMeasure;
 
 /**
  * @ingroup collision
@@ -42,7 +42,7 @@ public:
   virtual const reLinkedList<reEnt*>& entities() const = 0;
   
   // spatial queries
-  virtual re::RayResult queryWithRay(const reRayQuery& query) const = 0;
+  virtual re::RayQuery queryWithRay(const re::Ray& ray) const = 0;
   
   // measurement functions
   virtual reBPMeasure measure() const = 0;

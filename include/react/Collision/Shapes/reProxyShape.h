@@ -48,11 +48,6 @@ public:
   
   // collision queries
   bool containsPoint(const re::vec3& point) const override;
-  
-  bool intersectsRay(const reRayQuery& query, reRayQueryResult& result) const override;
-  
-  re::Plane::Location locationInPlane(const re::Plane& plane) const override;
-  
 private:
   re::Transform _transform;
   reShape* const _shape;
@@ -131,10 +126,6 @@ inline const re::mat3 reProxyShape::computeInertia() const {
 
 inline const re::vec3 reProxyShape::randomPoint() const {
   return _transform.applyToPoint(_shape->randomPoint());
-}
-
-inline re::Plane::Location reProxyShape::locationInPlane(const re::Plane& plane) const {
-  return _shape->locationInPlane(re::Plane(plane, re::inverse(_transform)));
 }
 
 #endif

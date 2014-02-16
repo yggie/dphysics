@@ -20,6 +20,7 @@ bool reTriangle::containsPoint(const re::vec3& point) const {
   return re::abs(re::dot(faceNorm(), point - _verts[0])) < RE_FP_TOLERANCE;
 }
 
+/**
 bool reTriangle::intersectsRay(const reRayQuery& query, reRayQueryResult& result) const {
   const re::vec3 u = (_verts[0] - _verts[1]);
   const re::vec3 v = (_verts[2] - _verts[1]);
@@ -81,4 +82,4 @@ bool reTriangle::intersectsRay(const reRayQuery& query, reRayQueryResult& result
 //  RE_ASSERT(!reIsNan(s) || !reIsNan(t), "Cannot be NaN");
   
   return false;
-}
+}*/

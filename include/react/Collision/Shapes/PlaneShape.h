@@ -24,10 +24,6 @@ namespace re {
     const re::vec3 randomPoint() const;
 
     bool containsPoint(const re::vec3& point) const override;
-
-    bool intersectsRay(const reRayQuery& query, reRayQueryResult& result) const override;
-
-    re::Plane::Location locationInPlane(const re::Plane& plane) const override;
   };
 
   inline PlaneShape::PlaneShape(const re::vec3& normal, const re::vec3& point) : Plane(normal, point), reShape() {

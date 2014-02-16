@@ -7,6 +7,7 @@ bool reShape::containsPoint(const re::Transform& transform, const re::vec3& poin
   return containsPoint(transform.applyToPoint(point));
 }
 
+/**
 bool reShape::intersectsRay(const re::Transform& transform, const reRayQuery& query, reRayQueryResult& result) const {
   const re::Transform inv = transform.inverse();
   reRayQuery newQuery;
@@ -25,33 +26,5 @@ bool reShape::intersectsRay(const re::Transform& transform, const reRayQuery& qu
   return false;
 }
 
-re::Plane::Location reShape::locationInPlane(const re::Plane& plane) const {
-  const reUInt N = numVerts();
-  reFloat maxV = RE_NEGATIVE_INFINITY;
-  reFloat minV = RE_INFINITY;
-  
-  for (reUInt i = 0; i < N; i++) {
-    const reFloat dat = re::dot(vert(i), plane.normal()) - plane.offset();
-    const reFloat mx = dat + shell();
-    const reFloat mn = dat - shell();
-    if (mx > maxV) {
-      maxV = mx;
-    }
-    if (mn < minV) {
-      minV = mn;
-    }
-    if ((maxV > RE_FP_TOLERANCE && minV < RE_FP_TOLERANCE) ||
-        (maxV < RE_FP_TOLERANCE && minV > RE_FP_TOLERANCE)) {
-      return re::Plane::ON_PLANE;
-    }
-  }
-  
-  if (minV > RE_FP_TOLERANCE && maxV > RE_FP_TOLERANCE) {
-    return re::Plane::FRONT_OF_PLANE;
-  } else if (minV < RE_FP_TOLERANCE && maxV < RE_FP_TOLERANCE) {
-    return re::Plane::BACK_OF_PLANE;
-  }
-  
-  return re::Plane::ON_PLANE;
-}
 
+*/

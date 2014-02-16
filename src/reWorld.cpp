@@ -134,18 +134,14 @@ const reLinkedList<reEnt*>& reWorld::entities() const {
  */
 
 reEnt* reWorld::queryWithRay(const re::vec3& origin, const re::vec3& dir, re::vec3* intersect, re::vec3* normal) {
-  reRayQuery query;
-  query.origin = origin;
-  query.dir = dir;
-  
-  re::RayResult res = _broadPhase->queryWithRay(query);
+  re::RayQuery res = _broadPhase->queryWithRay(re::Ray(origin, dir));
   
   if (res.entity != nullptr) {
     if (intersect != nullptr) {
-      *intersect = res.surfaceIntersect;
+      *intersect = res.point;
     }
     if (normal != nullptr) {
-      *normal = res.surfaceNormal;
+      *normal = res.normal;
     }
     return res.entity;
   }

@@ -27,7 +27,13 @@ namespace re {
    */
   
   extern FILE* logFile;
-  
+ 
+  enum Location {
+    FRONT,
+    INTERSECT,
+    BACK
+  };
+
   extern reUInt queriesMade;
 }
 

@@ -62,16 +62,16 @@ void reBSPNode::rebalanceNode(reTreeBalanceStrategy& strategy) {
 void reBSPNode::updateContacts(reContactGraph& contacts, reEnt& entity) const {
   if (hasChildren()) {
     // propagate call to children
-    switch (entity.locationInPlane(_splitPlane)) {
-      case re::Plane::FRONT_OF_PLANE:
+    switch (entity.relativeToPlane(_splitPlane)) {
+      case re::FRONT:
         _children[0]->updateContacts(contacts, entity);
         return;
       
-      case re::Plane::ON_PLANE:
+      case re::INTERSECT:
         // continue program
         break;
       
-      case re::Plane::BACK_OF_PLANE:
+      case re::BACK:
         _children[1]->updateContacts(contacts, entity);
         return;
       
@@ -100,32 +100,32 @@ bool reBSPNode::execute(reBSPTreeCallback callback) {
   return false;
 }
 
-void reBSPNode::queryWithRay(const reRayQuery& query, re::RayResult& result) const {
-  if (hasChildren()) {
-    const reFloat a = re::dot(query.dir, _splitPlane.normal());
-    const reFloat b = re::dot(_splitPlane.normal(), query.origin) - _splitPlane.offset();
-    if (a > RE_FP_TOLERANCE && b > RE_FP_TOLERANCE) {
-      _children[0]->queryWithRay(query, result);
-      return;
-    } else if (a < RE_FP_TOLERANCE && b < RE_FP_TOLERANCE) {
-      _children[1]->queryWithRay(query, result);
-      return;
-    }
-    
-    _children[0]->queryWithRay(query, result);
-    _children[1]->queryWithRay(query, result);
-  }
-  
-  reRayQueryResult res;
+#include "react/debug.h"
+
+void reBSPNode::queryWithRay(const re::Ray& ray, re::RayQuery& result) const {
+  re::RayQuery res;
   for (Marker* marker : _markers) {
     re::queriesMade++;
-    if (marker->entity.intersectsRay(query, res)) {
-      if (res.distSq < result.distSq) {
-        result.surfaceIntersect = res.intersect;
-        result.surfaceNormal = res.normal;
-        result.distSq = res.distSq;
+    if (marker->entity.intersects(ray, res)) {
+      if (res.depth < result.depth) {
+        result.point = res.point;
+        result.normal = res.normal;
+        result.depth = res.depth;
         result.entity = &marker->entity;
       }
+    }
+  }
+
+  if (hasChildren()) {
+    const reFloat a = re::dot(ray.dir(), _splitPlane.normal());
+    const reFloat b = re::dot(_splitPlane.normal(), ray.origin()) - _splitPlane.offset();
+    if (a > RE_FP_TOLERANCE && b > RE_FP_TOLERANCE) {
+      _children[0]->queryWithRay(ray, result);
+    } else if (a < RE_FP_TOLERANCE && b < RE_FP_TOLERANCE) {
+      _children[1]->queryWithRay(ray, result);
+    } else {
+      _children[0]->queryWithRay(ray, result);
+      _children[1]->queryWithRay(ray, result);
     }
   }
 }
@@ -204,14 +204,14 @@ const reLinkedList<reEnt*> reBSPNode::sample(reUInt num) const {
 
 reBSPNode* reBSPNode::place(Marker& marker) {
   if (hasChildren()) {
-    switch (marker.entity.locationInPlane(_splitPlane)) {
-      case re::Plane::FRONT_OF_PLANE:
+    switch (marker.entity.relativeToPlane(_splitPlane)) {
+      case re::FRONT:
         return _children[0]->place(marker);
       
-      case re::Plane::ON_PLANE:
+      case re::INTERSECT:
         break;
       
-      case re::Plane::BACK_OF_PLANE:
+      case re::BACK:
         return _children[1]->place(marker);
       
       default:

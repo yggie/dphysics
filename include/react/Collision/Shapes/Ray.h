@@ -21,6 +21,9 @@ namespace re {
     const re::vec3& origin() const;
     const re::vec3& dir() const;
 
+    void setOrigin(const re::vec3& origin);
+    void setDir(const re::vec3& dir);
+
   private:
     re::vec3 _origin;
     re::vec3 _dir;
@@ -34,7 +37,7 @@ namespace re {
     // do nothing
   }
 
-  inline Ray::Ray(const re::Ray& ray, const re::Transform& transform) : _origin(transform.applyToPoint(ray._origin)), _dir(re::normalize(transform.applyToDir(_dir))) {
+  inline Ray::Ray(const re::Ray& ray, const re::Transform& transform) : _origin(transform.applyToPoint(ray._origin)), _dir(re::normalize(transform.applyToDir(ray._dir))) {
     // do nothing
   }
 
@@ -44,6 +47,14 @@ namespace re {
 
   inline const re::vec3& Ray::dir() const {
     return _dir;
+  }
+
+  inline void Ray::setOrigin(const re::vec3& origin) {
+    _origin = origin;
+  }
+
+  inline void Ray::setDir(const re::vec3& dir) {
+    _dir = re::normalize(dir);
   }
 }
 

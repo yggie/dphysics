@@ -190,6 +190,8 @@ TEST_F(reBSPTreeTest, TreeBalancing) {
   ASSERT_NO_MEM_LEAKS();
 }
 
+#include "react/debug.h"
+
 TEST_F(reBSPTreeTest, RayQueries) {
   const int N = 20; // too high will make it slow
   generateFixtures(N*N);
@@ -203,15 +205,14 @@ TEST_F(reBSPTreeTest, RayQueries) {
     }
   }
   
-  reRayQuery query;
-  query.origin = re::vec3(0.0, 0.0, 100.0);
+  re::Ray ray(re::vec3(0.0, 0.0, 100.0), re::vec3());
   unsigned int II = 0;
   for (reRigidBody* body : fixtures) {
-    query.dir = re::normalize(body->center() - query.origin);
+    ray.setDir(body->center() - ray.origin());
 //    re::SingleResult res = tree.query().withRay(start, direction);
-    re::RayResult res = tree.queryWithRay(query);
+    re::RayQuery res = tree.queryWithRay(ray);
     ASSERT_TRUE(body == res.entity) <<
-      "should return the correct entity";
+      "should return the correct entity" << II++;
   }
   
   tree.rebalance();
@@ -223,11 +224,11 @@ TEST_F(reBSPTreeTest, RayQueries) {
   ASSERT_EQ(placements, fixtures.size()) <<
     "should not lose references in the structure";
   
-  query.origin = re::vec3(0.0, 0.0, 1000.0);
+  ray.setOrigin(re::vec3(0.0, 0.0, 1000.0));
   II = 0;
   for (reRigidBody* body : fixtures) {
-    query.dir = re::normalize(body->center() - query.origin);
-    re::RayResult res = tree.queryWithRay(query);
+    ray.setDir(body->center() - ray.origin());
+    re::RayQuery res = tree.queryWithRay(ray);
     ASSERT_TRUE(body == res.entity) <<
       "should still work after rebalancing loop@" << II;
     II++;

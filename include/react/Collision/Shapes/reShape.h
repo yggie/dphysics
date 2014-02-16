@@ -58,12 +58,6 @@ public:
   bool containsPoint(const re::Transform& transform, const re::vec3& point) const;
   
   virtual bool containsPoint(const re::vec3& point) const = 0;
-  
-  bool intersectsRay(const re::Transform& transform, const reRayQuery& query, reRayQueryResult& result) const;
-  
-  virtual bool intersectsRay(const reRayQuery& query, reRayQueryResult& result) const = 0;
-  
-  virtual re::Plane::Location locationInPlane(const re::Plane& plane) const;
 protected:
   reFloat _shell;
 };

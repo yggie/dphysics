@@ -22,10 +22,11 @@ bool reProxyShape::containsPoint(const re::vec3& point) const {
   return false;
 }
 
+/**
 bool reProxyShape::intersectsRay(const reRayQuery& query, reRayQueryResult& result) const {
   if (_shape != nullptr) {
     return _shape->intersectsRay(_transform, query, result);
   }
   return false;
 }
-
+*/

@@ -11,6 +11,25 @@
 class reEnt;
 
 namespace re {
+  struct Intersect {
+    Intersect() : depth(RE_INFINITY), point(), normal() { }
+    reFloat depth;
+    re::vec3 point;
+    re::vec3 normal;
+  };
+
+  struct RayQuery : public Intersect {
+    RayQuery() : Intersect(), entity(nullptr) { }
+    RayQuery& operator=(const RayQuery& q) {
+      depth = q.depth;
+      point = q.point;
+      normal = q.normal;
+      entity = q.entity;
+      return *this;
+    }
+    reEnt* entity;
+  };
+
   extern reUInt globalQueryID;  // defined in common.h
 };
 
@@ -48,14 +67,6 @@ struct reRayQueryResult {
 };
 
 namespace re {
-  struct PlaneQuery {
-    enum FastResult {
-      FRONT,
-      INTERSECTS,
-      BEHIND
-    };
-  };
-  
   struct RayResult {
     RayResult() : distSq(RE_INFINITY), entity(nullptr), surfaceIntersect(), surfaceNormal() { }
     reFloat distSq;
