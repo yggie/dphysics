@@ -25,6 +25,7 @@ namespace re {
     Type type() const override;
     reUInt numVerts() const override;
     const re::vec3 vert(reUInt i) const override;
+
     reFloat volume() const override;
     const re::mat3 computeInertia() const override;
     

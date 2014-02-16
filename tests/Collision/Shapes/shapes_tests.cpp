@@ -7,7 +7,7 @@
 
 // complex shape types
 #include "Sphere.h"
-#include "reProxyShape.h"
+#include "ProxyShape.h"
 
 int main(int argc, char** argv) {
   testing::InitGoogleTest(&argc, argv);

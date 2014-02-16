@@ -48,6 +48,7 @@ public:
   
   // collision queries
   bool containsPoint(const re::vec3& point) const override;
+
 private:
   re::Transform _transform;
   reShape* const _shape;

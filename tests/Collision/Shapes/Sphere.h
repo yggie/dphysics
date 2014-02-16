@@ -2,7 +2,7 @@
 
 #include "react/Collision/Shapes/shapes.h"
 
-TEST(Sphere, Constructor_test) {
+TEST(Sphere, ConstructorAndProperties_test) {
   re::Sphere s(3.0);
   
   ASSERT_FLOAT_EQ(s.radius(), 3.0) << "should create a sphere with given radius";
@@ -15,6 +15,9 @@ TEST(Sphere, Constructor_test) {
   
   ASSERT_TRUE(re::similar(s.vert(0), re::vec3(0.0, 0.0, 0.0))) <<
     "should have its only vertex at the origin";
+
+  ASSERT_LE(re::abs(s.volume() - RE_PI*4.0*9.0), RE_FP_TOLERANCE * s.volume()) <<
+    "should return the volume within tolerance";
 
   re::Sphere s2(s);
   ASSERT_FLOAT_EQ(s2.radius(), s.radius()) <<
@@ -32,15 +35,6 @@ TEST(Sphere, setRadius_test) {
 
   s.setRadius(15.0);
   ASSERT_FLOAT_EQ(s.radius(), 15.0) << "can change the radius with a setter";
-}
-
-TEST(Sphere, volume_test) {
-  for (unsigned int i = 0; i < NUM_REPEATS; i++) {
-    const float r = re::randf(1.0, 100.0);
-    const re::Sphere s(r);
-    ASSERT_LE(re::abs(s.volume() - RE_PI*4.0*r*r*r/3.0), 0.001*s.volume()) <<
-      "should return the volume within tolerance";
-  }
 }
 
 TEST(Sphere, randomPoint_test) {
