@@ -9,6 +9,7 @@
 #include "react/Entities/reEnt.h"
 #include "react/Utilities/reLinkedList.h"
 #include "react/Dynamics/reInteraction.h"
+#include "react/Utilities/ContactFilter.h"
 
 namespace re {
   /**
@@ -47,6 +48,7 @@ namespace re {
   private:
     reAllocator& _allocator;
     reLinkedList<ContactEdge*> _edges;
+    re::ContactFilter _filter;
   };
 }
 

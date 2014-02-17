@@ -170,7 +170,7 @@ EntityWrapper& Canvas::bind(reEnt& ent) {
         return *wrapper;
       }
       break;
-    
+
     default:
       RE_NOT_IMPLEMENTED
       throw 0;

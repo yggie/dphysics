@@ -3,6 +3,7 @@
 #include "react/reWorld.h"
 #include "react/Collision/reBSPTree.h"
 #include "react/Entities/reRigidBody.h"
+#include "react/Entities/StaticBody.h"
 #include "react/Dynamics/reGravAction.h"
 #include "react/Collision/Shapes/shapes.h"
 
@@ -86,8 +87,16 @@ void PlanetaryMotionDemo::prepareWorld() {
   build.GravAction(A, B);
   build.GravAction(body, B);
   build.GravAction(body, A);
-  
+
+  build.StaticBody(re::Plane(re::vec3(0.0, 0.0, -1.0), -5.0));
+  build.StaticBody(re::Plane(re::vec3(0.0, 0.0, 1.0), -5.0));
+  build.StaticBody(re::Plane(re::vec3(-1.0, 0.0, 0.0), -5.0));
+  build.StaticBody(re::Plane(re::vec3(1.0, 0.0, 0.0), -5.0));
+  build.StaticBody(re::Plane(re::vec3(0.0, 1.0, 0.0), -5.0));
+  build.StaticBody(re::Plane(re::vec3(0.0, -1.0, 0.0), -5.0));
+
   for (reEnt* ent : _world.entities()) {
+    if (ent->type() == reEnt::STATIC) return;
     _canvas.bind(*ent).withColor(re::normalize(re::vec3::rand(0.0, 1.0))).withAlpha(0.8f);
   }
   

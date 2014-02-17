@@ -25,5 +25,6 @@ add_custom_command(
 add_subdirectory(Math)
 add_subdirectory(Collision/Shapes)
 add_subdirectory(Entities)
+add_subdirectory(Utilities)
 add_subdirectory(Collision)
 

@@ -63,6 +63,9 @@ reShape* Builder::copyOf(const reShape& shape) {
   switch (shape.type()) {
     case reShape::SPHERE:
       return _world.allocator().alloc_new<re::Sphere>((const re::Sphere&)shape);
+
+    case reShape::PLANE:
+      return _world.allocator().alloc_new<re::Plane>((const re::Plane&)shape);
     
     case reShape::RECTANGLE:
       RE_NOT_IMPLEMENTED

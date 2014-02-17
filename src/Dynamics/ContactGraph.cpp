@@ -82,7 +82,8 @@ void ContactGraph::check(reEnt& A, reEnt& B) {
   // sanity check
   RE_ASSERT(A.id() < B.id());
   
-  // TODO contact filters
+  // higher level grouping filters
+  if (!_filter.filter((const reEnt&)A, (const reEnt&)B)) return;
   
   for (ContactEdge* edge : _edges) {
     if (edge->A.id() == A.id() && edge->B.id() == B.id()) {

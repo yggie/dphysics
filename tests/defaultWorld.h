@@ -1,6 +1,7 @@
 #include "helpers.h"
 
 #include "react/reWorld.h"
+#include "react/Collision/Shapes/Sphere.h"
 #include "react/Entities/reRigidBody.h"
 #include "react/Collision/reBroadPhase.h"
 

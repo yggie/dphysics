@@ -68,9 +68,9 @@ public:
   virtual const re::mat3 inertia() const = 0;
   virtual const re::mat3& inertiaInv() const = 0;
   virtual reFloat density() const = 0;
-  
+
   virtual void addImpulse(const re::vec3& impulse) = 0;
-  
+
   // setter methods
   void setPos(const re::vec3& position);
   void setPos(reFloat x, reFloat y, reFloat z);
