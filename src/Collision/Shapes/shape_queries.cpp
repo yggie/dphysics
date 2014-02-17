@@ -147,7 +147,7 @@ bool intersects3(const re::Plane& A, const re::Transform& tA, const re::Sphere& 
   if (re::abs(dist) < B.shell() + A.shell()) {
     intersect.point = norm * re::sign(dist) * (re::abs(dist) + B.shell() + A.shell()) / 2.0 + tA.v;
     intersect.normal = -norm;
-    intersect.depth = re::abs(dist);
+    intersect.depth = B.shell() + A.shell() - re::abs(dist);
 
     return true;
   }
@@ -164,7 +164,7 @@ bool intersects3(const re::Sphere& A, const re::Transform& tA, const re::Plane& 
 }
 
 /// TODO how to handle plane-plane collisions?
-bool intersects3(const re::Plane& A, const re::Transform& tA, const re::Plane& B, const re::Transform& tB, re::Intersect& intersect) {
+bool intersects3(const re::Plane&, const re::Transform&, const re::Plane&, const re::Transform&, re::Intersect&) {
   RE_NOT_IMPLEMENTED
   return false;
 }

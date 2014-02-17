@@ -43,12 +43,34 @@ TEST(IntersectionTests, Plane_Sphere_test) {
     const bool intersects = re::intersects(s, transform, plane, IDEN_TRANS, result);
 
     const reFloat dist = re::dot(transform.v, plane.normal()) - plane.offset();
-    ASSERT_EQ(intersects, re::abs(dist) < RE_FP_TOLERANCE + s.radius()) <<
+    ASSERT_EQ(intersects, re::abs(dist) < plane.shell() + s.radius()) <<
       "should return true if the distance between the plane surface and the sphere center is less than the radius" << i;
 
     if (intersects) {
       ASSERT_FLOAT_EQ(re::abs(re::dot(plane.normal(), result.normal)), 1.0) <<
         "should return an intersection normal parallel to the plane face normal";
+
+      ASSERT_LE(s.radius() - re::abs(dist) - result.depth, RE_FP_TOLERANCE) <<
+        "should return the correct penetration depth";
+
+      ASSERT_LE(s.radius() + plane.shell() - dist - re::length(result.point - transform.v), RE_FP_TOLERANCE) <<
+        "should return the correct intersection point";
+
+    }
+
+    const re::vec3 norm = result.normal;
+    const re::vec3 pt = result.point;
+    const reFloat dep = result.depth;
+    ASSERT_EQ(intersects, re::intersects(plane, IDEN_TRANS, s, transform, result)) <<
+      "should give the same result when the arguments are rearranged";
+
+    if (intersects) {
+      ASSERT_FLOAT_EQ(re::dot(norm, result.normal), -1.0) <<
+        "should return the normal vector facing in the opposite direction";
+      ASSERT_LE(re::length(pt - result.point), RE_FP_TOLERANCE) <<
+        "should return the same intersect point";
+      ASSERT_FLOAT_EQ(dep, result.depth) <<
+        "should return the same depth";
     }
   }
 }
