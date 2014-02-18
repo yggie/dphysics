@@ -12,8 +12,6 @@
 
 using namespace demo;
 
-reRigidBody* A;
-
 PlanetaryMotionDemo::PlanetaryMotionDemo() : _world(), _cam(), _canvas() {
   // do nothing
 }
@@ -47,12 +45,8 @@ void PlanetaryMotionDemo::release() {
   _world.clear();
 }
 
-#include "react/debug.h"
-
 void PlanetaryMotionDemo::draw() {
   _world.advance(0.1);
-  printf("pos: "); rePrint(A->pos());
-  printf("vel: "); rePrint(A->vel());
   
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   _cam.update();
@@ -75,35 +69,34 @@ void PlanetaryMotionDemo::prepareWorld() {
   
   re::Builder build = _world.build();
   
-  // reRigidBody& body = build.RigidBody(sphere).withMass(5.0).at(0, -5, -5).rotatingWith(0.0, 0.00, 0.01);
-  // 
-  // for (int i = 0; i < 15; i++) {
-  //   reRigidBody& b = build.RigidBody(sphere.withRadius(1))
-  //     .withMass(5.0)
-  //     .at(2.5*i - 3 , 1, -5)
-  //     .facing(re::vec3(0.0, -1.0, 1.0), re::vec3(0.0, 1.0, 0.0))
-  //     .rotatingWith(0.0, 0.01, 0.0)
-  //     .movingAt(re::vec3(0.01, 0.0, 0.0));
-  //   build.GravAction(body, b);
-  // }
+  reRigidBody& body = build.RigidBody(sphere).withMass(5.0).at(0, -5, -5).rotatingWith(0.0, 0.00, 0.01);
   
-  A = &build.RigidBody(sphere).at(0.0, 0.0, 0.0).movingAt(re::vec3(0.01, 0.0, 0.0));
-  // reRigidBody& A = &build.RigidBody(sphere).withMass(2.0).at(-6, -1, -5).movingAt(re::vec3(0.01, 0.0, 0.0));
-  // reRigidBody& B = build.RigidBody(sphere).withMass(2.0).at(6, 3, -5);
-  // 
-  // build.GravAction(A, B);
-  // build.GravAction(body, B);
-  // build.GravAction(body, A);
+  for (int i = 0; i < 15; i++) {
+    reRigidBody& b = build.RigidBody(sphere.withRadius(1))
+      .withMass(5.0)
+      .at(2.5*i - 3 , 1, -5)
+      .facing(re::vec3(0.0, -1.0, 1.0), re::vec3(0.0, 1.0, 0.0))
+      .rotatingWith(0.0, 0.01, 0.0)
+      .movingAt(re::vec3(0.01, 0.0, 0.0));
+    build.GravAction(body, b);
+  }
+  
+  reRigidBody& A = build.RigidBody(sphere).withMass(2.0).at(-6, -1, -5).movingAt(re::vec3(0.01, 0.0, 0.0));
+  reRigidBody& B = build.RigidBody(sphere).withMass(2.0).at(6, 3, -5);
+   
+  build.GravAction(A, B);
+  build.GravAction(body, B);
+  build.GravAction(body, A);
 
   build.StaticBody(re::Plane(re::vec3(0.0, 0.0, -1.0), -5.0));
   build.StaticBody(re::Plane(re::vec3(0.0, 0.0, 1.0), -5.0));
-  build.StaticBody(re::Plane(re::vec3(-1.0, 0.0, 0.0), -5.0));
-  build.StaticBody(re::Plane(re::vec3(1.0, 0.0, 0.0), -5.0));
+  build.StaticBody(re::Plane(re::vec3(-1.0, 0.0, 0.0), 5.0));
+  build.StaticBody(re::Plane(re::vec3(1.0, 0.0, 0.0), 5.0));
   build.StaticBody(re::Plane(re::vec3(0.0, 1.0, 0.0), -5.0));
   build.StaticBody(re::Plane(re::vec3(0.0, -1.0, 0.0), -5.0));
 
   for (reEnt* ent : _world.entities()) {
-    if (ent->type() == reEnt::STATIC) return;
+    if (ent->type() == reEnt::STATIC) continue;
     _canvas.bind(*ent).withColor(re::normalize(re::vec3::rand(0.0, 1.0))).withAlpha(0.8f);
   }
   
@@ -111,7 +104,7 @@ void PlanetaryMotionDemo::prepareWorld() {
   
   _world.broadPhase().rebalance();
   ((reBSPTree&)_world.broadPhase()).execute([](reBSPNode& node) {
-    printf("DEPTH: %d\n", node.depth());
+    printf("Node: (%d, %d)\n", node.depth(), node.placements());
     return false;
   });
 }

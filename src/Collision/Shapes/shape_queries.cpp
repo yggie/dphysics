@@ -2,8 +2,6 @@
 
 #include "react/Collision/reSpatialQueries.h"
 
-#include "react/debug.h"
-
 bool sphereRayIntersect(const re::Sphere& sphere, const re::Ray& ray, re::Intersect& intersect) {
   const reFloat a = re::lengthSq(ray.dir());
   const reFloat b = 2 * re::dot(ray.origin(), ray.dir());
@@ -135,7 +133,7 @@ bool intersects3(const re::Sphere& A, const re::Transform& tA, const re::Sphere&
   if (contact) {
     intersect.point = (tA.v + tB.v) / 2.0;
     intersect.normal = re::normalize(tA.v - tB.v);
-    intersect.depth = re::length(tA.v - intersect.point);
+    intersect.depth = A.radius() - re::length(tA.v - intersect.point);
   }
   
   return contact;
@@ -145,7 +143,7 @@ bool intersects3(const re::Plane& A, const re::Transform& tA, const re::Sphere& 
   const re::vec3 norm = tA.applyToDir(A.normal());
   const reFloat dist = re::dot(norm, tB.v) - re::dot(norm, tA.v) - A.offset();
   if (re::abs(dist) < B.shell() + A.shell()) {
-    intersect.normal = re::sign(re::dot(norm, tA.v - tB.v)) * norm;
+    intersect.normal = re::sign(re::dot(norm, tB.v - tA.v)) * norm;
     intersect.depth = B.shell() + A.shell() - re::abs(dist);
     intersect.point = intersect.normal * (B.shell() - intersect.depth) + tB.v;
 
