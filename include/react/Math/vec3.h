@@ -17,10 +17,10 @@ namespace re {
   struct vec3 {
     /** default constructor zeroes all values */
     vec3();
-    vec3(reFloat s);
+    explicit vec3(reFloat s);
     /** copy constructor @param a The vec3 to copy */
     vec3(const vec3& a);
-    vec3(const reFloat* array);
+    explicit vec3(const reFloat* array);
     /** initializes the vector with the input coordinates */
     vec3(reFloat _x, reFloat _y, reFloat _z);
     
@@ -77,8 +77,6 @@ namespace re {
     static const vec3 rand(reFloat a, reFloat b);
     static const vec3 unit();
   };
-  
-  typedef vec3 vec;
 
   // inline constructors
   inline vec3::vec3() : v{0.0} {

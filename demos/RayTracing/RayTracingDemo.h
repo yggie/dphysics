@@ -29,8 +29,8 @@ namespace demo {
     App::Options options() const override;
     
   private:
-    const re::vec shootRay(unsigned int depth, const re::vec& origin, const re::vec& dir);
-    void colorPixel(GLubyte* rgbaPixel, const re::vec& color);
+    const re::vec3 shootRay(unsigned int depth, const re::vec3& origin, const re::vec3& dir);
+    void colorPixel(GLubyte* rgbaPixel, const re::vec3& color);
     void resizeImage(GLsizei w, GLsizei h);
     void renderScene(GLsizei w, GLsizei h);
     void createSceneFromFile(const char* filename);
@@ -45,8 +45,8 @@ namespace demo {
     re::mat4x4 _viewMat;
     re::mat4x4 _inverseViewMat;
     
-    re::vec _ambient;
-    re::vec _attenuation;
+    re::vec3 _ambient;
+    re::vec3 _attenuation;
     
     std::vector<RayLightSource*> _lights;
     
@@ -55,7 +55,7 @@ namespace demo {
     GLsizei _renderWidth;
     GLsizei _renderHeight;
     
-    re::vec _infinityColor;
+    re::vec3 _infinityColor;
     
     std::string _sceneFile;
     unsigned int _lightNo;
@@ -69,7 +69,7 @@ namespace demo {
     return opt;
   }
 
-  inline void RayTracingDemo::colorPixel(GLubyte* rgbaPixel, const re::vec& color) {
+  inline void RayTracingDemo::colorPixel(GLubyte* rgbaPixel, const re::vec3& color) {
     for (int i = 0; i < 3; i++) {
       const float c = (color[i] > 1.0) ? 1.0 : color[i];
       rgbaPixel[i] = (GLubyte)(254.5 * ((c < 0.0) ? 0.0 : c));

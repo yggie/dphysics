@@ -20,10 +20,10 @@ namespace re {
   public:
     /** Default constructor initializes the matrix to identity */
     mat4x4();
-    mat4x4(const mat3x3& m);
+    explicit mat4x4(const mat3x3& m);
     mat4x4(const mat4x4& tm);
-    mat4x4(const reFloat* raw);
-    mat4x4(reFloat d);
+    explicit mat4x4(const reFloat* raw);
+    explicit mat4x4(reFloat d);
     mat4x4(const mat3x3& rotation, const vec3& translation);
     mat4x4(reFloat m11, reFloat m22, reFloat m33, reFloat m44);
     mat4x4(

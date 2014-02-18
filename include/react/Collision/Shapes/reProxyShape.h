@@ -91,7 +91,7 @@ inline const re::vec3 reProxyShape::vert(reUInt i) const {
   if (_shape != nullptr) {
     return _shape->vert(i);
   } else {
-    return re::vec(0.0, 0.0, 0.0);
+    return re::vec3(0.0, 0.0, 0.0);
   }
 }
 

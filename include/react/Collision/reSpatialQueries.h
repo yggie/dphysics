@@ -54,15 +54,15 @@ protected:
 struct reRayQuery : reSpatialQuery {
   reRayQuery() : reSpatialQuery(), origin(), dir() { }
   /** The ray origin */
-  re::vec origin;
+  re::vec3 origin;
   /** The ray direction */
-  re::vec dir;
+  re::vec3 dir;
 };
 
 struct reRayQueryResult {
   reRayQueryResult() : intersect(), normal(), distSq(RE_INFINITY) { }
-  re::vec intersect;
-  re::vec normal;
+  re::vec3 intersect;
+  re::vec3 normal;
   reFloat distSq;
 };
 

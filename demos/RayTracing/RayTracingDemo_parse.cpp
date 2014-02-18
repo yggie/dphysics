@@ -200,7 +200,7 @@ void RayTracingDemo::createSceneFromFile(const char* filename) {
       unsigned int inds[3];
       readUInts(3, &inds[0]);
       re::mat4 m = stack.mat();
-      re::vec tverts[3];
+      re::vec3 tverts[3];
       for (int i = 0; i < 3; i++) {
         tverts[i] = m.multPoint(verts.at(inds[i]));
       }
@@ -266,8 +266,8 @@ void RayTracingDemo::createSceneFromFile(const char* filename) {
       readFloats(6, &a[0]);
       RayLightSource* light = new RayLightSource();
       _lights.push_back(light);
-      light->withColor(re::vec(&a[3]))
-            .withVect(re::vec(&a[0]))
+      light->withColor(re::vec3(&a[3]))
+            .withVect(re::vec3(&a[0]))
             .asDirectional(true);
       
       RAY_PRINTF("    %-22s%3.1f, %3.1f, %3.1f", "DIRECTIONAL LIGHT", a[3], a[4], a[5]);
@@ -277,8 +277,8 @@ void RayTracingDemo::createSceneFromFile(const char* filename) {
       readFloats(6, &a[0]);
       RayLightSource* light = new RayLightSource();
       _lights.push_back(light);
-      light->withColor(re::vec(&a[3]))
-            .withVect(re::vec(&a[0]))
+      light->withColor(re::vec3(&a[3]))
+            .withVect(re::vec3(&a[0]))
             .asDirectional(false);
       RAY_PRINTF("    %-22s%3.1f, %3.1f, %3.1f", "SPOT LIGHT", a[3], a[4], a[5]);
 

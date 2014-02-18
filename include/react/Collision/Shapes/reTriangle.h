@@ -17,11 +17,11 @@ public:
   /** Default constructor does nothing */
   reTriangle();
   reTriangle(const reTriangle& other);
-  reTriangle(const re::vec& a, const re::vec& b, const re::vec& c);
+  reTriangle(const re::vec3& a, const re::vec3& b, const re::vec3& c);
   /** Destructor does nothing */
   ~reTriangle();
   
-  reTriangle& withVertex(reUInt i, const re::vec& vert);
+  reTriangle& withVertex(reUInt i, const re::vec3& vert);
   
   // shape representation
   reShape::Type type() const override;
@@ -69,7 +69,7 @@ inline reTriangle::reTriangle(const reTriangle& other) : _verts() {
  * @param c The third vertex
  */
 
-inline reTriangle::reTriangle(const re::vec& a, const re::vec& b, const re::vec& c) {
+inline reTriangle::reTriangle(const re::vec3& a, const re::vec3& b, const re::vec3& c) {
   _verts[0] = a;
   _verts[1] = b;
   _verts[2] = c;
@@ -99,7 +99,7 @@ inline const re::vec3 reTriangle::center() const {
  * @return A reference to the reTriangle
  */
 
-inline reTriangle& reTriangle::withVertex(reUInt i, const re::vec& vert) {
+inline reTriangle& reTriangle::withVertex(reUInt i, const re::vec3& vert) {
   _verts[i] = vert;
   return *this;
 }

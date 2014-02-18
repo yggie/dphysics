@@ -33,8 +33,8 @@ namespace {
     }
   }
   
-  const re::vec3 clamp(const re::vec& v) {
-    re::vec a;
+  const re::vec3 clamp(const re::vec3& v) {
+    re::vec3 a;
     for (int i = 0; i < 3; i++) {
       a[i] = re::clamp(v[i], 0.0, 1.0);
     }
@@ -181,13 +181,13 @@ void RayTracingDemo::mouseEvent(int button, int state, int x, int y) {
  * Recursively shoots rays at the image to determine the color
  */
 
-const re::vec RayTracingDemo::shootRay(unsigned int depth, const re::vec& origin, const re::vec& dir) {
+const re::vec3 RayTracingDemo::shootRay(unsigned int depth, const re::vec3& origin, const re::vec3& dir) {
   // reached recursion limit
   if (depth >= _maxDepth) {
     return _infinityColor;
   }
   
-  re::vec intersect, norm;
+  re::vec3 intersect, norm;
   // primary ray
   _raysSent++;
   const reEnt* ent = _world.queryWithRay(origin, dir, &intersect, &norm);
@@ -208,7 +208,7 @@ const re::vec RayTracingDemo::shootRay(unsigned int depth, const re::vec& origin
     const RayLightSource* light = *it;
     
     // determine direction of shadow rays
-    re::vec ray;
+    re::vec3 ray;
     if (light->isDirectional()) {
       ray = re::normalize(-light->vect());
     } else {
@@ -216,14 +216,14 @@ const re::vec RayTracingDemo::shootRay(unsigned int depth, const re::vec& origin
     }
     
     // trace shadow rays to light sources
-    re::vec objIntersect;
+    re::vec3 objIntersect;
     _raysSent++;
     reEnt* other = _world.queryWithRay(intersect, ray, &objIntersect);
     
     // if query is successful
     if (other == nullptr || (!light->isDirectional() && re::lengthSq(objIntersect - intersect) > re::lengthSq(light->vect() - intersect))) {
-      const re::vec back = re::normalize(light->vect() - intersect);
-      const re::vec halfVec = re::normalize(back + ray);
+      const re::vec3 back = re::normalize(light->vect() - intersect);
+      const re::vec3 halfVec = re::normalize(back + ray);
       
       const re::vec3 diffuse = ::clamp(obj->diffuse() * re::max(re::dot(ray, norm), 0.0f));
       const re::vec3 specular = ::clamp(obj->specular() * re::pow(re::max(re::dot(norm, halfVec), 0.0f), obj->shininess()));
@@ -241,7 +241,7 @@ const re::vec RayTracingDemo::shootRay(unsigned int depth, const re::vec& origin
   
   // TODO reflections don't seem to match samples in the discussion
   if (re::length(obj->specular()) > RE_FP_TOLERANCE) {
-    const re::vec reflec = re::normalize(dir - norm * 2.0 * re::dot(norm, dir));
+    const re::vec3 reflec = re::normalize(dir - norm * 2.0 * re::dot(norm, dir));
     // shoot secondary rays
     color += ::clamp(obj->specular() * shootRay(depth + 1, intersect, reflec));
   }
@@ -298,7 +298,7 @@ void RayTracingDemo::renderScene(GLsizei w, GLsizei h) {
   gettimeofday(&start, nullptr);
   gettimeofday(&lastChecked, nullptr);
   
-  const re::vec eye = _inverseViewMat.mult(re::vec(0,0,0), 1.0);
+  const re::vec3 eye = _inverseViewMat.mult(re::vec3(0,0,0), 1.0);
   
   _world.broadPhase().rebalance();
   ((reBSPTree&)_world.broadPhase()).execute([](reBSPNode& node) {
@@ -317,11 +317,11 @@ void RayTracingDemo::renderScene(GLsizei w, GLsizei h) {
     const float tany = glm::tan(fovy * (i + 0.5f - halfHeight) / halfHeight);
     
     for (GLsizei j = 0; j < w; j++) {
-      const re::vec ray = _inverseViewMat.mult(
-        re::normalize(re::vec(tanx[j], -tany, -1.0)), 0.0);
+      const re::vec3 ray = _inverseViewMat.mult(
+        re::normalize(re::vec3(tanx[j], -tany, -1.0)), 0.0);
       
       // shoot primary ray
-      const re::vec color = shootRay(0, eye, ray);
+      const re::vec3 color = shootRay(0, eye, ray);
       const int IDX = 4*(h - i - 1)*w + 4*j;
       GLubyte* pix = &_pixels[IDX];
       pix[0] = (GLubyte)(255.0 * re::clamp(color[0], 0.0, 1.0));

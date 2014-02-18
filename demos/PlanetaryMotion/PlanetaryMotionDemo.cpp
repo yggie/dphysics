@@ -12,6 +12,8 @@
 
 using namespace demo;
 
+reRigidBody* A;
+
 PlanetaryMotionDemo::PlanetaryMotionDemo() : _world(), _cam(), _canvas() {
   // do nothing
 }
@@ -45,8 +47,12 @@ void PlanetaryMotionDemo::release() {
   _world.clear();
 }
 
+#include "react/debug.h"
+
 void PlanetaryMotionDemo::draw() {
   _world.advance(0.1);
+  printf("pos: "); rePrint(A->pos());
+  printf("vel: "); rePrint(A->vel());
   
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   _cam.update();
@@ -69,24 +75,25 @@ void PlanetaryMotionDemo::prepareWorld() {
   
   re::Builder build = _world.build();
   
-  reRigidBody& body = build.RigidBody(sphere).withMass(5.0).at(0, -5, -5).rotatingWith(0.0, 0.00, 0.01);
+  // reRigidBody& body = build.RigidBody(sphere).withMass(5.0).at(0, -5, -5).rotatingWith(0.0, 0.00, 0.01);
+  // 
+  // for (int i = 0; i < 15; i++) {
+  //   reRigidBody& b = build.RigidBody(sphere.withRadius(1))
+  //     .withMass(5.0)
+  //     .at(2.5*i - 3 , 1, -5)
+  //     .facing(re::vec3(0.0, -1.0, 1.0), re::vec3(0.0, 1.0, 0.0))
+  //     .rotatingWith(0.0, 0.01, 0.0)
+  //     .movingAt(re::vec3(0.01, 0.0, 0.0));
+  //   build.GravAction(body, b);
+  // }
   
-  for (int i = 0; i < 15; i++) {
-    reRigidBody& b = build.RigidBody(sphere.withRadius(1))
-      .withMass(5.0)
-      .at(2.5*i - 3 , 1, -5)
-      .facing(re::vec3(0.0, -1.0, 1.0), re::vec3(0.0, 1.0, 0.0))
-      .rotatingWith(0.0, 0.01, 0.0)
-      .movingAt(re::vec3(0.01, 0.0, 0.0));
-    build.GravAction(body, b);
-  }
-  
-  reRigidBody& A = build.RigidBody(sphere).withMass(2.0).at(-6, -1, -5).movingAt(re::vec3(0.01, 0.0, 0.0));
-  reRigidBody& B = build.RigidBody(sphere).withMass(2.0).at(6, 3, -5);
-  
-  build.GravAction(A, B);
-  build.GravAction(body, B);
-  build.GravAction(body, A);
+  A = &build.RigidBody(sphere).at(0.0, 0.0, 0.0).movingAt(re::vec3(0.01, 0.0, 0.0));
+  // reRigidBody& A = &build.RigidBody(sphere).withMass(2.0).at(-6, -1, -5).movingAt(re::vec3(0.01, 0.0, 0.0));
+  // reRigidBody& B = build.RigidBody(sphere).withMass(2.0).at(6, 3, -5);
+  // 
+  // build.GravAction(A, B);
+  // build.GravAction(body, B);
+  // build.GravAction(body, A);
 
   build.StaticBody(re::Plane(re::vec3(0.0, 0.0, -1.0), -5.0));
   build.StaticBody(re::Plane(re::vec3(0.0, 0.0, 1.0), -5.0));

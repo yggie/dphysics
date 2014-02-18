@@ -13,15 +13,15 @@ public:
   RayObject& withEmission(float r, float g, float b);
   RayObject& withShininess(float s);
   
-  const re::vec& diffuse() const;
-  const re::vec& emission() const;
-  const re::vec& specular() const;
+  const re::vec3& diffuse() const;
+  const re::vec3& emission() const;
+  const re::vec3& specular() const;
   float shininess() const;
   
 private:
-  re::vec _diffuse;
-  re::vec _emission;
-  re::vec _specular;
+  re::vec3 _diffuse;
+  re::vec3 _emission;
+  re::vec3 _specular;
   float _shininess;
 };
 
@@ -53,15 +53,15 @@ inline RayObject& RayObject::withShininess(float s) {
   return *this;
 }
 
-inline const re::vec& RayObject::diffuse() const {
+inline const re::vec3& RayObject::diffuse() const {
   return _diffuse;
 }
 
-inline const re::vec& RayObject::emission() const {
+inline const re::vec3& RayObject::emission() const {
   return _emission;
 }
 
-inline const re::vec& RayObject::specular() const {
+inline const re::vec3& RayObject::specular() const {
   return _specular;
 }
 

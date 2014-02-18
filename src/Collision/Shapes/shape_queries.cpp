@@ -145,9 +145,9 @@ bool intersects3(const re::Plane& A, const re::Transform& tA, const re::Sphere& 
   const re::vec3 norm = tA.applyToDir(A.normal());
   const reFloat dist = re::dot(norm, tB.v) - re::dot(norm, tA.v) - A.offset();
   if (re::abs(dist) < B.shell() + A.shell()) {
-    intersect.point = norm * re::sign(dist) * (re::abs(dist) + B.shell() + A.shell()) / 2.0 + tA.v;
-    intersect.normal = -norm;
+    intersect.normal = re::sign(re::dot(norm, tA.v - tB.v)) * norm;
     intersect.depth = B.shell() + A.shell() - re::abs(dist);
+    intersect.point = intersect.normal * (B.shell() - intersect.depth) + tB.v;
 
     return true;
   }

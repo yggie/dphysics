@@ -50,10 +50,18 @@ TEST(IntersectionTests, Plane_Sphere_test) {
       ASSERT_FLOAT_EQ(re::abs(re::dot(plane.normal(), result.normal)), 1.0) <<
         "should return an intersection normal parallel to the plane face normal";
 
+      ASSERT_GE(result.depth, 0.0) <<
+        "penetration depth should always be positive";
+
       ASSERT_LE(s.radius() - re::abs(dist) - result.depth, RE_FP_TOLERANCE) <<
         "should return the correct penetration depth";
 
-      ASSERT_LE(s.radius() + plane.shell() - dist - re::length(result.point - transform.v), RE_FP_TOLERANCE) <<
+      const re::vec3 dp = result.point - transform.v;
+      const reFloat dpDotNorm = re::abs(re::dot(result.normal, dp));
+      ASSERT_LE(re::abs(dpDotNorm - re::length(dp)), RE_FP_TOLERANCE) <<
+        "should have the intersection point parallel to the normal";
+
+      ASSERT_LE(s.radius() - result.depth - dpDotNorm, RE_FP_TOLERANCE) <<
         "should return the correct intersection point";
 
     }

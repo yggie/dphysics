@@ -20,7 +20,7 @@ namespace re{
     /** Copy constructor */
     mat3x3(const mat3x3& m);
     /** Creates a diagonal matrix from the input scalar */
-    mat3x3(reFloat s);
+    explicit mat3x3(reFloat s);
     /** Creates a matrix from the given vectors, treating each as a column in the new matrix */
     mat3x3(const re::vec3& a, const re::vec3& b, const re::vec3& c);
     /** Creates a diagonal matrix from the input scalars */

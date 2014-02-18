@@ -69,7 +69,7 @@ protected:
  */
 
 /**
- * @fn const re::vec& reShape::vert(reUInt i) const
+ * @fn const re::vec3& reShape::vert(reUInt i) const
  * Returns the vertex at the specified index
  * 
  * Enforces constant constraint
@@ -93,8 +93,8 @@ protected:
  */
 
 /**
- * @fn bool reEnt::intersectsRay(const reEnt& parent, const re::vec& origin,
- * const re::vec& dir, re::vec* intersect = nullptr, re::vec* normal =
+ * @fn bool reEnt::intersectsRay(const reEnt& parent, const re::vec3& origin,
+ * const re::vec3& dir, re::vec3* intersect = nullptr, re::vec3* normal =
  * nullptr) const
  * @brief Returns true if the ray specified intersects with the shape
  * 
@@ -127,7 +127,7 @@ inline reFloat reShape::shell() const {
  */
 
 inline const re::vec3 reShape::center() const {
-  return re::vec(0.0, 0.0, 0.0);
+  return re::vec3(0.0, 0.0, 0.0);
 }
 
 #endif
