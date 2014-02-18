@@ -59,7 +59,6 @@ void ContactGraph::solve() {
                             (re::dot(edge->normal, A.vel() - B.vel()) +
                             (re::dot(A.angVel(), rAxN) - re::dot(B.angVel(), rBxN)));
       
-      printf("CONTACT %f\n", numer);
       // contact forces must always be repelling
       if (numer < 0.0) continue;
       
@@ -96,7 +95,6 @@ void ContactGraph::check(reEnt& A, reEnt& B) {
   // the edge does not exist, create a new one
   ContactEdge* edge = _allocator.alloc_new<ContactEdge>(_allocator, A, B);
   _edges.add(edge);
-  printf("NEW EDGE ADDED\n");
 }
 
 /// NOT TESTED
@@ -107,7 +105,6 @@ void ContactGraph::advance() {
     if (edge->timeLimit != 0) edge->timeLimit--;
     if (edge->timeLimit == 0 && edge->interactions.empty()) {
       toRemove.add(edge);
-      printf("DIED\n");
     }
   }
   

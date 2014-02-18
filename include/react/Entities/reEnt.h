@@ -85,6 +85,7 @@ public:
   virtual reEnt& at(reFloat x, reFloat y, reFloat z) = 0;
   virtual reEnt& facing(const re::vec3& dir, const re::vec3& up) = 0;
   virtual reEnt& movingAt(const re::vec3& velocity) = 0;
+  virtual reEnt& movingAt(reFloat vx, reFloat vy, reFloat vz) = 0;
   virtual reEnt& rotatingWith(reFloat wx, reFloat wy, reFloat wz) = 0;
   virtual reEnt& withMass(reFloat mass) = 0;
   virtual reEnt& withDensity(reFloat mass) = 0;
@@ -363,6 +364,7 @@ inline void reEnt::setVel(reFloat x, reFloat y, reFloat z) {
       KLASS& withDensity(reFloat density) override { setDensity(density);return *this; } \
       KLASS& facing(const re::vec3& dir, const re::vec3& up) { setFacing(dir, up); return *this; } \
       KLASS& movingAt(const re::vec3& velocity) { setVel(velocity); return *this; } \
+      KLASS& movingAt(reFloat vx, reFloat vy, reFloat vz) { setVel(re::vec3(vx, vy, vz)); return *this; } \
       KLASS& rotatingWith(reFloat wx, reFloat wy, reFloat wz) { setAngVel(wx, wy, wz); return *this; }
 
 #endif

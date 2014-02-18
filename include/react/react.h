@@ -13,9 +13,12 @@
 #include "react/Entities/reEnt.h"
 #include "react/Entities/reSolid.h"
 #include "react/Entities/reRigidBody.h"
+#include "react/Entities/StaticBody.h"
 
 #include "react/Collision/reBroadPhase.h"
 #include "react/Collision/reBSPTree.h"
+
+#include "react/Dynamics/ContactGraph.h"
 
 #include "react/reWorld.h"
 

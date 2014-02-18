@@ -121,6 +121,9 @@ re::Location re::relativeToPlane(const reShape& shape, const re::Transform& tran
       }
       break;
 
+    case reShape::PLANE:
+      break;
+
     default:
       RE_IMPOSSIBLE
       throw 0;
