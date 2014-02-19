@@ -10,10 +10,9 @@
 
 #include "react/Collision/Shapes/shapes.h"
 
-#include "react/Entities/reEnt.h"
-#include "react/Entities/reSolid.h"
-#include "react/Entities/reRigidBody.h"
-#include "react/Entities/StaticBody.h"
+#include "react/Entities/Entity.h"
+#include "react/Entities/Rigid.h"
+#include "react/Entities/Static.h"
 
 #include "react/Collision/reBroadPhase.h"
 #include "react/Collision/reBSPTree.h"

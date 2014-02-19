@@ -2,8 +2,8 @@
 
 #include "demos/RayTracing/RayObject.h"
 
-#include "react/Entities/reEnt.h"
-#include "react/Entities/reRigidBody.h"
+#include "react/Entities/Entity.h"
+#include "react/Entities/Rigid.h"
 #include "react/Collision/reBroadPhase.h"
 #include "react/Collision/reBSPTree.h"
 
@@ -87,7 +87,7 @@ void RayTracingDemo::restart() {
 }
 
 void RayTracingDemo::release() {
-  for (reEnt* ent : _world.entities()) {
+  for (re::Entity* ent : _world.entities()) {
     if (ent->userdata != nullptr) {
       delete (RayObject*)(ent->userdata);
       ent->userdata = nullptr;
@@ -190,7 +190,7 @@ const re::vec3 RayTracingDemo::shootRay(unsigned int depth, const re::vec3& orig
   re::vec3 intersect, norm;
   // primary ray
   _raysSent++;
-  const reEnt* ent = _world.queryWithRay(origin, dir, &intersect, &norm);
+  const re::Entity* ent = _world.queryWithRay(origin, dir, &intersect, &norm);
   
   // no more objects in this direction
   if (ent == nullptr) {
@@ -218,7 +218,7 @@ const re::vec3 RayTracingDemo::shootRay(unsigned int depth, const re::vec3& orig
     // trace shadow rays to light sources
     re::vec3 objIntersect;
     _raysSent++;
-    reEnt* other = _world.queryWithRay(intersect, ray, &objIntersect);
+    re::Entity* other = _world.queryWithRay(intersect, ray, &objIntersect);
     
     // if query is successful
     if (other == nullptr || (!light->isDirectional() && re::lengthSq(objIntersect - intersect) > re::lengthSq(light->vect() - intersect))) {

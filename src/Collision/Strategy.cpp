@@ -1,7 +1,9 @@
-#include "react/Collision/reTreeBalanceStrategy.h"
+#include "react/Collision/Strategy.h"
 
 #include "react/Collision/reBSPTree.h"
-#include "react/Entities/reEnt.h"
+#include "react/Entities/Entity.h"
+
+using namespace re;
 
 /**
  * Tests if the parent node should merge the child nodes
@@ -10,7 +12,7 @@
  * @return True if the condition for merging child nodes are met
  */
 
-bool reTreeBalanceStrategy::shouldMerge(const reBSPNode& node) {
+bool Strategy::shouldMerge(const reBSPNode& node) {
   return (node.hasChildren() && !node.child(0).hasChildren() &&
             (node.placements() +
              node.child(0).placements() +
@@ -23,7 +25,7 @@ bool reTreeBalanceStrategy::shouldMerge(const reBSPNode& node) {
  * @param node The current node
  */
 
-bool reTreeBalanceStrategy::shouldSplit(const reBSPNode& node) {
+bool Strategy::shouldSplit(const reBSPNode& node) {
   return node.placements() > 10 && node.depth() < 5;
 }
 
@@ -35,7 +37,7 @@ bool reTreeBalanceStrategy::shouldSplit(const reBSPNode& node) {
  * @param sample A sample of the entities contained in the parent
  */
 
-re::Plane reTreeBalanceStrategy::computeSplitPlane(const re::vec3& axis, const reLinkedList<reEnt*>& sample) {
+Plane Strategy::computeSplitPlane(const re::vec3& axis, const reLinkedList<Entity*>& sample) {
   re::vec3 split(0.0, 0.0, 0.0);
 
   const re::vec3 guess[3] = {
@@ -49,12 +51,12 @@ re::Plane reTreeBalanceStrategy::computeSplitPlane(const re::vec3& axis, const r
   reFloat score[NUM_GUESSES] = { 0.0 };
   reUInt index = 0;
 
-  for (const reEnt* entity : sample) {
+  for (const Entity* entity : sample) {
     split += entity->center();
   }
   split /= sample.size();
   
-  for (const reEnt* entity : sample) {
+  for (const Entity* entity : sample) {
     for (reUInt i = 0; i < NUM_GUESSES; i++) {
       score[i] += re::dot(guess[i], - split + entity->center());
     }

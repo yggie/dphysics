@@ -17,7 +17,9 @@
 #define INVALID_ATTRIBUTE_INDEX(who) \
   printf("[WARN]  Invalid shader attribute index for %s\n", who);
 
-class reEnt;
+namespace re {
+  class Entity;
+}
 
 namespace demo { 
 
@@ -46,7 +48,7 @@ namespace demo {
     Plane::Instance& addPlane(const re::vec3& normal, const re::vec3& side, const re::vec3& center, float width);
     
     void setMaterial(ShaderMaterial& material);
-    EntityWrapper& bind(reEnt& ent);
+    EntityWrapper& bind(re::Entity& ent);
     
     void drawUnitSphere();
     void drawUnitPlane();

@@ -3,7 +3,7 @@
 
 #include "demos/Common/EntityWrapper.h"
 
-#include "react/Entities/reEnt.h"
+#include "react/Entities/Entity.h"
 #include "react/Collision/Shapes/Sphere.h"
 
 namespace demo {
@@ -29,7 +29,7 @@ namespace demo {
     GLuint numTBOReq() const override;
     
     struct Wrapper : public EntityWrapper {
-      Wrapper(const reEnt& ent);
+      Wrapper(const re::Entity& ent);
       const re::Sphere& shape() const;
       void draw(Canvas& canvas) override;
     };
@@ -59,12 +59,12 @@ namespace demo {
     return 0;
   }
   
-  inline Sphere::Wrapper::Wrapper(const reEnt& ent) : EntityWrapper(ent) {
+  inline Sphere::Wrapper::Wrapper(const re::Entity& ent) : EntityWrapper(ent) {
     shape();
   }
   
   inline const re::Sphere& Sphere::Wrapper::shape() const {
-    return *((re::Sphere*)entity.shape());
+    return ((re::Sphere&)entity.shape());
   }
 }
 

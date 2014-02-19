@@ -3,15 +3,15 @@
 #include "react/Utilities/ContactFilter.h"
 
 #include "react/Collision/Shapes/Sphere.h"
-#include "react/Entities/reRigidBody.h"
-#include "react/Entities/StaticBody.h"
+#include "react/Entities/Rigid.h"
+#include "react/Entities/Static.h"
 
 TEST(ContactFilter, filter_test) {
   re::Sphere s(1.0);
-  reRigidBody a(&s);
-  reRigidBody b(&s);
-  re::StaticBody c(&s);
-  re::StaticBody d(&s);
+  re::Rigid a(s);
+  re::Rigid b(s);
+  re::Static c(s);
+  re::Static d(s);
 
   re::ContactFilter cf;
 

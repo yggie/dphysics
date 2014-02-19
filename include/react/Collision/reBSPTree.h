@@ -7,7 +7,6 @@
 
 #include "react/Collision/reBroadPhase.h"
 #include "react/Collision/reAABB.h"
-#include "react/Utilities/reEntList.h"
 
 class reBSPNode;
 class reBSPTree;
@@ -23,9 +22,9 @@ class reBSPNode {
 public:
   
   struct Marker {
-    Marker(reEnt& e) : entity(e), node(nullptr), queryID(0) { }
+    Marker(re::Entity& e) : entity(e), node(nullptr), queryID(0) { }
     
-    reEnt& entity;
+    re::Entity& entity;
     reBSPNode* node;
     reUInt queryID;
   };
@@ -46,16 +45,16 @@ public:
   reUInt depth() const;
   reUInt placements() const;
   
-  void rebalanceNode(reTreeBalanceStrategy& strategy);
-  void updateContacts(re::ContactGraph& collisions, reEnt& entity) const;
+  void rebalanceNode(re::Strategy& strategy);
+  void updateContacts(re::ContactGraph& collisions, re::Entity& entity) const;
   
   void measureRecursive(reBPMeasure& m) const;
   
   bool execute(reBSPTreeCallback callback);
-  void split(reTreeBalanceStrategy& strategy);
+  void split(re::Strategy& strategy);
   void merge();
   
-  const reLinkedList<reEnt*> sample(reUInt size) const;
+  const reLinkedList<re::Entity*> sample(reUInt size) const;
   
   // spatial queries
   void queryWithRay(const re::Ray& ray, re::RayQuery& result) const;
@@ -87,16 +86,16 @@ public:
   ~reBSPTree();
   
   void clear() override;
-  bool add(reEnt& ent) override;
-  bool remove(reEnt& ent) override;
-  bool contains(const reEnt& ent) const override;
+  bool add(re::Entity& ent) override;
+  bool remove(re::Entity& ent) override;
+  bool contains(const re::Entity& ent) const override;
   reUInt size() const override;
-  void rebalance(reTreeBalanceStrategy* strategy = nullptr) override;
+  void rebalance(re::Strategy* strategy = nullptr) override;
   void advance(re::Integrator& integrator, reFloat dt) override;
   
-  void addInteraction(reInteraction& action, reEnt& A, reEnt& B) override;
+  void addInteraction(reInteraction& action, re::Entity& A, re::Entity& B) override;
   
-  const reLinkedList<reEnt*>& entities() const override;
+  const reLinkedList<re::Entity*>& entities() const override;
   
   // spatial queries
   re::RayQuery queryWithRay(const re::Ray& ray) const override;
@@ -109,9 +108,9 @@ protected:
   /** The structure maintaining collision interactions between entities */
   re::ContactGraph _contacts;
   /** The strategy used to balance the tree */
-  reTreeBalanceStrategy _strategy;
+  re::Strategy _strategy;
   reLinkedList<Marker*> _allMarkers;
-  reLinkedList<reEnt*> _masterEntityList;
+  reLinkedList<re::Entity*> _masterEntityList;
 };
 
 inline const reBSPNode& reBSPNode::child(reUInt i) const {
@@ -142,7 +141,7 @@ inline reUInt reBSPNode::placements() const {
   return _markers.size();
 }
 
-inline const reLinkedList<reEnt*>& reBSPTree::entities() const {
+inline const reLinkedList<re::Entity*>& reBSPTree::entities() const {
   return _masterEntityList;
 }
 

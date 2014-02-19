@@ -162,6 +162,21 @@ namespace re {
     
     return re::normalize(q);
   }
+
+  inline const re::mat3 orientY(const re::vec3& dir, const re::vec3& up) {
+    re::vec3 v = re::normalize(dir);
+    re::vec3 upn = re::normalize(up);
+    if (re::abs(re::dot(v, upn) - 1.0) < RE_FP_TOLERANCE) {
+      upn = re::vec3::unit();
+    }
+    const re::vec3 u = re::normalize(re::cross(v, upn));
+    const re::vec3 w = re::normalize(re::cross(u, v));
+    return re::mat3(
+      u[0], v[0], w[0],
+      u[1], v[1], w[1],
+      u[2], v[2], w[2]
+    );
+  }
 }
 
 #endif

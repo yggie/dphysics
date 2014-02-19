@@ -2,36 +2,36 @@
 
 #include "react/Collision/Shapes/shapes.h"
 
-TEST(ProxyShape, Constructor_test) {
+TEST(ShapeProxy, Constructor_test) {
   re::Sphere s(0.1);
-  reProxyShape ps(&s);
+  re::ShapeProxy ps(&s);
   
   ASSERT_TRUE(ps.type() == reShape::PROXY) << "should have the correct type";
   
   ASSERT_TRUE(ps.shape() == &s) << "should have the correct base shape";
 }
 
-TEST(ProxyShape, randomPoint_test) {
+TEST(ShapeProxy, randomPoint_test) {
   re::Sphere s(1.0);
   re::Transform m;
   m.scale(3, 2, 5);
   m.rotate(re::randf(0.0, 33.3*RE_PI), re::vec3::rand());
 
   const re::Transform inv = re::inverse(m);
-  const reProxyShape proxy(&s, m);
+  const re::ShapeProxy proxy(&s, m);
   for (unsigned int i = 0; i < NUM_SAMPLES; i++) {
     ASSERT_LE(re::length(inv.applyToPoint(proxy.randomPoint())), s.radius()) <<
       "should be contained within the shape";
   }
 }
 
-TEST(ProxyShape, containsPoint_test) {
+TEST(ShapeProxy, containsPoint_test) {
   re::Sphere s(1.0);
   re::Transform m;
   m.scale(5, 3, 0.8);
   m.rotate(re::randf(0.0, 33.3*RE_PI), re::vec3::rand());
 
-  const reProxyShape proxy(&s, m);
+  const re::ShapeProxy proxy(&s, m);
   for (unsigned int i = 0; i < NUM_SAMPLES; i++) {
     const re::vec3 pt = proxy.randomPoint();
     ASSERT_TRUE(proxy.containsPoint(pt)) <<
@@ -45,14 +45,14 @@ TEST(ProxyShape, containsPoint_test) {
 
 #include "react/debug.h"
 
-TEST(ProxyShape, intersects_test) {
+TEST(ShapeProxy, intersects_test) {
   re::Sphere s(5.0);
   re::Transform m;
   m.scale(1, 1, 1);
   m.rotate(re::randf(0.0, 50.0*RE_PI), re::vec3::rand());
 
   const re::Transform inv = re::inverse(m);
-  const reProxyShape proxy(&s, m);
+  const re::ShapeProxy proxy(&s, m);
   re::RayQuery result;
   for (reUInt i = 0; i < NUM_SAMPLES; i++) {
     const re::vec3 pt = proxy.randomPoint();

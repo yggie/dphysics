@@ -8,9 +8,9 @@
 #include "react/common.h"
 #include "react/math.h"
 
-class reEnt;
-
 namespace re {
+  class Entity;
+
   struct Intersect {
     Intersect() : depth(RE_INFINITY), point(), normal() { }
     reFloat depth;
@@ -27,7 +27,7 @@ namespace re {
       entity = q.entity;
       return *this;
     }
-    reEnt* entity;
+    Entity* entity;
   };
 
   extern reUInt globalQueryID;  // defined in common.h
@@ -70,7 +70,7 @@ namespace re {
   struct RayResult {
     RayResult() : distSq(RE_INFINITY), entity(nullptr), surfaceIntersect(), surfaceNormal() { }
     reFloat distSq;
-    reEnt* entity;
+    Entity* entity;
     re::vec3 surfaceIntersect;
     re::vec3 surfaceNormal;
   };
@@ -78,7 +78,7 @@ namespace re {
   struct SingleResult {
     SingleResult() : distSq(RE_INFINITY), entity(nullptr) { }
     reFloat distSq;
-    reEnt* entity;
+    Entity* entity;
   };
 }
 

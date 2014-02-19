@@ -76,6 +76,8 @@ namespace re {
     static const vec3 rand(reFloat b = 1.0);
     static const vec3 rand(reFloat a, reFloat b);
     static const vec3 unit();
+
+    static const vec3 ZERO;
   };
 
   // inline constructors

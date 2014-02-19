@@ -3,7 +3,7 @@
 #include "RayLightSource.h"
 #include "RayObject.h"
 
-#include "react/Entities/reRigidBody.h"
+#include "react/Entities/Rigid.h"
 #include "react/Collision/Shapes/shapes.h"
 #include "demos/Common/MatrixStack.h"
 
@@ -146,7 +146,7 @@ void RayTracingDemo::createSceneFromFile(const char* filename) {
       
       re::mat4 m = stack.mat();
       re::Transform tm = re::toTransform(m);
-      reRigidBody& body = _world.build().RigidBody(re::Sphere(v[3]), tm).at(v[0], v[1], v[2]);
+      re::Rigid& body = _world.build().Rigid(re::Sphere(v[3]), tm).at(v[0], v[1], v[2]);
       RayObject* obj = new RayObject();
       body.userdata = obj;
 //        printf("DIFFUSE: (%.2f, %.2f, %.2f)\n", specular[0], specular[1], specular[2]);
@@ -204,7 +204,7 @@ void RayTracingDemo::createSceneFromFile(const char* filename) {
       for (int i = 0; i < 3; i++) {
         tverts[i] = m.multPoint(verts.at(inds[i]));
       }
-      reRigidBody& body = _world.build().RigidBody(
+      re::Rigid& body = _world.build().Rigid(
         reTriangle(tverts[0], tverts[1], tverts[2])
       ).at(0, 0, 0);
       RayObject* obj = new RayObject();

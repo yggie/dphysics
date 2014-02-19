@@ -51,7 +51,7 @@ bool re::intersects(const reShape& shape, const re::Transform& transform, const 
 
     case reShape::PROXY:
       {
-        const reProxyShape& proxy = (const reProxyShape&)shape;
+        const re::ShapeProxy& proxy = (const re::ShapeProxy&)shape;
         return (re::intersects(*proxy.shape(), transform * proxy.transform(), ray, intersect)); 
       }
 
@@ -116,12 +116,9 @@ re::Location re::relativeToPlane(const reShape& shape, const re::Transform& tran
 
     case reShape::PROXY:
       {
-        const reProxyShape& proxy = (const reProxyShape&)shape;
+        const re::ShapeProxy& proxy = (const re::ShapeProxy&)shape;
         return re::relativeToPlane(*proxy.shape(), transform * proxy.transform(), plane);
       }
-      break;
-
-    case reShape::PLANE:
       break;
 
     default:

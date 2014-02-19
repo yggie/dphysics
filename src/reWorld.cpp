@@ -1,7 +1,6 @@
 #include "react/reWorld.h"
 
 #include "react/Math/Integrator.h"
-#include "react/Entities/reRigidBody.h"
 #include "react/Collision/Shapes/shapes.h"
 
 #include "react/Collision/reBroadPhase.h"
@@ -74,7 +73,7 @@ void reWorld::clear() {
  * @param entity The entity to attach
  */
 
-void reWorld::add(reEnt& entity) {
+void reWorld::add(re::Entity& entity) {
   _broadPhase->add(entity);
 }
 
@@ -85,7 +84,7 @@ void reWorld::add(reEnt& entity) {
  * @param entity The entity to remove
  */
 
-void reWorld::remove(reEnt& entity) {
+void reWorld::remove(re::Entity& entity) {
   _broadPhase->remove(entity);
 }
 
@@ -96,9 +95,9 @@ void reWorld::remove(reEnt& entity) {
  * @param entity The entity to destroy
  */
 
-void reWorld::destroy(reEnt& entity) {
+void reWorld::destroy(re::Entity& entity) {
   remove(entity);
-  allocator().alloc_delete(entity.shape());
+  allocator().alloc_delete(&entity.shape());
   allocator().alloc_delete(&entity);
 }
 
@@ -113,12 +112,12 @@ void reWorld::advance(reFloat dt) {
 }
 
 /**
- * Returns a list of all reEnt contained in the reWorld
+ * Returns a list of all re::Entity contained in the reWorld
  * 
- * @return A list of reEnt
+ * @return A list of re::Entity
  */
 
-const reLinkedList<reEnt*>& reWorld::entities() const {
+const reLinkedList<re::Entity*>& reWorld::entities() const {
   return _broadPhase->entities();
 }
 
@@ -133,7 +132,7 @@ const reLinkedList<reEnt*>& reWorld::entities() const {
  * @return The entity which was found
  */
 
-reEnt* reWorld::queryWithRay(const re::vec3& origin, const re::vec3& dir, re::vec3* intersect, re::vec3* normal) {
+re::Entity* reWorld::queryWithRay(const re::vec3& origin, const re::vec3& dir, re::vec3* intersect, re::vec3* normal) {
   re::RayQuery res = _broadPhase->queryWithRay(re::Ray(origin, dir));
   
   if (res.entity != nullptr) {

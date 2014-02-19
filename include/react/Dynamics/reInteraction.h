@@ -5,13 +5,13 @@
 #ifndef RE_INTERACTION_H
 #define RE_INTERACTION_H
 
-#include "react/Entities/reEnt.h"
+#include "react/Entities/Entity.h"
 
 class reInteraction {
 public:
   virtual ~reInteraction() { }
   
-  virtual void solve(reEnt& A, reEnt& B) = 0;
+  virtual void solve(re::Entity& A, re::Entity& B) = 0;
 };
 
 #endif

@@ -6,9 +6,9 @@ TEST(Integration, TestCase_1) {
   reWorld world;
 
   const re::vec3 vel(1.0, 0.0, 0.0);
-  reRigidBody& sphere = world.build().RigidBody(re::Sphere(1.0)).at(-2.0, 0.0, 0.0).movingAt(vel);
+  re::Rigid& sphere = world.build().Rigid(re::Sphere(1.0)).at(-2.0, 0.0, 0.0).movingAt(vel);
   
-  re::StaticBody& plane = world.build().StaticBody(re::Plane(-vel, 0.0));
+  re::Static& plane = world.build().Static(re::Plane(-vel, 0.0));
 
   for (int i = 0; i < 1000; i++) {
     world.advance(0.05);

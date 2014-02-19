@@ -1,22 +1,19 @@
 #include "helpers.h"
-#include "react/reWorld.h"
-#include "react/Entities/reRigidBody.h"
+
 #include "react/Collision/Shapes/shapes.h"
+#include "react/Entities/Rigid.h"
 
-struct reRigidBodyTest : public testing::Test {
-  reRigidBodyTest() : world(), body(world.build().RigidBody(re::Sphere(1.0))) { }
-  
-protected:
-  reWorld world;
-  reRigidBody& body;
-};
-
-TEST_F(reRigidBodyTest, HasIdentityRotationOnInit) {
+TEST(Rigid, Constructor_test) {
+  re::Sphere s(1.0);
+  re::Rigid body(s);
   ASSERT_TRUE(re::similar(body.rot(), re::mat3(1.0))) <<
     "should have no initial rotation";
 }
 
-TEST_F(reRigidBodyTest, SetFacingMethod) {
+TEST(Rigid, SetFacingMethod) {
+  re::Sphere s(1.0);
+  re::Rigid body(s);
+
   body.facing(re::vec3(1.0, 0.0, 0.0), re::vec3(0.0, 0.0, 1.0));
   
   re::mat3 r = body.rot();

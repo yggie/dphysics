@@ -11,7 +11,7 @@
 #include "react/Collision/Shapes/reShape.h"
 #include "react/Collision/Shapes/Sphere.h"
 #include "react/Collision/Shapes/reTriangle.h"
-#include "react/Collision/Shapes/reProxyShape.h"
+#include "react/Collision/Shapes/ShapeProxy.h"
 #include "react/Collision/Shapes/Plane.h"
 #include "react/Collision/Shapes/shape_queries.h"
 

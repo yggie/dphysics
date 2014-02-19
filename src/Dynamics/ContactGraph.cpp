@@ -7,7 +7,7 @@ using namespace re;
 const reUInt LIMIT = 10;
 
 /// NOT TESTED
-ContactEdge::ContactEdge(reAllocator& allocator, reEnt& a, reEnt& b) : re::Intersect(), A(a), B(b), contact(false), timeLimit(0), interactions(allocator) {
+ContactEdge::ContactEdge(reAllocator& allocator, Entity& a, Entity& b) : re::Intersect(), A(a), B(b), contact(false), timeLimit(0), interactions(allocator) {
   check();
 }
 
@@ -17,7 +17,7 @@ void ContactEdge::check() {
     timeLimit = LIMIT;
   }
 
-  contact = re::intersects(*A.shape(), A.transform(), *B.shape(), B.transform(), *this);
+  contact = re::intersects(A.shape(), A.transform(), B.shape(), B.transform(), *this);
 }
 
 /// NOT TESTED
@@ -42,8 +42,8 @@ void ContactGraph::solve() {
   // TODO TEMPORARY
   for (ContactEdge* edge : _edges) {
     if (edge->contact) {
-      reEnt& A = edge->A;
-      reEnt& B = edge->B;
+      Entity& A = edge->A;
+      Entity& B = edge->B;
       
       const re::vec3 dA = edge->point - A.center();
       const re::vec3 rA = dA - re::dot(dA, edge->normal) * dA;
@@ -78,12 +78,12 @@ void ContactGraph::solve() {
 }
 
 /// NOT TESTED
-void ContactGraph::check(reEnt& A, reEnt& B) {
+void ContactGraph::check(Entity& A, Entity& B) {
   // sanity check
   RE_ASSERT(A.id() < B.id());
   
   // higher level grouping filters
-  if (!_filter.filter((const reEnt&)A, (const reEnt&)B)) return;
+  if (!_filter.filter((const Entity&)A, (const Entity&)B)) return;
   
   for (ContactEdge* edge : _edges) {
     if (edge->A.id() == A.id() && edge->B.id() == B.id()) {
@@ -116,7 +116,7 @@ void ContactGraph::advance() {
 }
 
 /// NOT TESTED
-void ContactGraph::addInteraction(reInteraction& action, reEnt& A, reEnt& B) {
+void ContactGraph::addInteraction(reInteraction& action, Entity& A, Entity& B) {
   if (A.id() > B.id()) {
     addInteraction(action, B, A);
     return;

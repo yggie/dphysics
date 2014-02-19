@@ -1,10 +1,10 @@
 #include "react/Collision/reBSPTree.h"
 
 #include "react/math.h"
-#include "react/Entities/reEnt.h"
+#include "react/Entities/Entity.h"
 #include "react/Memory/reAllocator.h"
 #include "react/Utilities/util_funcs.h"
-#include "react/Collision/Shapes/reProxyShape.h"
+#include "react/Collision/Shapes/ShapeProxy.h"
 
 reBSPNode::reBSPNode(reAllocator& allocator, reUInt depth) : _allocator(allocator), _markers(allocator), _children{nullptr}, _splitPlane(re::vec3(1.0, 0.0, 0.0), 0.0), _depth(depth) {
   // do nothing
@@ -31,13 +31,13 @@ bool reBSPNode::remove(Marker& marker) {
 }
 
 /**
- * Called from the root or parent node to update its structure. If any reEnts
+ * Called from the root or parent node to update its structure. If any re::Entitys
  * were removed, it is returned
  * 
  * @return A list of rejected _entities
  */
 
-void reBSPNode::rebalanceNode(reTreeBalanceStrategy& strategy) {
+void reBSPNode::rebalanceNode(re::Strategy& strategy) {
   if (hasChildren()) {
     if (strategy.shouldMerge(*this)) {
       merge();
@@ -59,7 +59,7 @@ void reBSPNode::rebalanceNode(reTreeBalanceStrategy& strategy) {
  * @param collisions The collision collection object
  */
 
-void reBSPNode::updateContacts(re::ContactGraph& contacts, reEnt& entity) const {
+void reBSPNode::updateContacts(re::ContactGraph& contacts, re::Entity& entity) const {
   if (hasChildren()) {
     // propagate call to children
     switch (entity.relativeToPlane(_splitPlane)) {
@@ -134,7 +134,7 @@ void reBSPNode::queryWithRay(const re::Ray& ray, re::RayQuery& result) const {
  * Called when the tree requires branching out
  */
 
-void reBSPNode::split(reTreeBalanceStrategy& strategy) {
+void reBSPNode::split(re::Strategy& strategy) {
   // use parent split normal to determine optimal split plane
   _splitPlane = strategy.computeSplitPlane(_splitPlane.normal(), sample(8));
   
@@ -173,8 +173,8 @@ void reBSPNode::merge() {
   }
 }
 
-const reLinkedList<reEnt*> reBSPNode::sample(reUInt num) const {
-  reLinkedList<reEnt*> list(allocator());
+const reLinkedList<re::Entity*> reBSPNode::sample(reUInt num) const {
+  reLinkedList<re::Entity*> list(allocator());
   
   if (num < _markers.size()) {
     reUInt* indices = new reUInt[num];
@@ -262,12 +262,12 @@ void reBSPTree::clear() {
   // clear all entities
   for (Marker* marker : _allMarkers) {
     RE_EXPECT(marker->entity.userdata == nullptr)
-    if (marker->entity.shape()->type() == reShape::PROXY) {
+    if (marker->entity.shape().type() == reShape::PROXY) {
       allocator().alloc_delete(
-        ((reProxyShape*)marker->entity.shape())->shape()
+        ((re::ShapeProxy&)marker->entity.shape()).shape()
       );
     }
-    allocator().alloc_delete(marker->entity.shape());
+    allocator().alloc_delete(&marker->entity.shape());
     allocator().alloc_delete(&marker->entity);
     allocator().alloc_delete(marker);
   }
@@ -279,7 +279,7 @@ void reBSPTree::clear() {
   reBSPNode::clear();
 }
 
-bool reBSPTree::add(reEnt& ent) {
+bool reBSPTree::add(re::Entity& ent) {
   if (!_masterEntityList.contains(&ent)) {
     Marker* marker = allocator().alloc_new<Marker>(ent);
     _allMarkers.add(marker);
@@ -291,7 +291,7 @@ bool reBSPTree::add(reEnt& ent) {
   return false;
 }
 
-bool reBSPTree::remove(reEnt& ent) {
+bool reBSPTree::remove(re::Entity& ent) {
   for (Marker* marker : _allMarkers) {
     if (marker->entity.id() == ent.id()) {
       if (marker->node != nullptr) {
@@ -308,12 +308,12 @@ bool reBSPTree::remove(reEnt& ent) {
   return false;
 }
 
-bool reBSPTree::contains(const reEnt& ent) const {
+bool reBSPTree::contains(const re::Entity& ent) const {
   // TODO very hacky way, must be a better method
-  return _masterEntityList.contains(const_cast<reEnt*>(&ent));
+  return _masterEntityList.contains(const_cast<re::Entity*>(&ent));
 }
 
-void reBSPTree::rebalance(reTreeBalanceStrategy* strategy) {
+void reBSPTree::rebalance(re::Strategy* strategy) {
   if (strategy == nullptr) {
     strategy = &_strategy;
   }
@@ -342,7 +342,7 @@ void reBSPTree::advance(re::Integrator& integrator, reFloat dt) {
   _contacts.advance();
 }
 
-void reBSPTree::addInteraction(reInteraction& action, reEnt& A, reEnt& B) {
+void reBSPTree::addInteraction(reInteraction& action, re::Entity& A, re::Entity& B) {
   _contacts.addInteraction(action, A, B);
 }
 

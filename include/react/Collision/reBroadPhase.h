@@ -6,13 +6,14 @@
 #define RE_BROADPHASE_H
 
 #include "react/common.h"
-#include "react/Utilities/reEntList.h"
 #include "react/Dynamics/reInteraction.h"
 #include "react/Dynamics/ContactGraph.h"
 #include "react/Collision/reSpatialQueries.h"
-#include "react/Collision/reTreeBalanceStrategy.h"
+#include "react/Collision/Strategy.h"
 
-class reEnt;
+namespace re {
+  class Entity;
+}
 class reBPMeasure;
 
 /**
@@ -30,16 +31,16 @@ public:
   virtual ~reBroadPhase() = 0;
 
   virtual void clear() = 0;
-  virtual bool add(reEnt& ent) = 0;
-  virtual bool remove(reEnt& ent) = 0;
-  virtual bool contains(const reEnt& ent) const = 0;
+  virtual bool add(re::Entity& ent) = 0;
+  virtual bool remove(re::Entity& ent) = 0;
+  virtual bool contains(const re::Entity& ent) const = 0;
   virtual reUInt size() const = 0;
-  virtual void rebalance(reTreeBalanceStrategy* strategy = nullptr) = 0;
+  virtual void rebalance(re::Strategy* strategy = nullptr) = 0;
   virtual void advance(re::Integrator& integrator, reFloat dt) = 0;
   
-  virtual void addInteraction(reInteraction& action, reEnt& A, reEnt& B) = 0;
+  virtual void addInteraction(reInteraction& action, re::Entity& A, re::Entity& B) = 0;
   
-  virtual const reLinkedList<reEnt*>& entities() const = 0;
+  virtual const reLinkedList<re::Entity*>& entities() const = 0;
   
   // spatial queries
   virtual re::RayQuery queryWithRay(const re::Ray& ray) const = 0;
@@ -84,27 +85,27 @@ inline reBroadPhase::~reBroadPhase() {
 
 /**
  * @fn void reBroadPhase::clear()
- * Clears the reBroadPhase of references to any reEnt
+ * Clears the reBroadPhase of references to any re::Entity
  */
 
 /**
- * @fn bool reBroadPhase::add(reEnt* ent)
- * Adds the reEnt into structure
+ * @fn bool reBroadPhase::add(re::Entity* ent)
+ * Adds the re::Entity into structure
  * 
- * @param ent The reEnt to add
+ * @param ent The re::Entity to add
  * @return True if the operation was successful
  */
 
 /**
- * @fn void reBroadPhase::remove(reEnt* ent)
- * Removes the reEnt from the broad phase
+ * @fn void reBroadPhase::remove(re::Entity* ent)
+ * Removes the re::Entity from the broad phase
  * 
- * @param ent The reEnt to remove
+ * @param ent The re::Entity to remove
  * @return True if the operation was successful
  */
 
 /**
- * @fn void reBroadPhase::rebalance(reTreeBalanceStrategy& strategy)
+ * @fn void reBroadPhase::rebalance(re::Strategy& strategy)
  * Notifies the broad phase that the entities positions have changed
  * 
  * @param strategy The strategy used to rebalance the tree
@@ -120,13 +121,13 @@ inline reBroadPhase::~reBroadPhase() {
  */
 
 /**
- * @fn reEnt* reBroadPhase::queryWithRay(const reRayQuery& query,
+ * @fn re::Entity* reBroadPhase::queryWithRay(const reRayQuery& query,
  * reRayQueryResult& result) const;
  * Performs a spatial query into the structure using a ray
  * 
  * @param query The ray query structure
  * @param result The ray query result structure
- * @return The reEnt which was found
+ * @return The re::Entity which was found
  */
 
 /**

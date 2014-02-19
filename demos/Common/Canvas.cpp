@@ -5,7 +5,7 @@
 #include "demos/Common/Sphere.h"
 #include "demos/Common/Plane.h"
 
-#include "react/Entities/reEnt.h"
+#include "react/Entities/Entity.h"
 #include "react/Collision/Shapes/shapes.h"
 
 using namespace demo;
@@ -161,8 +161,8 @@ void Canvas::setMaterial(ShaderMaterial& material) {
   material.apply(_uniforms);
 }
 
-EntityWrapper& Canvas::bind(reEnt& ent) {
-  switch (ent.shape()->type()) {
+EntityWrapper& Canvas::bind(re::Entity& ent) {
+  switch (ent.shape().type()) {
     case reShape::SPHERE:
       {
         EntityWrapper* wrapper = new Sphere::Wrapper(ent);

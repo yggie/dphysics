@@ -1,10 +1,11 @@
 #include "helpers.h"
 
-#include "react/Entities/StaticBody.h"
+#include "react/Collision/Shapes/Sphere.h"
+#include "react/Entities/Static.h"
 
-TEST(StaticBody, Constructor) {
+TEST(Static, Constructor) {
   re::Sphere s(1.0);
-  re::StaticBody body(&s);
+  re::Static body(s);
 
   ASSERT_FLOAT_EQ(body.massInv(), 0.0) <<
     "should have inverse mass of zero";

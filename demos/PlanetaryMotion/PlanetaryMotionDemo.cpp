@@ -2,8 +2,8 @@
 
 #include "react/reWorld.h"
 #include "react/Collision/reBSPTree.h"
-#include "react/Entities/reRigidBody.h"
-#include "react/Entities/StaticBody.h"
+#include "react/Entities/Rigid.h"
+#include "react/Entities/Static.h"
 #include "react/Dynamics/reGravAction.h"
 #include "react/Collision/Shapes/shapes.h"
 
@@ -69,10 +69,10 @@ void PlanetaryMotionDemo::prepareWorld() {
   
   re::Builder build = _world.build();
   
-  reRigidBody& body = build.RigidBody(sphere).withMass(5.0).at(0, -5, -5).rotatingWith(0.0, 0.00, 0.01);
+  re::Rigid& body = build.Rigid(sphere).withMass(5.0).at(0, -5, -5).rotatingWith(0.0, 0.00, 0.01);
   
   for (int i = 0; i < 15; i++) {
-    reRigidBody& b = build.RigidBody(sphere.withRadius(1))
+    re::Rigid& b = build.Rigid(sphere.withRadius(1))
       .withMass(5.0)
       .at(2.5*i - 3 , 1, -5)
       .facing(re::vec3(0.0, -1.0, 1.0), re::vec3(0.0, 1.0, 0.0))
@@ -81,22 +81,22 @@ void PlanetaryMotionDemo::prepareWorld() {
     build.GravAction(body, b);
   }
   
-  reRigidBody& A = build.RigidBody(sphere).withMass(2.0).at(-6, -1, -5).movingAt(re::vec3(0.01, 0.0, 0.0));
-  reRigidBody& B = build.RigidBody(sphere).withMass(2.0).at(6, 3, -5);
+  re::Rigid& A = build.Rigid(sphere).withMass(2.0).at(-6, -1, -5).movingAt(re::vec3(0.01, 0.0, 0.0));
+  re::Rigid& B = build.Rigid(sphere).withMass(2.0).at(6, 3, -5);
    
   build.GravAction(A, B);
   build.GravAction(body, B);
   build.GravAction(body, A);
 
-  build.StaticBody(re::Plane(re::vec3(0.0, 0.0, -1.0), -5.0));
-  build.StaticBody(re::Plane(re::vec3(0.0, 0.0, 1.0), -5.0));
-  build.StaticBody(re::Plane(re::vec3(-1.0, 0.0, 0.0), 5.0));
-  build.StaticBody(re::Plane(re::vec3(1.0, 0.0, 0.0), 5.0));
-  build.StaticBody(re::Plane(re::vec3(0.0, 1.0, 0.0), -5.0));
-  build.StaticBody(re::Plane(re::vec3(0.0, -1.0, 0.0), -5.0));
+  build.Static(re::Plane(re::vec3(0.0, 0.0, -1.0), -5.0));
+  build.Static(re::Plane(re::vec3(0.0, 0.0, 1.0), -5.0));
+  build.Static(re::Plane(re::vec3(-1.0, 0.0, 0.0), 5.0));
+  build.Static(re::Plane(re::vec3(1.0, 0.0, 0.0), 5.0));
+  build.Static(re::Plane(re::vec3(0.0, 1.0, 0.0), -5.0));
+  build.Static(re::Plane(re::vec3(0.0, -1.0, 0.0), -5.0));
 
-  for (reEnt* ent : _world.entities()) {
-    if (ent->type() == reEnt::STATIC) continue;
+  for (re::Entity* ent : _world.entities()) {
+    if (ent->type() == re::Entity::STATIC) continue;
     _canvas.bind(*ent).withColor(re::normalize(re::vec3::rand(0.0, 1.0))).withAlpha(0.8f);
   }
   

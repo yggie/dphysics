@@ -62,6 +62,9 @@ namespace re{
     static const mat3x3 rand(reFloat b = 1.0);
     static const mat3x3 rotation(reFloat angle, const re::vec3& axis);
     static const mat3x3 rotation(reFloat angle, reFloat x, reFloat y, reFloat z);
+
+    static const mat3x3 ZERO;
+    static const mat3x3 IDENTITY;
   };
   
   typedef mat3x3 mat3;

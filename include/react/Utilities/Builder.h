@@ -6,14 +6,14 @@
 #define RE_BUILDER_H
 
 class reWorld;
-class reEnt;
-class reRigidBody;
 class reShape;
 class reGravAction;
 
 namespace re {
+  class Entity;
+  class Rigid;
   class Transform;
-  class StaticBody;
+  class Static;
 
   /**
    * @ingroup utilities
@@ -25,17 +25,17 @@ namespace re {
     Builder(reWorld& world);
     
     // factory methods for entities
-    reRigidBody& RigidBody(const reShape& shape);
-    reRigidBody& RigidBody(const reShape& shape, const re::Transform& transform);
-    re::StaticBody& StaticBody(const reShape& shape);
-    re::StaticBody& StaticBody(const reShape& shape, const re::Transform& transform);
+    re::Rigid& Rigid(const reShape& shape);
+    re::Rigid& Rigid(const reShape& shape, const re::Transform& transform);
+    re::Static& Static(const reShape& shape);
+    re::Static& Static(const reShape& shape, const re::Transform& transform);
     
     // factory methods for interactions
-    reGravAction& GravAction(reEnt& A, reEnt& B);
-    
+    reGravAction& GravAction(Entity& A, Entity& B);
+
     // copy methods, uses internal allocator
     reShape* copyOf(const reShape& shape);
-    
+
     reWorld& _world;
   };
 

@@ -1,10 +1,11 @@
 file(GLOB react_SOURCE_FILES
   "*.cpp"
   "Memory/*.cpp"
-  "Collision/*.cpp"
+  "Math/*.cpp"
   "Collision/Shapes/*.cpp"
   "Entities/*.cpp"
   "Utilities/*.cpp"
+  "Collision/*.cpp"
   "Dynamics/*.cpp"
 )
 

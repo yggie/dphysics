@@ -1,7 +1,7 @@
 #include "helpers.h"
 
 #include "react/Collision/reBSPTree.h"
-#include "react/Entities/reRigidBody.h"
+#include "react/Entities/Rigid.h"
 #include "react/Collision/Shapes/shapes.h"
 
 struct reBSPTreeTest : public ::testing::Test {
@@ -10,13 +10,13 @@ protected:
   void generateFixtures(unsigned int n);
   
   reBSPTree tree;
-  std::vector<reRigidBody*> fixtures;
+  std::vector<re::Rigid*> fixtures;
 };
 
 void reBSPTreeTest::generateFixtures(unsigned int n) {
   for (unsigned int i = 0; i < n; i++) {
     re::Sphere* s = SHARED_ALLOCATOR.alloc_new<re::Sphere>(1.0);
-    reRigidBody* body = SHARED_ALLOCATOR.alloc_new<reRigidBody>(s);
+    re::Rigid* body = SHARED_ALLOCATOR.alloc_new<re::Rigid>(*s);
     body->setPos(re::vec3::rand(100.0));
     fixtures.push_back(body);
   }
@@ -41,7 +41,7 @@ TEST_F(reBSPTreeTest, Creation) {
 
 TEST_F(reBSPTreeTest, AddContainRemoveActions) {
   generateFixtures(1000);
-  reRigidBody& body = *fixtures.at(0);
+  re::Rigid& body = *fixtures.at(0);
   
   ASSERT_FALSE(tree.contains(body)) <<
     "should return false for an entity which has not been added";
@@ -61,7 +61,7 @@ TEST_F(reBSPTreeTest, AddContainRemoveActions) {
   ASSERT_EQ(tree.size(), 0) <<
     "should have an empty entity list";
   
-  for (reRigidBody* body : fixtures) {
+  for (re::Rigid* body : fixtures) {
     ASSERT_TRUE(tree.add(*body)) <<
       "should be able to add unique entities to the structure";
     
@@ -72,14 +72,14 @@ TEST_F(reBSPTreeTest, AddContainRemoveActions) {
   ASSERT_EQ(tree.size(), fixtures.size()) <<
     "should have size equal to the number added";
   
-  for (reRigidBody* body : fixtures) {
+  for (re::Rigid* body : fixtures) {
     ASSERT_TRUE(tree.remove(*body)) <<
       "should be able to remove contained entities";
   }
   ASSERT_EQ(tree.size(), 0) <<
     "should be empty after removing all entities";
   
-  for (reRigidBody* body : fixtures) {
+  for (re::Rigid* body : fixtures) {
     ASSERT_TRUE(tree.add(*body)) <<
       "should be able to add unique entities to the structure";
   }
@@ -93,14 +93,14 @@ TEST_F(reBSPTreeTest, AddContainRemoveActions) {
 TEST_F(reBSPTreeTest, Sampling) {
   generateFixtures(1000);
   
-  for (reRigidBody* body : fixtures) {
+  for (re::Rigid* body : fixtures) {
     ASSERT_TRUE(tree.add(*body)) <<
       "should be able to add unique entities";
   }
   
   auto list = tree.sample(300);
   
-  for (reEnt* body : list) {
+  for (re::Entity* body : list) {
     ASSERT_TRUE(tree.contains(*body)) <<
       "should contain the body from the sample";
   }
@@ -135,7 +135,7 @@ namespace {
 TEST_F(reBSPTreeTest, TreeBalancing) {
   generateFixtures(1000);
   
-  for (reRigidBody* body : fixtures) {
+  for (re::Rigid* body : fixtures) {
     ASSERT_TRUE(tree.add(*body)) <<
       "should be able to add unique entities to the structure";
   }
@@ -163,7 +163,7 @@ TEST_F(reBSPTreeTest, TreeBalancing) {
   ASSERT_EQ(m.references, m.entities) <<
     "should contain an equal number of references and entities";
   
-  for (reEnt* ent : tree.entities()) {
+  for (re::Entity* ent : tree.entities()) {
     ent->setPos(re::vec3::rand(250.0));
   }
   tree.rebalance();
@@ -198,7 +198,7 @@ TEST_F(reBSPTreeTest, RayQueries) {
   
   for (int i = 0; i < N; i++) {
     for (int j = 0; j < N; j++) {
-      reRigidBody* body = fixtures.at(N*i + j);
+      re::Rigid* body = fixtures.at(N*i + j);
       body->setPos(3.0 * re::vec3(i - N/2, j - N/2, 0.0));
       ASSERT_TRUE(tree.add(*body)) <<
         "should be able to add new entities";
@@ -207,7 +207,7 @@ TEST_F(reBSPTreeTest, RayQueries) {
   
   re::Ray ray(re::vec3(0.0, 0.0, 100.0), re::vec3());
   unsigned int II = 0;
-  for (reRigidBody* body : fixtures) {
+  for (re::Rigid* body : fixtures) {
     ray.setDir(body->center() - ray.origin());
 //    re::SingleResult res = tree.query().withRay(start, direction);
     re::RayQuery res = tree.queryWithRay(ray);
@@ -226,7 +226,7 @@ TEST_F(reBSPTreeTest, RayQueries) {
   
   ray.setOrigin(re::vec3(0.0, 0.0, 1000.0));
   II = 0;
-  for (reRigidBody* body : fixtures) {
+  for (re::Rigid* body : fixtures) {
     ray.setDir(body->center() - ray.origin());
     re::RayQuery res = tree.queryWithRay(ray);
     ASSERT_TRUE(body == res.entity) <<

@@ -2,7 +2,7 @@
 
 #include "react/reWorld.h"
 #include "react/Collision/Shapes/Sphere.h"
-#include "react/Entities/reRigidBody.h"
+#include "react/Entities/Rigid.h"
 #include "react/Collision/reBroadPhase.h"
 
 /**
@@ -15,14 +15,14 @@ struct DefaultWorldTest : public testing::Test {
 };
 
 TEST_F(DefaultWorldTest, AddRemoveClearActions) {
-  reRigidBody& r = world.build().RigidBody(re::Sphere(1.0));
+  re::Rigid& r = world.build().Rigid(re::Sphere(1.0));
   ASSERT_EQ(world.entities().size(), 1) << "can create new entities";
   
   world.add(r);
   ASSERT_EQ(world.entities().size(), 1) << "add() should reject repeated entities";
   
   re::Sphere* sp = world.allocator().alloc_new<re::Sphere>(1.0);
-  reRigidBody* r2 = world.allocator().alloc_new<reRigidBody>(sp);
+  re::Rigid* r2 = world.allocator().alloc_new<re::Rigid>(*sp);
   world.add(*r2);
   ASSERT_EQ(world.entities().size(), 2) << "add() should accept new entities";
   

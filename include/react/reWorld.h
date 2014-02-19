@@ -13,10 +13,10 @@
 #include "react/Utilities/reLinkedList.h"
 
 class reBroadPhase;
-class reEnt;
 class reShape;
 
 namespace re {
+  class Entity;
   class Integrator;
 }
 
@@ -35,20 +35,20 @@ public:
   reWorld& operator=(const reWorld&) = delete;
   
   void clear();
-  void add(reEnt& entity);
-  void remove(reEnt& entity);
-  void destroy(reEnt& entity);
+  void add(re::Entity& entity);
+  void remove(re::Entity& entity);
+  void destroy(re::Entity& entity);
   void advance(reFloat dt);
   
   // getters
-  const reLinkedList<reEnt*>& entities() const;
+  const reLinkedList<re::Entity*>& entities() const;
   reAllocator& allocator() const;
   reBroadPhase& broadPhase() const;
   re::Integrator& integrator() const;
   re::Builder build();
   
   // spatial queries
-  reEnt* queryWithRay(const re::vec3& from, const re::vec3& direction, re::vec3* intersect = nullptr, re::vec3* normal = nullptr);
+  re::Entity* queryWithRay(const re::vec3& from, const re::vec3& direction, re::vec3* intersect = nullptr, re::vec3* normal = nullptr);
 
 private:
   /** The reBroadPhase used in this reWorld */

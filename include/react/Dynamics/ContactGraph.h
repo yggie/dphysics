@@ -6,7 +6,7 @@
 #ifndef RE_COLLISION_GRAPH_H
 #define RE_COLLISION_GRAPH_H
 
-#include "react/Entities/reEnt.h"
+#include "react/Entities/Entity.h"
 #include "react/Utilities/reLinkedList.h"
 #include "react/Dynamics/reInteraction.h"
 #include "react/Utilities/ContactFilter.h"
@@ -18,12 +18,12 @@ namespace re {
    */
 
   struct ContactEdge : public re::Intersect {
-    ContactEdge(reAllocator& allocator, reEnt& a, reEnt& b);
+    ContactEdge(reAllocator& allocator, Entity& a, Entity& b);
     
     void check();
     
-    reEnt& A;
-    reEnt& B;
+    Entity& A;
+    Entity& B;
     bool contact;
     reUInt timeLimit;
     reLinkedList<reInteraction*> interactions;
@@ -40,10 +40,10 @@ namespace re {
     ~ContactGraph();
     
     void solve();
-    void check(reEnt& entA, reEnt& entB);
+    void check(Entity& entA, Entity& entB);
     void advance();
     
-    void addInteraction(reInteraction& action, reEnt& A, reEnt& B);
+    void addInteraction(reInteraction& action, Entity& A, Entity& B);
     
   private:
     reAllocator& _allocator;

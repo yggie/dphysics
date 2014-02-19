@@ -35,6 +35,8 @@ namespace re {
   };
 
   extern reUInt queriesMade;
+
+  typedef unsigned int ID;
 }
 
 #define RE_FUNC             __func__

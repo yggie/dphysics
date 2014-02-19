@@ -6,7 +6,7 @@
 
 // complex shape types
 #include "Sphere.h"
-#include "ProxyShape.h"
+#include "ShapeProxy.h"
 
 // includes tests between individual shape objects
 #include "IntersectionTests.h"

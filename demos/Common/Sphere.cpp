@@ -104,7 +104,7 @@ void Sphere::setup(GLuint* vao, GLuint* vbo, const Canvas& canvas) {
 
 void Sphere::Wrapper::draw(Canvas& canvas) {
   canvas.push();
-  re::quat q = entity.quat();
+  re::quat q = entity.orient();
   canvas.translate(entity.pos()[0], entity.pos()[1], entity.pos()[2]);
   canvas.scale(shape().radius()*1.05);
   const reFloat ang = acos(q.r);

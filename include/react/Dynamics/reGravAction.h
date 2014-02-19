@@ -5,6 +5,7 @@
 #ifndef RE_GRAV_ACTION_H
 #define RE_GRAV_ACTION_H
 
+#include "react/Entities/Entity.h"
 #include "react/Dynamics/reInteraction.h"
 
 /**
@@ -14,14 +15,14 @@
 
 class reGravAction : public reInteraction {
 public:
-  void solve(reEnt& A, reEnt& B) override;
+  void solve(re::Entity& A, re::Entity& B) override;
 };
 
 namespace {
   const reFloat G = 0.0001;
 }
 
-inline void reGravAction::solve(reEnt& A, reEnt& B) {
+inline void reGravAction::solve(re::Entity& A, re::Entity& B) {
   const re::vec3 diff = A.center() - B.center();
   const re::vec3 f = (G*A.mass()*B.mass() / re::lengthSq(diff)) * re::normalize(diff);
   A.addImpulse(-f);
